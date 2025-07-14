@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 // Import the LikeButton component
 import LikeButton from "@/components/LikeButton"; // Adjust path as per your project structure
 import BuyButton from "@/components/reader/BuyButton";
+import Link from "next/link";
+
 
 export default function Home({ initialReaderToken, initialBookId }) {
   // Placeholder for userToken. In a real app, this would come from your auth context/store.
@@ -42,6 +44,7 @@ export default function Home({ initialReaderToken, initialBookId }) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
+        console.log("All books from the Home: ", result)
         const formattedBooks = result.data.map((book) => ({
           id: book.id,
           type: book.type, // Keep type if needed
@@ -184,9 +187,12 @@ export default function Home({ initialReaderToken, initialBookId }) {
                     : "Price N/A"}
                 </div>
                 <div className="flex justify-center mt-2">
-                  {/* <Button size="sm" onClick={() => handlePurchase(book.id)}>
-                    Buy now
-                  </Button> */}
+                  <Link
+                    href={`/reader/home/book-details/${book.id}`} // Ensure this matches your BookDetails page path
+                    className="block text-sm text-red-600 mt-2 hover:underline"
+                  >
+                    View details
+                  </Link>
                   <BuyButton
                     bookId={book.id}
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

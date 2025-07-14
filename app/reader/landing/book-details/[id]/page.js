@@ -3,10 +3,27 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card"; // Assuming these are from shadcn/ui
+import { Button } from "@/components/ui/button"; // Assuming this is from shadcn/ui
 
-import BuyButton from "@/components/reader/BuyButton";
+// Import Shadcn UI Dialog components
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import BuyButton from "@/components/reader/BuyButton"; // Your custom component
+import ReviewForm from "@/components/ReviewForm"; // Your ReviewForm component
+import ReviewCard from "@/components/ReviewCard"; // Your ReviewCard component
+
+// IMPORTANT: Replace these with actual values from your authentication system.
+// For a real application, you would typically get the token and user ID
+// from an authentication context (e.g., using a custom `useAuth` hook).
+const DUMMY_JWT_TOKEN = "YOUR_JWT_TOKEN_HERE"; // Placeholder: Replace with dynamic token
+const CURRENT_LOGGED_IN_USER_ID = "SOME_CURRENT_USER_ID"; // Placeholder: Replace with actual logged-in user's ID
 
 export default function BookDetails() {
   const params = useParams();
@@ -15,6 +32,7 @@ export default function BookDetails() {
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false); // State for review modal
 
   useEffect(() => {
     if (!bookId) {
@@ -25,6 +43,9 @@ export default function BookDetails() {
     const fetchBookDetails = async () => {
       try {
         setLoading(true);
+        // Using `fetch` here as per your original component.
+        // If you want to use axios for this initial book detail fetch as well,
+        // you'd need to import your 'api' instance from lib/api.js and use it.
         const response = await fetch(
           `http://localhost:3000/api/v1/books/${bookId}/storefront`
         );
@@ -39,13 +60,11 @@ export default function BookDetails() {
         }
 
         const jsonResponse = await response.json();
-        // Assuming the actual book data is within jsonResponse.data.attributes
-        // And the unique_book_id is jsonResponse.data.id
         setBookData({
           ...jsonResponse.data.attributes,
           unique_book_id: jsonResponse.data.id, // Extract ID from data level
         });
-        console.log("Fetched Book Data:", jsonResponse.data.attributes); // Log the attributes specifically
+        console.log("Fetched Book Data:", jsonResponse.data.attributes);
       } catch (err) {
         console.error("Error fetching book details:", err);
         setError("An unexpected error occurred.");
@@ -56,6 +75,48 @@ export default function BookDetails() {
 
     fetchBookDetails();
   }, [bookId]);
+
+  // Callback function to handle a newly created review
+  const handleReviewCreated = (newReview) => {
+    // Optimistically update the reviews list in bookData
+    setBookData((prevBookData) => {
+      if (prevBookData) {
+        // Ensure prevBookData.reviews is an array before spreading
+        const updatedReviews = Array.isArray(prevBookData.reviews)
+          ? [...prevBookData.reviews, newReview]
+          : [newReview];
+
+        return {
+          ...prevBookData,
+          reviews: updatedReviews,
+          reviews_count: (prevBookData.reviews_count || 0) + 1,
+          // For average_rating, you might need to re-fetch the book details
+          // or implement a more complex client-side calculation if you want
+          // it to update immediately after a new review.
+        };
+      }
+      return prevBookData;
+    });
+    setIsReviewModalOpen(false); // Close the modal after successful submission
+  };
+
+  // Callback function to handle a review being deleted
+  const handleReviewDeleted = (deletedReviewId) => {
+    setBookData((prevBookData) => {
+      if (prevBookData) {
+        const updatedReviews = (prevBookData.reviews || []).filter(
+          (review) => review.id !== deletedReviewId
+        );
+        return {
+          ...prevBookData,
+          reviews: updatedReviews,
+          reviews_count: (prevBookData.reviews_count || 0) - 1,
+          // Similar to average_rating, you might need to re-fetch or recalculate
+        };
+      }
+      return prevBookData;
+    });
+  };
 
   if (loading) {
     return <div className="text-center py-20">Loading book details...</div>;
@@ -76,10 +137,10 @@ export default function BookDetails() {
     ebook_price,
     cover_image_url,
     total_pages,
-    categories, // This will now be null if the API sends it as such
+    categories,
     author, // This will be the author object { id, name }
     average_rating,
-    reviews,
+    reviews, // The array of reviews for this book
     reviews_count,
     ebook_file_url,
     unique_book_id, // This is now directly available from the state
@@ -88,8 +149,7 @@ export default function BookDetails() {
   // Format author name (now from author.name)
   const authorName = author?.name?.trim() || "Unknown Author";
 
-  // Display price in Nigerian Naira (₦) as per current location, or default to generic $
-  // Assuming ebook_price is in the smallest currency unit (e.g., kobo for Naira, cents for Dollar)
+  // Display price in Nigerian Naira (₦)
   const displayPrice = ebook_price
     ? `₦${(ebook_price / 100).toFixed(2)}` // Divide by 100 to convert from kobo to Naira
     : "N/A";
@@ -101,9 +161,6 @@ export default function BookDetails() {
       : "N/A";
 
   // Publication date: Your sample JSON doesn't include 'publication_date' but 'created_at'
-  // If 'publication_date' is intended, ensure your API returns it.
-  // For now, using a placeholder or created_at if it fits the purpose.
-  // The sample JSON showed 'created_at'. If you want to use it:
   const displayPublicationDate = bookData.created_at
     ? new Date(bookData.created_at).toLocaleDateString("en-US", {
         year: "numeric",
@@ -113,7 +170,7 @@ export default function BookDetails() {
     : "N/A";
 
   const displayLength = total_pages ? `${total_pages} Pages` : "N/A";
-  const displaySize = "409.4 kb"; // Placeholder as discussed, ideally from API
+  const displaySize = "409.4 kb"; // Placeholder, ideally from API
 
   const displayRating =
     average_rating && average_rating > 0
@@ -156,10 +213,31 @@ export default function BookDetails() {
                 Read Sample
               </Button>
             )}
+            {/* "Write a Review" button triggering the modal */}
+            <Dialog
+              open={isReviewModalOpen}
+              onOpenChange={setIsReviewModalOpen}
+            >
+              <DialogTrigger asChild>
+                <Button variant="ghost" className="border">
+                  Write a Review
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Write a Review for "{title}"</DialogTitle>
+                </DialogHeader>
+                <ReviewForm
+                  bookId={unique_book_id || bookId}
+                  onReviewCreated={handleReviewCreated}
+                  token={DUMMY_JWT_TOKEN} // Pass the authentication token
+                />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
-      ---
+      <hr className="my-8" /> {/* Separator */}
       {/* Description */}
       <section>
         <h3 className="text-xl font-semibold mb-2">Publisher’s Description</h3>
@@ -167,7 +245,7 @@ export default function BookDetails() {
           {description || "No description available."}
         </p>
       </section>
-      ---
+      <hr className="my-8" /> {/* Separator */}
       {/* Book Info Grid */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center border-t border-b py-4">
         <div>
@@ -191,30 +269,23 @@ export default function BookDetails() {
           <p>{displaySize}</p> {/* Placeholder */}
         </div>
       </div>
-      ---
-      {/* Reviews */}
+      <hr className="my-8" /> {/* Separator */}
+      {/* Reviews Section */}
       <section>
         <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
         {reviews && reviews.length > 0 ? (
           <div className="flex gap-4 overflow-x-auto">
             {reviews.map((review) => (
-              <Card key={review.id} className="min-w-[300px]">
-                <CardContent className="p-4 space-y-2">
-                  <p className="font-semibold">{review.title}</p>
-                  <p className="text-sm text-gray-700">{review.content}</p>
-                  <div className="text-red-500">
-                    {"★".repeat(review.rating)}
-                    {"☆".repeat(5 - review.rating)}
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    {new Date(review.created_at).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                    })}{" "}
-                    {review.user_name || "Anonymous"}
-                  </p>
-                </CardContent>
-              </Card>
+              <ReviewCard
+                key={review.id}
+                review={review}
+                // Determine if the current logged-in user is the owner of this review
+                currentUserIsOwner={
+                  review.user_id === CURRENT_LOGGED_IN_USER_ID
+                }
+                onDeleteSuccess={handleReviewDeleted}
+                token={DUMMY_JWT_TOKEN} // Pass the authentication token to ReviewCard
+              />
             ))}
           </div>
         ) : (
@@ -223,13 +294,13 @@ export default function BookDetails() {
           </p>
         )}
       </section>
-      ---
+      <hr className="my-8" /> {/* Separator */}
       {/* More Books by the same author */}
       <section>
         <h3 className="text-xl font-semibold mb-4">
           More Books by {authorName}
         </h3>
-        {/* This section would require another API call to fetch books by this author */}
+        {/* This section would ideally fetch and display actual books by this author */}
         <div className="flex gap-4 overflow-x-auto">
           {[...Array(4)].map((_, i) => (
             <Image

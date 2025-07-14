@@ -1,46 +1,45 @@
 // app/components/PdfFlipbook.js
-"use client"; // This directive marks the component as a Client Component
+"use client";
 
-import React, {
-  useState,
-  useRef,
-  useCallback,
-  forwardRef,
-  useEffect,
-} from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { Document, Page as ReactPdfPage, pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
 
-// Import the CSS for react-pdf (annotation layer and text layer)
+// Configure react-pdf worker
+// This approach is generally more robust for Next.js and modern build systems.
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url
+).toString();
+
+// Import react-pdf stylesheets for text layer and annotations
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
-// --- IMPORTANT for PDF.js Worker Setup ---
-// Directly import the worker from pdfjs-dist. This helps prevent version mismatches.
-// import PdfjsWorker from "pdfjs-dist/build/pdf.worker.min.mjs";
-// pdfjs.GlobalWorkerOptions.workerSrc = PdfjsWorker;
-
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
-// If the above line gives a module not found error, try this alternative:
-// pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-
-// A component to represent each page in the flipbook.
+// A functional component for individual pages within the flipbook.
 // It needs to be forwardRef because HTMLFlipBook passes a ref to its children.
-const Page = forwardRef(({ pageNumber, width, height }, ref) => {
+const Page = React.forwardRef(({ pageNumber, width, height }, ref) => {
   return (
-    <div ref={ref} className="pdf-flipbook-page">
+    <div
+      ref={ref}
+      className="flex justify-center items-center bg-gray-100 border border-gray-300 shadow-md overflow-hidden relative" // Tailwind for styling the page container
+    >
       <ReactPdfPage
         pageNumber={pageNumber}
         width={width}
         height={height}
-        renderAnnotationLayer={false} // You might want to disable this if it interferes with flipbook styling
-        renderTextLayer={false} // Disable text layer for better performance if not needed for selection/copy
+        renderTextLayer={true} // Enable text selection
+        renderAnnotationLayer={true} // Enable links/annotations
+        className="w-full h-full" // Ensure PDF page takes full available space
       />
-      {/* You can add page numbers or other overlays here */}
-      <p className="page-number-text">Page {pageNumber}</p>
+      {/* Optional: Page number overlay */}
+      <p className="absolute bottom-2 right-4 text-gray-600 text-sm">
+        Page {pageNumber}
+      </p>
     </div>
   );
 });
+
 Page.displayName = "Page"; // Good practice for debugging with React DevTools
 
 function PdfFlipbook({ pdfUrl }) {
@@ -48,20 +47,21 @@ function PdfFlipbook({ pdfUrl }) {
   const [currentPage, setCurrentPage] = useState(1);
   const bookRef = useRef(null);
 
-  // Define the dimensions for each page of the flipbook.
-  // Adjust these values based on your PDF's aspect ratio and desired display size.
-  const pageWidth = 450; // Example width
-  const pageHeight = 600; // Example height (adjust to match your PDF's aspect ratio)
+  // Define base dimensions for the flipbook pages.
+  // These will be used by react-pdf's Page component.
+  // The HTMLFlipBook component handles the responsiveness based on its own min/max width/height.
+  const basePageWidth = 500;
+  const basePageHeight = 700;
 
   // Callback for when the PDF document successfully loads
   const onDocumentLoadSuccess = useCallback(({ numPages }) => {
     setNumPages(numPages);
+    setCurrentPage(1); // Reset to first page on new document load
   }, []);
 
   // Callback for when the flipbook page changes
   const onFlip = useCallback((e) => {
     setCurrentPage(e.data + 1); // e.data is 0-indexed page number
-    console.log("Current flipbook page: " + (e.data + 1));
   }, []);
 
   // Functions for navigation buttons
@@ -78,59 +78,84 @@ function PdfFlipbook({ pdfUrl }) {
   };
 
   return (
-    <div className="pdf-flipbook-container">
-      <h2>PDF Flipbook Viewer</h2>
-      <p>
-        Current Page: {currentPage} / {numPages}
-      </p>
+    <div className="flex flex-col items-center p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
+      {/* Container for the entire flipbook component */}
+      <h2 className="text-3xl font-bold text-gray-800 mb-4">
+        Interactive PDF Flipbook
+      </h2>
 
-      <div className="flipbook-wrapper">
-        <Document
-          file={pdfUrl}
-          onLoadSuccess={onDocumentLoadSuccess}
-          onLoadError={(error) => console.error("Error loading PDF:", error)}
-          className="pdf-document"
-        >
-          {numPages > 0 && (
-            <HTMLFlipBook
-              width={pageWidth}
-              height={pageHeight}
-              minWidth={300} // Minimum width for responsiveness
-              maxWidth={800} // Maximum width for responsiveness
-              minHeight={400} // Minimum height
-              maxHeight={1200} // Maximum height
-              maxShadowOpacity={0.5} // Shadow intensity
-              showCover={true} // Show a cover page
-              flippingTime={800} // Animation speed in ms
-              onFlip={onFlip}
-              className="my-flipbook"
-              ref={bookRef}
-              // Render only if page length changes for performance, default is false
-              renderOnlyPageLengthChange={false}
+      {pdfUrl ? (
+        <div className="w-full max-w-5xl">
+          <Document
+            file={pdfUrl}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={(error) => console.error("Error loading PDF:", error)}
+            className="flex justify-center items-center w-full" // Center the document
+          >
+            {numPages > 0 ? (
+              <>
+                <HTMLFlipBook
+                  width={basePageWidth}
+                  height={basePageHeight}
+                  size="stretch" // Allows the book to stretch to fit the container
+                  minWidth={300}
+                  maxWidth={800} // Increased max-width for larger screens
+                  minHeight={400}
+                  maxHeight={1100} // Increased max-height
+                  maxShadowOpacity={0.5}
+                  showCover={true}
+                  flippingTime={800}
+                  onFlip={onFlip}
+                  className="my-flipbook shadow-lg rounded-lg overflow-hidden" // Tailwind for book styling
+                  ref={bookRef}
+                  // Render all pages for the flipbook
+                  // You can optimize by rendering only visible pages in more complex scenarios
+                >
+                  {Array.from(new Array(numPages), (el, index) => (
+                    <Page
+                      key={`page_${index + 1}`}
+                      pageNumber={index + 1}
+                      width={basePageWidth}
+                      height={basePageHeight}
+                    />
+                  ))}
+                </HTMLFlipBook>
+              </>
+            ) : (
+              <p className="text-lg text-gray-600">Loading PDF...</p>
+            )}
+          </Document>
+        </div>
+      ) : (
+        <p className="text-lg text-red-500 mt-4">
+          Please provide a valid PDF URL to display the flipbook.
+        </p>
+      )}
+
+      {numPages > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+          <div className="flex gap-3">
+            <button
+              onClick={goToPrevPage}
+              disabled={currentPage === 1}
+              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 ease-in-out"
             >
-              {Array.from(new Array(numPages), (el, index) => (
-                <Page
-                  key={`page_${index + 1}`}
-                  pageNumber={index + 1}
-                  width={pageWidth}
-                  height={pageHeight}
-                />
-              ))}
-            </HTMLFlipBook>
-          )}
-        </Document>
-      </div>
-
-      <div className="navigation-controls">
-        <button onClick={goToPrevPage} disabled={currentPage === 1}>
-          Previous Page
-        </button>
-        <button onClick={goToNextPage} disabled={currentPage === numPages}>
-          Next Page
-        </button>
-      </div>
-
-      {numPages === 0 && <p>Loading PDF...</p>}
+              Previous Page
+            </button>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === numPages}
+              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 ease-in-out"
+            >
+              Next Page
+            </button>
+          </div>
+          <p className="text-lg font-medium text-gray-700 mt-2 sm:mt-0">
+            Page <span className="font-bold">{currentPage}</span> /{" "}
+            <span className="font-bold">{numPages}</span>
+          </p>
+        </div>
+      )}
     </div>
   );
 }

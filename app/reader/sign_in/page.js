@@ -8,6 +8,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 
+import { useAuth } from "@/contexts/AuthContext";
 import { signInReader } from "@/utils/auth/readerApi";
 import Image from "next/image";
 
@@ -16,9 +17,10 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  // const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setAuth } = useAuth();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -28,8 +30,11 @@ export default function SignIn() {
     try {
       const reader = await signInReader(email, password);
       localStorage.setItem("access_token", reader.data.token);
+      localStorage.setItem("currentUserId", reader.data.id);
       console.log("Reader log in successfully: ", reader.data);
+      console.log("Reader's id: ", reader.data.id);
       if (reader?.data?.id) {
+        setAuth(reader.data.token, reader.data.id);
         router.push("/reader/home")
       }
     } catch (error) {

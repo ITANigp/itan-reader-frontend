@@ -1,18 +1,13 @@
-"use client";
+// pages/index.js (or app/page.jsx for App Router)
+import PdfFlipbook from "@/components/PdfFlipbook";
 
-import dynamic from "next/dynamic";
-
-const PDFBookWithUI = dynamic(
-  () => import("@/components/reader/PDFBookWithUI"),
-  { ssr: false }
-);
-
-export default function ReadBookPage() {
-  const pdfUrl = "/CYBERSECURITY.pdf"; // Ensure the file is in /public
+export default function HomePage() {
+  const pdfExampleUrl = "/CYBERSECURITY.pdf"; // Place your PDF in the public folder
 
   return (
-    <div className="my-20">
-      <PDFBookWithUI pdfUrl={pdfUrl} />
+    <div>
+      <h1>My Interactive PDF Flipbook</h1>
+      <PdfFlipbook pdfUrl={pdfExampleUrl} />
     </div>
   );
 }
