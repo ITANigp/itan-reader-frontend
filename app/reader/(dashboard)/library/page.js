@@ -23,6 +23,8 @@ export default function Library() {
   const [finishedBooks, setFinishedBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [allBooks, setAllBooks] = useState([]);
+  const [wishlistBooks, setWishlistBooks] = useState([]);
 
   // Placeholder for other tabs
   const books = [
@@ -114,6 +116,58 @@ export default function Library() {
           setLoading(false);
           console.log("[Library] Finished books fetch process finished.");
         });
+    } else if (TABS[activeTab] === "All") {
+      // Fetch all books for the 'All' tab
+      console.log("[Library] Fetching all books from /api/v1/books");
+      // console.log("[Library] Fetching all books from /purchases");
+      setLoading(true);
+      setError(null);
+      api
+        .get("/purchases")
+        // .get("/books/my_books")
+        .then((res) => {
+          console.log("[Library] API response for all books:", res);
+          setAllBooks(res.data.data || []);
+        })
+        .catch((err) => {
+          console.error("[Library] Error fetching all books:", err);
+          if (err.response) {
+            console.error("[Library] Error response data:", err.response.data);
+          }
+          setError(
+            err.response?.data?.message || "Failed to load books."
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+          console.log("[Library] All books fetch process finished.");
+        });
+    } else if (TABS[activeTab] === "Wishlist" && isLoggedIn && authToken) {
+      // Fetch wishlist books for the 'Wishlist' tab
+      console.log("[Library] Fetching wishlist books from /likes");
+      setLoading(true);
+      setError(null);
+      api
+        .get("/likes", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        })
+        .then((res) => {
+          console.log("[Library] API response for wishlist books:", res.data);
+          setWishlistBooks(res.data.data || []);
+        })
+        .catch((err) => {
+          console.error("[Library] Error fetching wishlist books:", err);
+          if (err.response) {
+            console.error("[Library] Error response data:", err.response.data);
+          }
+          setError(
+            err.response?.data?.message || "Failed to load wishlist books."
+          );
+        })
+        .finally(() => {
+          setLoading(false);
+          console.log("[Library] Wishlist books fetch process finished.");
+        });
     } else {
       if (TABS[activeTab] === "Finished Books") {
         console.warn("[Library] Not fetching finished books: not logged in or missing auth token", {
@@ -124,11 +178,11 @@ export default function Library() {
     }
   }, [activeTab, isLoggedIn, authToken]);
 
-  const renderBooks = (booksToRender, isFinishedBooks = false) => (
+  const renderBooks = (booksToRender, isNestedBook = false) => (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
       {booksToRender.map((item, index) => {
         // If rendering finished books, extract book info from item.book
-        const book = isFinishedBooks ? item.book : item;
+        const book = isNestedBook ? item.book : item;
         if (!book) return null;
         return (
           <Card key={book.id || index} className="relative">
@@ -203,6 +257,26 @@ export default function Library() {
           <div>No finished books found.</div>
         ) : (
           renderBooks(finishedBooks, true)
+        )
+      ) : TABS[activeTab] === "All" ? (
+        loading ? (
+          <div>Loading books...</div>
+        ) : error ? (
+          <div className="text-red-600">{error}</div>
+        ) : allBooks.length === 0 ? (
+          <div>No books found.</div>
+        ) : (
+          renderBooks(allBooks)
+        )
+      ) : TABS[activeTab] === "Wishlist" ? (
+        loading ? (
+          <div>Loading wishlist books...</div>
+        ) : error ? (
+          <div className="text-red-600">{error}</div>
+        ) : wishlistBooks.length === 0 ? (
+          <div>No wishlist books found.</div>
+        ) : (
+          renderBooks(wishlistBooks, true)
         )
       ) : (
         renderBooks(books)
