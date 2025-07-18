@@ -8,28 +8,28 @@ const features = [
     title: "Enjoy on all your devices",
     description:
       "Books that travel with you – Enjoy reading on all your devices",
-    gradient: "from-[#232526] via-[#393939] to-[#181818]", // Netflix subtle dark gradient
+    gradient: "from-[#232526] via-[#393939] to-[#181818]",
   },
   {
     icon: "🌍",
     title: "One Place. Infinite Stories. All Ages.",
     description:
       "From picture books to handpicked reads for teens, to adult page turners, we’ve got stories for every age and stage.",
-    gradient: "from-[#181818] via-[#232526] to-[#393939]", // Netflix subtle dark gradient
+    gradient: "from-[#181818] via-[#232526] to-[#393939]",
   },
   {
     icon: "🧒",
     title: "Give your kids access to endless books and adventures",
     description:
       "Spark curiosity with enchanting tales and first reads made to grow with your child.",
-    gradient: "from-[#232526] via-[#181818] to-[#393939]", // Netflix subtle dark gradient
+    gradient: "from-[#232526] via-[#181818] to-[#393939]",
   },
   {
     icon: "⭐",
     title: "Curate your favorites",
     description:
       "Organize and revisit books you love with your personalized library.",
-    gradient: "from-[#181818] via-[#393939] to-[#232526]", // Netflix subtle dark gradient
+    gradient: "from-[#181818] via-[#393939] to-[#232526]",
   },
 ];
 
@@ -63,10 +63,6 @@ export default function FeatureCarousel() {
               <h4 className="text-xl md:text-2xl font-semibold drop-shadow-sm tracking-tight">
                 {feature.title}
               </h4>
-          
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-800 p-6 rounded-xl shadow-lg h-[200px] w-[300px]">
-              <h4 className="text-lg font-semibold mb-2">{feature.title}</h4>
-              <p className="text-sm">{feature.description}</p>
             </div>
             <p className="text-base md:text-lg opacity-95 leading-relaxed font-medium tracking-tight">
               {feature.description}

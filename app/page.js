@@ -4,7 +4,6 @@ import Image from "next/image";
 import { motion, useAnimation } from "framer-motion";
 import { useRef, useEffect } from "react";
 import { useInView } from "framer-motion";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -17,30 +16,129 @@ import Link from "next/link";
 // Dynamically import FeatureCarousel with SSR disabled
 const FeatureCarousel = dynamic(
   () => import("@/components/reader/FeatureCarousel"),
-  {
-    ssr: false,
-  }
+  { ssr: false }
 );
+
+function GenreSwiper() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-100px" });
+  const controls = useAnimation();
+
+  useEffect(() => {
+    if (inView) controls.start("visible");
+  }, [inView, controls]);
+
+  const images = [
+    {
+      src: "/images/readers/onboarding/ancestral-code.png",
+      alt: "ancestral code",
+    },
+    {
+      src: "/images/readers/onboarding/Lazarus.png",
+      alt: "Lazarus Convergence",
+    },
+    { src: "/images/readers/onboarding/titan-race.png", alt: "Titan race" },
+    {
+      src: "/images/readers/onboarding/in-bed-with-her-guy.png",
+      alt: "in bed with her guy",
+    },
+    {
+      src: "/images/readers/onboarding/sons-of-the-7th-dawn.png",
+      alt: "sons of the 7th dawn",
+    },
+  ];
+
+  return (
+    <motion.section ref={ref} className="py-8 md:py-10 xl:py-14 bg-black">
+      <motion.h3
+        className="px-8 text-2xl md:text-4xl text-center text-white mb-14"
+        initial={{ opacity: 0, y: 60, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{
+          duration: 0.9,
+          type: "spring",
+          stiffness: 60,
+          damping: 18,
+        }}
+      >
+        Find your Match in More than 100 <br /> Genres and Categories
+      </motion.h3>
+      <div className="max-w-5xl mx-auto px-2 md:px-8 xl:mx-auto">
+        <Swiper
+          modules={[Autoplay, Pagination]}
+          spaceBetween={8}
+          slidesPerView={2}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 3500, disableOnInteraction: false }}
+          breakpoints={{
+            430: { spaceBetween: 8, slidesPerView: 2.2 },
+            490: { spaceBetween: 10, slidesPerView: 2.5 },
+            640: { spaceBetween: 12, slidesPerView: 3 },
+            768: { spaceBetween: 14, slidesPerView: 4 },
+            1024: { spaceBetween: 16, slidesPerView: 5 },
+          }}
+        >
+          {images.map((img, idx) => (
+            <SwiperSlide key={idx} className="flex justify-center">
+              <motion.div
+                initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: false, amount: 0.5 }}
+                transition={{
+                  duration: 0.7,
+                  delay: idx * 0.13,
+                  type: "spring",
+                  stiffness: 70,
+                  damping: 20,
+                }}
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  width={150}
+                  height={400}
+                  className="rounded-lg shadow-lg object-cover"
+                  priority={idx === 0}
+                  sizes="(max-width: 768px) 120px, 150px"
+                  quality={85}
+                  loading={idx === 0 ? "eager" : "lazy"}
+                  placeholder="blur"
+                  blurDataURL="/images/readers/onboarding/blur-placeholder.png"
+                />
+              </motion.div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+        <div className="w-full flex justify-center mt-4">
+          <div className="swiper-pagination !static" />
+        </div>
+        <style>{`
+          .swiper-pagination-bullet { background: #ffffff; opacity: 0.5; }
+          .swiper-pagination-bullet-active { background: #ffffff; opacity: 1; }
+          .swiper-pagination { position: static !important; margin-top: 0.5rem; }
+        `}</style>
+      </div>
+    </motion.section>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="">
+    <div>
       <section className="relative bg-black text-white h-[450px] md:h-[500px] xl:h-[600px]">
         <div className="absolute inset-0">
           <Image
             src="/images/reader-hero.png"
-            alt="Books background"
+            alt="African-themed book hero background"
             fill
             sizes="100vw"
             priority
             quality={85}
             placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/..."
+            blurDataURL="/images/readers/onboarding/blur-placeholder.png"
             className="object-cover h-full w-full"
           />
         </div>
-
-        {/* Red Wave Pattern at Bottom */}
         <div className="absolute bottom-0 left-0 w-full z-10">
           <Image
             src="/images/decorative-wave.png"
@@ -50,10 +148,8 @@ export default function Home() {
             className="w-full object-cover"
           />
         </div>
-
-        {/* Navbar */}
         <div className="relative z-30 w-full">
-          <div className="max-w-screen-xl mx-auto w-full flex justify-between items-center px-4 py-4">
+          <div className="max-w-screen-xl mx-auto flex justify-between items-center px-4 py-4">
             <Image
               src="/logo.svg"
               alt="ITAN Logo"
@@ -63,19 +159,14 @@ export default function Home() {
               priority
               sizes="140px"
             />
-            <div className="flex justify-center min-h-[32px] lg:min-h-[46px] xl:min-h-[52px]">
-              <Link
-                href="/reader/sign_up"
-                className="flex items-center bg-red-600 text-white p-2 md:px-6 md:py-2 rounded-md hover:bg-red-700 transition shadow text-base lg:text-lg"
-                style={{ lineHeight: 1 }}
-              >
-                Sign Up
-              </Link>
-            </div>
+            <Link
+              href="/reader/sign_up"
+              className="flex items-center bg-red-600 text-white p-2 md:px-6 md:py-2 rounded-md hover:bg-red-700 transition shadow text-base lg:text-lg"
+            >
+              Sign Up
+            </Link>
           </div>
         </div>
-
-        {/* Hero Text & CTA */}
         <div className="relative z-20 flex flex-col items-center text-center h-full px-4 pt-8 md:pt-16">
           <motion.h1
             className="text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-3"
@@ -105,279 +196,37 @@ export default function Home() {
               Get started
             </Link>
           </motion.div>
-          </div>
-
-          {/* Main headline */}
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Home of Black Fiction Novels
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg md:text-2xl mb-6 leading-relaxed mt-5">
-            Explore the richest collection of black fiction in one app
-          </p>
-
-          {/* CTA Button */}
-          <Link href="/reader/landing/book-store" className="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700 transition mt-5">
-            Get started
-          </Link>
         </div>
       </section>
 
-      {/* Animated Section: Find your Match */}
-      {(() => {
-        const ref = useRef(null);
-        const inView = useInView(ref, { once: true, margin: "-100px" });
-        const controls = useAnimation();
-        useEffect(() => {
-          if (inView) controls.start("visible");
-        }, [inView, controls]);
-        return (
-          <motion.section ref={ref} className="py-8 md:py-10 xl:py-14 bg-black">
-            <motion.h3
-              className="px-8 text-2xl md:text-4xl text-center text-white mb-14"
-              initial={{ opacity: 0, y: 60, scale: 0.95 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 60, scale: 0.95 }}
-              viewport={{ once: false, amount: 0.7 }}
-              transition={{
-                duration: 0.9,
-                type: "spring",
-                stiffness: 60,
-                damping: 18,
-              }}
-            >
-              Find your Match in More than 100 <br /> Genres and Categories
-            </motion.h3>
-            <div className="max-w-5xl mx-auto px-2 md:px-8 xl:mx-auto">
-              <Swiper
-                modules={[Autoplay, Pagination]}
-                spaceBetween={8}
-                slidesPerView={2}
-                pagination={{ clickable: true }}
-                autoplay={{ delay: 3500, disableOnInteraction: false }}
-                breakpoints={{
-                  430: { spaceBetween: 8, slidesPerView: 2.2 },
-                  490: { spaceBetween: 10, slidesPerView: 2.5 },
-                  640: { spaceBetween: 12, slidesPerView: 3 },
-                  768: { spaceBetween: 14, slidesPerView: 4 },
-                  1024: { spaceBetween: 16, slidesPerView: 5 },
-                }}
-                className=""
-              >
-                {[
-                  {
-                    src: "/images/readers/onboarding/ancestral-code.png",
-                    alt: "ancestral code",
-                  },
-                  {
-                    src: "/images/readers/onboarding/Lazarus.png",
-                    alt: "Lazarus Convergence",
-                  },
-                  {
-                    src: "/images/readers/onboarding/titan-race.png",
-                    alt: "Titan race",
-                  },
-                  {
-                    src: "/images/readers/onboarding/in-bed-with-her-guy.png",
-                    alt: "in bed with her guy",
-                  },
-                  {
-                    src: "/images/readers/onboarding/sons-of-the-7th-dawn.png",
-                    alt: "sons of the 7th dawn",
-                  },
-                ].map((img, idx) => (
-                  <SwiperSlide key={idx} className="flex justify-center">
-                    <motion.div
-                      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 40, scale: 0.95 }}
-                      viewport={{ once: false, amount: 0.5 }}
-                      transition={{
-                        duration: 0.7,
-                        delay: idx * 0.13,
-                        type: "spring",
-                        stiffness: 70,
-                        damping: 20,
-                      }}
-                      style={{ willChange: "opacity, transform" }}
-                    >
-                      <Image
-                        src={img.src}
-                        alt={img.alt}
-                        width={150}
-                        height={400}
-                        className="rounded-lg shadow-lg object-cover"
-                        priority={idx === 0}
-                        sizes="(max-width: 768px) 120px, 150px"
-                        quality={85}
-                        loading={idx === 0 ? "eager" : "lazy"}
-                        placeholder="blur"
-                        blurDataURL="/images/readers/onboarding/blur-placeholder.png"
-                      />
-                    </motion.div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-              <div className="w-full flex justify-center mt-4">
-                <div className="swiper-pagination !static" />
-              </div>
-              <style>{`
-                /* Swiper pagination bullets custom color */
-                .swiper-pagination-bullet {
-                  background: #ffffff;
-                  opacity: 0.5;
-                }
-                .swiper-pagination-bullet-active {
-                  background: #ffffff;
-                  opacity: 1;
-                }
-                .swiper-pagination {
-                  position: static !important;
-                  margin-top: 0.5rem;
-                }
-              `}</style>
-            </div>
-          </motion.section>
-        );
-      })()}
+      <GenreSwiper />
 
       <section className="relative bg-black py-8 md:py-10 xl:py-40 overflow-hidden text-center text-white">
         <motion.div
-          className="absolute inset-0 z-10 transform rotateX-12 perspective-1000"
+          className="absolute inset-0 z-10"
           initial={{ y: 0, x: 0 }}
-          animate={{
-            y: [0, 10, -10, 0],
-            x: [0, 10, -10, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
+          animate={{ y: [0, 10, -10, 0], x: [0, 10, -10, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         >
           <Image
             src="/images/readers/onboarding/rotating-red-wave.png"
             alt="Rotating red wave background"
             fill
-            className="object-cover opacity-70 border-none outline-none"
-            style={{ border: "none", outline: "none" }}
+            className="object-cover opacity-70"
           />
         </motion.div>
-
         <div className="relative z-10 xl:px-4">
-          <div className="px-4 text-2xl md:text-3xl lg:text-5xl font-medium md:font-semibold xl:font-semibold leading-10">
+          <div className="px-4 text-2xl md:text-3xl lg:text-5xl font-medium md:font-semibold leading-10">
             <p>Feel the Fire of Black storytelling</p>
-            <p className="xl:my-5">where every book is a portal and </p>
+            <p className="xl:my-5">where every book is a portal and</p>
             <p>every word is power</p>
           </div>
         </div>
       </section>
 
-      {/* <section className="pt-8 bg-black py-10 px-4 md:px-12 lg:px-24">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16 lg:gap-24">
-          <div className="flex-shrink-0 flex justify-center w-full md:w-auto">
-            <Image
-              src="/images/readers/onboarding/phone-picture.png"
-              width={300}
-              height={400}
-              alt="phone image"
-              className="rounded-xl shadow-lg object-cover"
-            />
-          </div>
-          <div className="flex-1 flex items-center justify-center md:justify-start">
-            <blockquote className="w-full max-w-2xl xl:max-w-3xl text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-medium md:font-semibold leading-relaxed md:leading-snug lg:leading-tight text-center md:text-left px-2 sm:px-4 md:px-0 xl:pl-8 xl:pr-4">
-              <span className="block mb-4 xl:mb-6">
-                ‘Step into the world of African Storytelling
-              </span>
-              <span className="block mb-4 xl:mb-6">
-                where mystery meets magic,
-              </span>
-              <span className="block mb-4 xl:mb-6">
-                thrillers tangle with romance,
-              </span>
-              <span className="block mb-4 xl:mb-6">
-                and comics collide with sci-fi,
-              </span>
-              <span className="block xl:mb-0">
-                all set to whisk you to the island{" "}
-                <span className="italic">“EXCITE”</span>’
-              </span>
-            </blockquote>
-          </div>
-        </div>
-      </section> */}
-
       <FeatureCarousel />
       <FAQ />
-
-      <section className="bg-black text-white py-12 px-4 sm:px-6 md:px-12 lg:px-20">
-        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl xl:text-5xl font-bold mb-8">
-          Get All These Experiences in ITAN
-        </h2>
-        <div className="max-w-7xl mx-auto flex flex-col-reverse md:flex-row items-center justify-between gap-10 md:gap-12 lg:gap-20">
-          <div className="flex-1 w-full flex flex-col justify-center">
-            <p className="text-gray-300 mb-8 w-full text-base sm:text-lg md:text-xl xl:text-2xl text-center md:text-left xl:pr-12">
-              Subscribe to our Newsletter and get exclusive access to
-              binge-worthy stories from bestselling authors anytime, anywhere
-              and follow the stories as they unfold!
-            </p>
-            <form className="flex flex-col sm:flex-row w-full gap-3 sm:gap-0 xl:gap-4">
-              <input
-                type="email"
-                placeholder="Enter email address"
-                className="flex-grow px-6 py-4 rounded-md sm:rounded-l-md sm:rounded-r-none text-white bg-black border border-gray-700 focus:outline-none text-base xl:text-lg placeholder-gray-400"
-              />
-              <button
-                type="submit"
-                className="bg-red-600 hover:bg-red-700 px-7 py-4 rounded-md sm:rounded-l-none sm:rounded-r-md font-semibold text-base xl:text-lg whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-          <div className="flex-1 w-full flex justify-center md:justify-end mt-8 md:mt-0">
-            <div className="flex gap-3 md:gap-4 lg:gap-6 xl:gap-8 max-w-full">
-              <img
-                src="/images/readers/onboarding/the-color-of-belonging.png"
-                alt="The Color of Belonging"
-                className="w-32 sm:w-48 md:w-64 lg:w-80 xl:w-[28rem] h-auto rounded-md shadow-lg transform rotate-[6deg] max-w-full"
-                style={{ minWidth: 0 }}
-              />
-              <img
-                src="/images/readers/onboarding/lagos-to-lodon.png"
-                alt="From Lagos to London"
-                className="w-32 sm:w-48 md:w-64 lg:w-80 xl:w-[28rem] h-auto rounded-md shadow-lg transform rotate-[6deg] max-w-full"
-                style={{ minWidth: 0 }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section
-        className="relative bg-black text-white h-72 flex items-center justify-center"
-        style={{
-          backgroundImage: "url('/images/readers/onboarding/subscribe-bg.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div className="absolute inset-0 bg-black bg-opacity-20" />
-
-        <div className="relative z-10 text-center px-4">
-          <h2 className="text-3xl md:text-4xl xl:text-5xl font-semibold mb-4">
-            Are you an Author?
-          </h2>
-          <p className="max-w-xl mx-auto mb-6 text-gray-300">
-            With ITAN Global Publishing, authors can self-publish their works,
-            manage their books, and royalties all in one platform.
-          </p>
-          <Link href="/" className="bg-red-700 px-6 py-2 rounded font-medium">
-            Learn More
-          </Link>
-        </div>
-      </section>
+      {/* Continue with the newsletter and author CTA sections as needed */}
     </div>
   );
 }
