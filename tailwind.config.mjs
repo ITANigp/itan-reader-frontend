@@ -72,6 +72,9 @@ export default {
         roboto: ["Roboto", "sans-serif"],
       },
       screens: {
+        tiny: {
+          max: "326px",
+        },
         xxs: {
           min: "250px",
           max: "410px",

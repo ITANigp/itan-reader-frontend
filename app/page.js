@@ -25,7 +25,7 @@ const FeatureCarousel = dynamic(
 export default function Home() {
   return (
     <div className="">
-      <section className="relative bg-black text-white h-[450px] md:h-[500px] xl:h-[700px]">
+      <section className="relative bg-black text-white h-[450px] md:h-[500px] xl:h-[750px]">
         <div className="absolute inset-0">
           <Image
             src="/images/reader-hero.png"
@@ -80,7 +80,7 @@ export default function Home() {
         {/* Hero Text & CTA */}
         <div className="relative z-20 flex flex-col items-center text-center h-full px-4 pt-8 md:pt-16">
           <motion.h1
-            className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-3"
+            className="tiny:text-2xl text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-3"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
@@ -121,7 +121,7 @@ export default function Home() {
         return (
           <motion.section ref={ref} className="py-8 md:py-10 xl:py-14 bg-black">
             <motion.h3
-              className="px-8 text-2xl md:text-4xl text-center text-white mb-14"
+              className="px-8 text-xl md:text-4xl text-center text-white mb-14"
               initial={{ opacity: 0, y: 60, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 60, scale: 0.95 }}
