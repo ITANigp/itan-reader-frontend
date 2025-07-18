@@ -43,9 +43,9 @@ export default function FAQ() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="flex items-start gap-4 bg-gradient-to-br from-[#181818] via-[#393939] to-[#232526] p-6 rounded-lg"
+              className="border-[0.5px] border-red-500 flex items-start gap-4 bg-gradient-to-br from-[#181818] via-[#393939] to-[#232526] p-6 rounded-lg"
             >
-              <div className="flex-shrink-0 w-8 h-8 rounded-md bg-gray-400 text-white flex items-center justify-center font-semibold">
+              <div className="flex-shrink-0 w-8 h-8 rounded-md bg-black text-white flex items-center justify-center font-semibold">
                 {index + 1}
               </div>
               <div>

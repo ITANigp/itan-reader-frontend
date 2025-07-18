@@ -121,7 +121,7 @@ export default function Home() {
         return (
           <motion.section ref={ref} className="py-8 md:py-10 xl:py-14 bg-black">
             <motion.h3
-              className="px-8 text-xl md:text-4xl text-center text-white mb-14"
+              className="px-8 text-xl md:text-4xl text-center text-white mb-6 md:mb-14 xl:mb-14"
               initial={{ opacity: 0, y: 60, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 60, scale: 0.95 }}
@@ -175,9 +175,9 @@ export default function Home() {
                 ].map((img, idx) => (
                   <SwiperSlide key={idx} className="flex justify-center">
                     <motion.div
-                      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 40, scale: 0.95 }}
+                      initial={{ y: 40, scale: 0.95 }}
+                      whileInView={{ y: 0, scale: 1 }}
+                      exit={{ y: 40, scale: 0.95 }}
                       viewport={{ once: false, amount: 0.5 }}
                       transition={{
                         duration: 0.7,
@@ -186,7 +186,7 @@ export default function Home() {
                         stiffness: 70,
                         damping: 20,
                       }}
-                      style={{ willChange: "opacity, transform" }}
+                      style={{ willChange: "transform" }}
                     >
                       <Image
                         src={img.src}
@@ -364,6 +364,46 @@ export default function Home() {
           </div>
         </div>
       </section> */}
+
+      <section className="bg-black text-white py-16 md:py-24 xl:py-32 px-4 md:px-8">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8">
+          {/* Image section */}
+          <div className="w-full md:w-5/12 flex justify-center">
+            <div className="relative group">
+              <div className="w-[280px] sm:w-[320px] md:w-[350px] lg:w-[600px]">
+                <img
+                  src="/images/readers/onboarding/phone-picture.png"
+                  alt="ITAN Reading Experience"
+                  className="w-full h-auto rounded-2xl shadow-2xl transform group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              {/* Subtle glow effect */}
+              <div className="absolute inset-0 bg-red-600/10 rounded-2xl blur-xl -z-10 scale-110 opacity-50"></div>
+            </div>
+          </div>
+
+          {/* Text section */}
+          <div className="w-full md:w-7/12 text-center md:text-left">
+            <blockquote className="relative">
+              <div className="text-6xl text-red-600 opacity-20 absolute -top-4 -left-2 font-serif hidden md:block">
+                "
+              </div>
+              <p className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-medium md:font-semibold leading-relaxed md:leading-snug lg:leading-tight relative z-10">
+                Step into the world of{" "}
+                <span className="font-bold bg-white bg-clip-text text-transparent">
+                  Afrocentric Storytelling
+                </span>{" "}
+                – where mystery meets magic, thrillers tangle with romance, and
+                comics collide with sci-fi, all set to whisk you to the island{" "}
+                <span className="italic font-bold text-red-400">"EXCITE"</span>
+              </p>
+              <div className="text-6xl text-red-600 opacity-20 absolute -bottom-8 -right-2 font-serif hidden md:block">
+                "
+              </div>
+            </blockquote>
+          </div>
+        </div>
+      </section>
 
       <FeatureCarousel />
       <FAQ />
