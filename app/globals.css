@@ -18,6 +18,14 @@ body {
   /* background-color: #1e293b; */
 }
 
+/* styles/globals.css or Tailwind config */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 
 @layer base {
