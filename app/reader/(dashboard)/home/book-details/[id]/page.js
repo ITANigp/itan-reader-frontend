@@ -218,6 +218,8 @@ export default function BookDetails() {
                 : "Read Now (Login)"}
             </Button>
 
+            <Button onClick={() => router.push(`/read/${bookId}`)}>READ</Button>
+
             <BuyButton
               bookId={unique_book_id}
               className="bg-green-600 text-white"
