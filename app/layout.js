@@ -12,10 +12,13 @@ import ReadersFooter from "@/app/reader/(components)/ReadersFooter";
 export default function Layout({ children }) {
   const pathname = usePathname();
 
-  const signUpPage = pathname.endsWith("/reader/sign_up")
-  const signInPage = pathname.endsWith("/reader/sign_in")
+  const signUpPage = pathname.endsWith("/reader/sign_up");
+  const signInPage = pathname.endsWith("/reader/sign_in");
+  const termsPage = pathname.endsWith("/terms&conditions");
+  const privacyPolicy = pathname.endsWith("/privacy-policies");
 
-  const hideRegPage =  signUpPage || signInPage ? "hidden" : "";
+  const hideRegPage =
+    signUpPage || signInPage || termsPage || privacyPolicy ? "hidden" : "";
   return (
     <html lang="eng">
       <body>
