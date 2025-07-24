@@ -93,7 +93,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, delay: 0.3, ease: "easeOut" }}
           >
-            Explore the richest collection of black <br /> fiction in one app
+            Explore the richest collection of <br /> afrocentric fiction 
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -329,41 +329,7 @@ export default function Home() {
             </motion.p>
           </div>
         </motion.div>
-      </section>
-
-      {/* <section className="pt-8 bg-black py-10 px-4 md:px-12 lg:px-24">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16 lg:gap-24">
-          <div className="flex-shrink-0 flex justify-center w-full md:w-auto">
-            <Image
-              src="/images/readers/onboarding/phone-picture.png"
-              width={300}
-              height={400}
-              alt="phone image"
-              className="rounded-xl shadow-lg object-cover"
-            />
-          </div>
-          <div className="flex-1 flex items-center justify-center md:justify-start">
-            <blockquote className="w-full max-w-2xl xl:max-w-3xl text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-medium md:font-semibold leading-relaxed md:leading-snug lg:leading-tight text-center md:text-left px-2 sm:px-4 md:px-0 xl:pl-8 xl:pr-4">
-              <span className="block mb-4 xl:mb-6">
-                ‘Step into the world of African Storytelling
-              </span>
-              <span className="block mb-4 xl:mb-6">
-                where mystery meets magic,
-              </span>
-              <span className="block mb-4 xl:mb-6">
-                thrillers tangle with romance,
-              </span>
-              <span className="block mb-4 xl:mb-6">
-                and comics collide with sci-fi,
-              </span>
-              <span className="block xl:mb-0">
-                all set to whisk you to the island{" "}
-                <span className="italic">“EXCITE”</span>’
-              </span>
-            </blockquote>
-          </div>
-        </div>
-      </section> */}
+      </section>     
 
       <section className="bg-black text-white py-16 md:py-24 xl:py-32 px-4 md:px-8">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8">
