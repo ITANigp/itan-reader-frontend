@@ -1056,7 +1056,7 @@ export default function Library() {
           //   headers: { Authorization: `Bearer ${authToken}` },
           // });
           // setFinishedBooks(res.data.data || []);
-          setFinishedBooks(books);
+          setFinishedBooks(books.slice(0, 8)); // Simulating finished books
           console.log("SEE FINISHED BOOKS", finishedBooks)
         } else if (TABS[activeTab] === "Bought Books") {
           // const res = await api.get("/books");
@@ -1067,9 +1067,9 @@ export default function Library() {
           //   headers: { Authorization: `Bearer ${authToken}` },
           // });
           // setWishlistBooks(res.data.data || []);
-          setWishlistBooks(books);
+          setWishlistBooks(books.slice(0, 10));
         } else if (TABS[activeTab] === "Current Reads" && isLoggedIn && authToken) {
-          setCurrentReads(books);
+          setCurrentReads(books.slice(0, 5));
           console.log("[Library] Current reads:", currentReads);
         } else if (TABS[activeTab] === "Audiobooks" && isLoggedIn && authToken) {
           setAudioBooks(" ");
@@ -1086,195 +1086,233 @@ export default function Library() {
   }, [activeTab, isLoggedIn, authToken]);
 
 
-  const renderBooks = (booksToRender, isNestedBook = false) => (
-    <div className="max-w-[1440px] mx-auto px-4">
-      <div
-        className={`
-        grid gap-4
-        grid-cols-2
-        sm:grid-cols-3
-        md:grid-cols-4
-        lg:grid-cols-5
-        xl:grid-cols-6
-        2xl:grid-cols-7
-        mt-14
-      `}
-      >
-        {booksToRender.map((item, index) => {
-          const book = isNestedBook ? item.book : item;
-          if (!book) return null;
+  // const renderBooks = (booksToRender, isNestedBook = false) => (
+  //   <div className="max-w-[1440px] mx-auto px-4">
+  //     <div
+  //       className={`
+  //       grid gap-4
+  //       grid-cols-2
+  //       sm:grid-cols-3
+  //       md:grid-cols-4
+  //       lg:grid-cols-5
+  //       xl:grid-cols-6
+  //       2xl:grid-cols-7
+  //       mt-14
+  //     `}
+  //     >
+  //       {booksToRender.map((item, index) => {
+  //         const book = isNestedBook ? item.book : item;
+  //         if (!book) return null;
 
-          // console.log("Rendering Book in renderBooks:", booksToRender);
+  //         // console.log("Rendering Book in renderBooks:", booksToRender);
 
-          return (
-            <div
-              key={index}
-              className="relative bg-white p-2 rounded shadow-md w-full"
-            >
+  //         return (
+  //           <div
+  //             key={index}
+  //             className="relative bg-white p-2 rounded shadow-md w-full"
+  //           >
 
-              <div className="absolute top-1 right-1 z-10 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow">
-                <div className="bg-white rounded-full w-4 h-4 flex items-center justify-center text-red-500">
-                  <Heart />
-                </div>
-              </div>
+  //             <div className="absolute top-1 right-1 z-10 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow">
+  //               <div className="bg-white rounded-full w-4 h-4 flex items-center justify-center text-red-500">
+  //                 <Heart />
+  //               </div>
+  //             </div>
 
-              <div className="w-full h-[220px] relative rounded overflow-hidden mb-2">
-                <Image
-                  src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                  alt={book.title || "Book Title"}
-                  fill
-                  className="object-cover rounded"
-                />
-              </div>
+  //             <div className="w-full h-[220px] relative rounded overflow-hidden mb-2">
+  //               <Image
+  //                 src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+  //                 alt={book.title || "Book Title"}
+  //                 fill
+  //                 className="object-cover rounded"
+  //               />
+  //             </div>
 
-              <div className="flex items-center gap-0.5 mb-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span key={i} className="text-red-500 text-xs">★</span>
-                ))}
-              </div>
+  //             <div className="flex items-center gap-0.5 mb-1">
+  //               {Array.from({ length: 5 }).map((_, i) => (
+  //                 <span key={i} className="text-red-500 text-xs">★</span>
+  //               ))}
+  //             </div>
 
-              <p className="text-sm font-bold leading-snug">{book.title}</p>
-              <p className="text-xs text-gray-500 mb-1">
-                By: {book?.author?.trim() ? book.author : "Jane Doe"}
-              </p>
+  //             <p className="text-sm font-bold leading-snug">{book.title}</p>
+  //             <p className="text-xs text-gray-500 mb-1">
+  //               By: {book?.author?.trim() ? book.author : "Jane Doe"}
+  //             </p>
 
-              <div className="flex justify-between items-center mt-1">
-                <span className="text-teal-600 font-bold text-[16px]">
-                  ${Number(book.price) / 100}
-                </span>
-                <Link
-                  href={`/reader/home/book-details/${book.id}`}
-                  className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
-                >
-                  View details
-                </Link>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-
+  //             <div className="flex justify-between items-center mt-1">
+  //               <span className="text-teal-600 font-bold text-[16px]">
+  //                 ${Number(book.price) / 100}
+  //               </span>
+  //               <Link
+  //                 href={`/reader/home/book-details/${book.id}`}
+  //                 className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
+  //               >
+  //                 View details
+  //               </Link>
+  //             </div>
+  //           </div>
+  //         );
+  //       })}
+  //     </div>
+  //   </div>
+  // );
 
 
 
 
-  const renderFinishedBooks = (booksToRender, isNestedBook = false) => (
-    <div className="max-w-[1440px] mx-auto px-4">
-      <div
-        className={`
-        grid gap-4
-        grid-cols-2
-        sm:grid-cols-3
-        md:grid-cols-4
-        lg:grid-cols-5
-        xl:grid-cols-6
-        2xl:grid-cols-7
-        mt-14
-      `}
-      >
-        {booksToRender.map((item, index) => {
-          const book = isNestedBook ? item.book : item;
-          if (!book) return null;
+  const renderBoughtBooks = (booksToRender, isNestedBook = false) => {
+    return (
+      <div className="max-w-[1440px] mx-auto px-4 mt-14">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
+          {booksToRender.map((item, index) => {
+            const book = isNestedBook ? item.book : item;
+            if (!book) return null;
 
-          console.log("Rendering Book in renderFinishedBooks:", booksToRender);
+            return (
+              <div
+                key={index}
+                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
+                className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
 
-          return (
-            <div
-              key={index}
-              className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
-            >
 
-              {/* Book Image */}
-              <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                <Image
-                  src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                  alt={book.title || "Book Title"}
-                  fill
-                  className="object-cover rounded"
-                />
-              </div>
-
-              {/* Title & Author */}
-              <p className="text-sm font-bold leading-snug">{book.title}</p>
-              <p className="text-xs text-gray-500 mb-1">
-                By: {book?.author?.trim() ? book.author : "Jane Doe"}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const renderCurrentReads = (booksToRender, isNestedBook = false) => (
-
-    <div className="max-w-[1440px] mx-auto px-4">
-      <div
-        className={`
-        grid gap-4
-        grid-cols-2
-        sm:grid-cols-3
-        md:grid-cols-4
-        lg:grid-cols-5
-        xl:grid-cols-6
-        2xl:grid-cols-7
-        mt-14
-        `}
-
-      >
-        {console.log("BOOKS TO RENDER", booksToRender)}
-        {booksToRender.map((item, index) => {
-          const book = isNestedBook ? item.book : item;
-          if (!book) return null;
-          console.log("Rendering Current Reads:", book);
-
-          return (
-            <div
-              key={index}
-              className="flex gap-[10px] md:gap-[24px] overflow-x-auto no-scrollbar"
-              style={{
-                width: '100%',
-                maxWidth: '1376px',
-                height: 'auto',
-                opacity: 1,
-              }}
-            >
-              {books.map((book, index) => (
-                <div
-                  key={index}
-                  className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
-                >
-
-                  {/* Book Image */}
-                  <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                    <Image
-                      src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                      alt={book.title || "Book Title"}
-                      fill
-                      className="object-cover rounded"
-                    />
-                  </div>
-
-                  {/* Page and continue Button */}
-                  <div className="flex flex-col justify-center items-center mt-1">
-
-                    <p className="text-xs text-gray-600 mb-1">Page 25 of 283</p>
-
-                    <Button className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-7 py-1 rounded">
-                      Continue
-                    </Button>
+              >
+                {/* Heart */}
+                <div className="absolute top-1 right-1 z-10 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow">
+                  <div className="bg-white rounded-full w-4 h-4 flex items-center justify-center text-red-500">
+                    <Heart />
                   </div>
                 </div>
-              ))}
-            </div>
-          );
-        })}
+
+                {/* Book Image */}
+                <div className="w-full h-[220px] md:h-[260px] relative rounded overflow-hidden mb-2">
+                  <Image
+                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    alt={book.title || "Book Title"}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+
+                {/* Stars */}
+                <div className="flex items-center gap-0.5 mb-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className="text-red-500 text-xs">★</span>
+                  ))}
+                </div>
+
+                {/* Title or CTA */}
+                <p className="text-sm font-bold leading-snug">{book.title}</p>
+                <p className="text-xs text-gray-500 mb-1">
+                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
+                </p>
+
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-teal-600 font-bold text-[16px]">
+                    ${Number(book.price) / 100}
+                  </span>
+                  <Link
+                    href={`/reader/home/book-details/${book.id}`}
+                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
+                  >
+                    View details
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+
+
+
+  const renderFinishedBooks = (booksToRender, isNestedBook = false) => {
+    return (
+      <div className="max-w-[1440px] mx-auto px-4 mt-14">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
+          {booksToRender.map((item, index) => {
+            const book = isNestedBook ? item.book : item;
+            if (!book) return null;
+
+            return (
+              <div
+                key={index}
+                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
+                className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
+
+              >
+                {/* Book Image */}
+                <div className="w-full h-[220px] md:h-[260px] relative rounded overflow-hidden mb-2">
+                  <Image
+                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    alt={book.title || "Book Title"}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+
+                {/* Title or CTA */}
+                <p className="text-sm font-bold leading-snug">{book.title}</p>
+                <p className="text-xs text-gray-500 mb-1">
+                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+
+
+
+
+
+  const renderCurrentReads = (booksToRender, isNestedBook = false) => {
+    return (
+      <div className="max-w-[1440px] mx-auto px-4 mt-14">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
+          {booksToRender.map((item, index) => {
+            const book = isNestedBook ? item.book : item;
+            if (!book) return null;
+
+            return (
+              <div
+                key={index}
+                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
+                className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
+
+
+              >
+                {/* Book Image */}
+                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
+                  <Image
+                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    alt={book.title || "Book Title"}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+
+                {/* Page and continue Button */}
+                <div className="flex flex-col justify-center items-center mt-1">
+                  <p className="text-xs text-gray-600 mb-1">Page 25 of 283</p>
+
+                  <Button className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-7 py-1 rounded">
+                    Continue
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+
 
 
   const renderAudioBooks = (booksToRender, isNestedBook = false) => {
@@ -1290,21 +1328,9 @@ export default function Library() {
         </div>
       );
     }
-
     return (
-      <div className="max-w-[1440px] mx-auto px-4">
-        <div
-          className={`
-          grid gap-4
-          grid-cols-2
-          sm:grid-cols-3
-          md:grid-cols-4
-          lg:grid-cols-5
-          xl:grid-cols-6
-          2xl:grid-cols-7
-          mt-14
-        `}
-        >
+      <div className="max-w-[1440px] mx-auto px-4 mt-14">
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
           {booksToRender.map((item, index) => {
             const book = isNestedBook ? item.book : item;
             if (!book) return null;
@@ -1312,38 +1338,29 @@ export default function Library() {
             return (
               <div
                 key={index}
-                className="flex gap-[10px] md:gap-[24px] overflow-x-auto no-scrollbar"
-                style={{
-                  width: '100%',
-                  maxWidth: '1376px',
-                  height: 'auto',
-                  opacity: 1,
-                }}
-              >
-                {[book].map((bookItem, i) => (
-                  <div
-                    key={i}
-                    className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
-                  >
-                    {/* Book Image */}
-                    <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                      <Image
-                        src={bookItem.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                        alt={bookItem.title || "Book Title"}
-                        fill
-                        className="object-cover rounded"
-                      />
-                    </div>
+                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
+                className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
 
-                    {/* Page and continue Button */}
-                    <div className="flex flex-col justify-center items-center mt-1">
-                      <p className="text-xs text-gray-600 mb-1">Page 25 of 283</p>
-                      <Button className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-7 py-1 rounded">
-                        Continue
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+
+              >
+                {/* Book Image */}
+                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
+                  <Image
+                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    alt={book.title || "Book Title"}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+
+                {/* Page and continue Button */}
+                <div className="flex flex-col justify-center items-center mt-1">
+                  <p className="text-xs text-gray-600 mb-1">Page 25 of 283</p>
+
+                  <Button className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-7 py-1 rounded">
+                    Play Audio
+                  </Button>
+                </div>
               </div>
             );
           })}
@@ -1351,6 +1368,7 @@ export default function Library() {
       </div>
     );
   };
+
 
 
   return (
@@ -1430,7 +1448,7 @@ export default function Library() {
           </p>
         </div>
       ) : activeTab === 0 ? (
-        renderBooks(allBooks)
+        renderBoughtBooks(allBooks)
       ) : activeTab === 1 ? (
         renderCurrentReads(currentReads)
       ) : activeTab === 2 ? (
@@ -1438,7 +1456,7 @@ export default function Library() {
       ) : activeTab === 4 ? (
         renderAudioBooks(audioBooks)
       ) : (
-        renderBooks(books)
+        renderBoughtBooks(books)
       )}
     </div>
   )
