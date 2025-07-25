@@ -1056,29 +1056,38 @@ export default function Library() {
     setLoading(true);
     setError(null);
 
+    
+    
     const fetchBooks = async () => {
+      const currentTabLabel = TABS[activeTab].label;
+
       try {
-        if (TABS[activeTab] === "Finished Books" && isLoggedIn && authToken) {
+        if (currentTabLabel === "Finished Books" && isLoggedIn && authToken) {
           // const res = await api.get("/reader/finished_books", {
           //   headers: { Authorization: `Bearer ${authToken}` },
           // });
           // setFinishedBooks(res.data.data || []);
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           setFinishedBooks(books.slice(0, 8)); // Simulating finished books
-          console.log("SEE FINISHED BOOKS", finishedBooks)
-        } else if (TABS[activeTab] === "Bought Books") {
+        } else if (currentTabLabel === "Bought Books") {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
           // const res = await api.get("/books");
           // setAllBooks(res.data.data || []);
           setAllBooks(books)
-        } else if (TABS[activeTab] === "My Wishlist" && isLoggedIn && authToken) {
+        } else if (currentTabLabel === "My Wishlist" && isLoggedIn && authToken) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           // const res = await api.get("/likes", {
           //   headers: { Authorization: `Bearer ${authToken}` },
           // });
           // setWishlistBooks(res.data.data || []);
           setWishlistBooks(books.slice(0, 10));
-        } else if (TABS[activeTab] === "Current Reads" && isLoggedIn && authToken) {
+        } else if (currentTabLabel === "Current Reads" && isLoggedIn && authToken) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           setCurrentReads(books.slice(0, 5));
           console.log("[Library] Current reads:", currentReads);
-        } else if (TABS[activeTab] === "Audiobooks" && isLoggedIn && authToken) {
+        } else if (currentTabLabel === "Audiobooks" && isLoggedIn && authToken) {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           setAudioBooks(" ");
           console.log("[Library] Current reads:", currentReads);
         }
@@ -1093,8 +1102,19 @@ export default function Library() {
   }, [activeTab, isLoggedIn, authToken]);
 
 
-
   const renderBoughtBooks = (booksToRender, isNestedBook = false) => {
+    if (!Array.isArray(booksToRender) || booksToRender.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-700">
+            You Haven't Bought Any Books Yet
+          </h2>
+          <p className="text-md md:text-lg text-gray-500 max-w-md">
+            Explore the store to add books and audio books to your library.
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="max-w-[1440px] mx-auto px-4 mt-14">
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
@@ -1157,9 +1177,19 @@ export default function Library() {
   };
 
 
-
-
   const renderFinishedBooks = (booksToRender, isNestedBook = false) => {
+    if (!Array.isArray(booksToRender) || booksToRender.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-700">
+            No Finished Books Yet
+          </h2>
+          <p className="text-md md:text-lg text-gray-500 max-w-md">
+            Explore the store to add books and audio books to your library.
+          </p>
+        </div>
+      );
+    }
     return (
       <div className="max-w-[1440px] mx-auto px-4 mt-14">
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
@@ -1196,9 +1226,20 @@ export default function Library() {
   };
 
 
-
-
   const renderCurrentReads = (booksToRender, isNestedBook = false) => {
+    if (!Array.isArray(booksToRender) || booksToRender.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <h2 className="text-2xl md:text-3xl font-semibold mb-4 text-gray-700">
+            Your Current Reads library is currently empty.
+          </h2>
+          <p className="text-md md:text-lg text-gray-500 max-w-md">
+            Explore the store to add books and audio books to your library.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div className="max-w-[1440px] mx-auto px-4 mt-14">
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-6">
@@ -1236,8 +1277,6 @@ export default function Library() {
       </div>
     );
   };
-
-
 
 
   const renderAudioBooks = (booksToRender, isNestedBook = false) => {
@@ -1292,11 +1331,6 @@ export default function Library() {
   };
 
 
-
-
-
-
-
   return (
     <div className="p-6">
       {/* Header row with title and select */}
@@ -1309,22 +1343,27 @@ export default function Library() {
         </select>
       </div>
 
+
       {/* Tab buttons */}
       <div className="mb-6">
-        <div className="w-full max-w-screen-xl px-4 mx-auto flex flex-wrap gap-6 items-center justify-center">
+        <div className="w-full max-w-screen-xl px-4 mx-auto flex flex-wrap gap-3 sm:gap-4 md:gap-5 lg:gap-6 items-center justify-center">
           {TABS.map((tab, i) => (
             <button
               key={i}
-              className={`w-[160px] h-[82px] text-sm rounded-[12px] border flex flex-col items-center justify-center gap-1 transition-colors duration-150
+              className={`w-[110px] sm:w-[120px] md:w-[130px] lg:w-[140px]
+                    h-[60px] sm:h-[65px] md:h-[70px] lg:h-[75px]
+                    text-[10px] sm:text-xs md:text-sm
+                    rounded-[10px] sm:rounded-[11px] md:rounded-[12px] border
+                    flex flex-col items-center justify-center gap-1 transition-all duration-200 ease-in-out
           ${i === activeTab
                   ? "bg-red-600 text-white border-red-600"
                   : "bg-white text-gray-700 border-gray-300 hover:border-red-400"}`}
               style={{
-                boxShadow: `10px 10px 20px -1px #00000026, -10px -10px 20px 1px #F2F9FF4D`,
+                boxShadow: `6px 6px 12px -1px #00000020, -6px -6px 12px 1px #F2F9FF33`,
               }}
               onClick={() => setActiveTab(i)}
             >
-              <span>{tab.icon}</span>
+              <span className="text-sm sm:text-base md:text-lg">{tab.icon}</span>
               <span className="font-semibold">{tab.label}</span>
             </button>
           ))}
@@ -1334,7 +1373,9 @@ export default function Library() {
 
       {/* Book rendering */}
       {loading ? (
-        <div>Loading books...</div>
+        <div className="flex items-center justify-center w-full h-40">
+          <div className="w-14 h-14 border-4 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center text-center mt-20 px-4">
           {/* Optional error icon */}

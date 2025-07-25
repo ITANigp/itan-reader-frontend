@@ -285,20 +285,21 @@ export default function Home({ initialReaderToken }) {
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
       {/* <div className="hidden md:flex max-w-8xl mx-auto px-4 py-5 justify-end"> */}
-      <div className="hidden md:flex max-w-[1440px] mx-auto px-4 py-5 justify-end">
+      <div className="flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
         <FreeTrialTimer />
       </div>
+
       {/* CONTAINER */}
       {/* <div className="max-w-7xl mx-auto px-4">  */}
       {/* <div className="max-w-8xl mx-auto px-4">  */}
       <div className="max-w-[1440px] mx-auto px-4">
 
         {/* Header */}
-        <div className="flex justify-between items-center py-3 mb-2 md:hidden">
+        {/* <div className="flex justify-between items-center py-3 mb-2 md:hidden">
           <button className="bg-white w-8 h-8 rounded-full flex items-center justify-center text-base border border-gray-500 text-gray-500">
             ←
           </button>
-        </div>
+        </div> */}
 
         {/* Hero */}
         <div className="mb-14">
@@ -321,7 +322,7 @@ export default function Home({ initialReaderToken }) {
 
 
         {/* Genres */}
-        <section className="mt-6 mb-14">
+        <section className="mt-6 mb-16">
           <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">Genres</h2>
           <div className="flex gap-3 overflow-x-auto no-scrollbar md:gap-4 px-1 -mx-1">
             {[
@@ -348,7 +349,7 @@ export default function Home({ initialReaderToken }) {
 
 
         {/* Popular Trending */}
-        <section className="mt-8 mb-14">
+        <section className="mt-8 mb-16">
           <div className="flex justify-between items-center">
             <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">Popular Trending</h2>
             <span className="text-red-600 cursor-pointer sm:text-xs md:text-sm lg:text-xl ">See more →</span>
@@ -408,7 +409,7 @@ export default function Home({ initialReaderToken }) {
 
 
         {/* Continue Reading */}
-        <section className="mt-8 mb-14">
+        <section className="mt-8 mb-16">
           <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">Continue Reading</h2>
           <div
             className="flex gap-[10px] md:gap-[24px] overflow-x-auto no-scrollbar"
@@ -451,7 +452,7 @@ export default function Home({ initialReaderToken }) {
 
 
         {/* Recommended for you */}
-        <section className="mt-8 mb-14">
+        <section className="mt-8 mb-16">
           <div className="flex justify-between items-center mb-3">
             {/* <h2 className="font-bold text-[27px] mb-4">Recommended for you</h2> */}
             <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">Recommended for you</h2>
@@ -512,7 +513,7 @@ export default function Home({ initialReaderToken }) {
 
         {/* ITAN Originals */}
 
-        <section className="mt-8 mb-14">
+        <section className="mt-8 mb-16">
           <div className="max-w-[1440px] mx-auto px-4">
             {/* <div className="flex justify-between items-center mb-3">
               <h2 className="font-bold text-[27px] mb-4">ITAN Originals</h2>
