@@ -35,6 +35,23 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 'use client'
 
 import { useState } from "react"
@@ -47,39 +64,35 @@ const DashboardNav = () => {
 
   return (
     <header className="hidden md:block bg-white w-full border-b border-gray-200 shadow-lg z-50 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Left: Logo */}
-          <div className="flex-shrink-0">
-            <Link href="/" className="text-2xl font-bold text-red-600">
-              ITAN
+      <div className="w-full px-4 sm:px-6 md:px-8 xl:px-12 2xl:px-20">
+        <div className="flex items-center justify-between h-[88px]">
+
+          {/* Logo with tighter spacing */}
+          {/* <div className="-ml-4 sm:-ml-6 md:-ml-8 xl:-ml-12 2xl:-ml-20"> */}
+          <div className="-ml-1 sm:-ml-3 md:-ml-2 xl:-ml-6 2xl:-ml-12">
+
+            <Link href="/" className="text-3xl font-bold text-red-600 flex items-center">
+              <img
+                src="/logo.svg"
+                alt="ITAN Logo"
+                className="h-28 w-auto max-h-[88px] object-contain"
+              />
             </Link>
           </div>
 
-          {/* Mobile Search (only visible on mobile) */}
-          <div className="flex-1 mx-4 md:hidden">
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="pl-9 pr-3 py-1.5 w-full border border-gray-300 rounded-md text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-red-500 bg-gray-50"
-              />
-            </div>
-          </div>
-
           {/* Right section */}
-          <div className="hidden md:flex items-center justify-end space-x-6 flex-1">
+          <div className="flex items-center gap-6 lg:gap-8 xl:gap-10">
+
             {/* Navigation */}
-            <nav className="flex items-center space-x-8">
+            <nav className="flex items-center gap-4 md:gap-6 lg:gap-8">
               {["Home", "Library", "Blogs", "Pricing"].map((item) => (
                 <Link
                   key={item}
-                  href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                  href={item === "Home" ? "/reader/home" : `/reader/${item.toLowerCase()}`}
                   onClick={() => setActiveTab(item)}
-                  className={`text-base font-medium transition-colors ${activeTab === item
-                    ? "text-red-600"
-                    : "text-gray-600 hover:text-red-600"
+                  className={`text-sm lg:text-base font-medium transition-colors ${activeTab === item
+                      ? "text-red-600"
+                      : "text-gray-700 hover:text-red-600"
                     }`}
                 >
                   {item}
@@ -87,34 +100,24 @@ const DashboardNav = () => {
               ))}
             </nav>
 
-            {/* Desktop Search */}
-            <div className="relative">
-              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+            {/* Search Bar */}
+            <div className="relative w-[200px] md:w-[260px] xl:w-[300px]">
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search for books using ISBN, Keywords, Tags..."
-                className="pl-10 pr-4 py-2 w-72 border border-gray-300 rounded-md text-sm text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent bg-gray-50"
+                placeholder="Search by ISBN, Keywords..."
+                className="pl-10 pr-4 py-2 w-full border border-gray-300 rounded-md text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50"
               />
             </div>
 
             {/* Profile Icon */}
-            <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors">
+            <div className="w-8 h-8 md:w-9 md:h-9 bg-gray-200 rounded-full flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors">
               <User className="w-4 h-4 text-gray-600" />
             </div>
           </div>
-
-          {/* Hamburger for mobile */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="text-gray-600 hover:text-red-600 focus:outline-none"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-          </div>
         </div>
 
-        {/* Mobile Menu (below header) */}
+        {/* Mobile Menu Placeholder (not visible on md+) */}
         {menuOpen && (
           <div className="md:hidden mt-2 space-y-4">
             <nav className="flex flex-col space-y-2">
@@ -139,7 +142,6 @@ const DashboardNav = () => {
         )}
       </div>
     </header>
-
   );
 };
 

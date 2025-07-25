@@ -27,7 +27,7 @@ const Footer = ({ styles }) => {
 
   return (
     <footer
-      className={`${styles} bg-[#111928]`}
+      className={`${styles} bg-[#111928] hidden`}
     >
       <section className="relative z-30 h-[150px] xs:h-[170px] medium:h-[200px] large:h-[220px] xl:h-[250px] flex flex-col items-center justify-center text-center">
         {/* Background image */}
