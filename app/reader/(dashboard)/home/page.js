@@ -359,7 +359,9 @@ export default function Home({ initialReaderToken }) {
             {books.map((book, index) => (
               <div
                 key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                // className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                className="relative bg-white p-2 rounded md:shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
+
               >
                 <div className="absolute top-2 right-2 z-10">
                   <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
@@ -423,7 +425,9 @@ export default function Home({ initialReaderToken }) {
             {books.map((book, index) => (
               <div
                 key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                // className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                className="relative bg-white p-2 rounded md:shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
+
               >
 
                 {/* Book Image */}
@@ -462,7 +466,9 @@ export default function Home({ initialReaderToken }) {
             {books.map((book, index) => (
               <div
                 key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                // className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                className="relative bg-white p-2 rounded md:shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
+
               >
                 <div className="absolute top-2 right-2 z-10">
                   <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
@@ -533,7 +539,7 @@ export default function Home({ initialReaderToken }) {
                 {books.map((book, index) => (
                   <div
                     key={index}
-                    className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
+                    className="relative bg-white p-2 rounded md:shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
                   >
                     {/* Like Button */}
                     <div className="absolute top-1 right-1 z-10 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow">
