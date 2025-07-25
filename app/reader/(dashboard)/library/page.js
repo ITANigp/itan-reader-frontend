@@ -921,6 +921,7 @@ import { Heart, PlayCircle } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
 import Link from "next/link";
 import Image from "next/image";
+import { FaBookOpen, FaStar, FaUserAlt, FaHeart, FaHeadphonesAlt } from "react-icons/fa"; // Example icons
 
 const PdfFlipbook = dynamic(() => import("@/components/PdfFlipbook"), {
   ssr: false,
@@ -943,7 +944,13 @@ export default function Library() {
   const [audioBooks, setAudioBooks] = useState([]);
 
 
-  const TABS = ["Bought Books", "Current Reads", "Finished Books", "My Wishlist", "Audiobooks"];
+  const TABS = [
+    { label: "Bought Books", icon: <FaBookOpen className="text-lg" /> },
+    { label: "Current Reads", icon: <FaStar className="text-lg" /> },
+    { label: "Finished Books", icon: <FaUserAlt className="text-lg" /> },
+    { label: "My Wishlist", icon: <FaHeart className="text-lg" /> },
+    { label: "Audiobooks", icon: <FaHeadphonesAlt className="text-lg" /> },
+  ];
 
   const books = [
     {
@@ -1086,78 +1093,6 @@ export default function Library() {
   }, [activeTab, isLoggedIn, authToken]);
 
 
-  // const renderBooks = (booksToRender, isNestedBook = false) => (
-  //   <div className="max-w-[1440px] mx-auto px-4">
-  //     <div
-  //       className={`
-  //       grid gap-4
-  //       grid-cols-2
-  //       sm:grid-cols-3
-  //       md:grid-cols-4
-  //       lg:grid-cols-5
-  //       xl:grid-cols-6
-  //       2xl:grid-cols-7
-  //       mt-14
-  //     `}
-  //     >
-  //       {booksToRender.map((item, index) => {
-  //         const book = isNestedBook ? item.book : item;
-  //         if (!book) return null;
-
-  //         // console.log("Rendering Book in renderBooks:", booksToRender);
-
-  //         return (
-  //           <div
-  //             key={index}
-  //             className="relative bg-white p-2 rounded shadow-md w-full"
-  //           >
-
-  //             <div className="absolute top-1 right-1 z-10 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow">
-  //               <div className="bg-white rounded-full w-4 h-4 flex items-center justify-center text-red-500">
-  //                 <Heart />
-  //               </div>
-  //             </div>
-
-  //             <div className="w-full h-[220px] relative rounded overflow-hidden mb-2">
-  //               <Image
-  //                 src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-  //                 alt={book.title || "Book Title"}
-  //                 fill
-  //                 className="object-cover rounded"
-  //               />
-  //             </div>
-
-  //             <div className="flex items-center gap-0.5 mb-1">
-  //               {Array.from({ length: 5 }).map((_, i) => (
-  //                 <span key={i} className="text-red-500 text-xs">★</span>
-  //               ))}
-  //             </div>
-
-  //             <p className="text-sm font-bold leading-snug">{book.title}</p>
-  //             <p className="text-xs text-gray-500 mb-1">
-  //               By: {book?.author?.trim() ? book.author : "Jane Doe"}
-  //             </p>
-
-  //             <div className="flex justify-between items-center mt-1">
-  //               <span className="text-teal-600 font-bold text-[16px]">
-  //                 ${Number(book.price) / 100}
-  //               </span>
-  //               <Link
-  //                 href={`/reader/home/book-details/${book.id}`}
-  //                 className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
-  //               >
-  //                 View details
-  //               </Link>
-  //             </div>
-  //           </div>
-  //         );
-  //       })}
-  //     </div>
-  //   </div>
-  // );
-
-
-
 
   const renderBoughtBooks = (booksToRender, isNestedBook = false) => {
     return (
@@ -1170,10 +1105,7 @@ export default function Library() {
             return (
               <div
                 key={index}
-                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
                 className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
-
-
               >
                 {/* Heart */}
                 <div className="absolute top-1 right-1 z-10 bg-white rounded-full w-6 h-6 flex items-center justify-center shadow">
@@ -1238,9 +1170,7 @@ export default function Library() {
             return (
               <div
                 key={index}
-                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
                 className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
-
               >
                 {/* Book Image */}
                 <div className="w-full h-[220px] md:h-[260px] relative rounded overflow-hidden mb-2">
@@ -1268,8 +1198,6 @@ export default function Library() {
 
 
 
-
-
   const renderCurrentReads = (booksToRender, isNestedBook = false) => {
     return (
       <div className="max-w-[1440px] mx-auto px-4 mt-14">
@@ -1281,10 +1209,7 @@ export default function Library() {
             return (
               <div
                 key={index}
-                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
                 className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
-
-
               >
                 {/* Book Image */}
                 <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
@@ -1338,10 +1263,7 @@ export default function Library() {
             return (
               <div
                 key={index}
-                // className="w-[170px] sm:w-[160px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
                 className="relative bg-white p-2 rounded shadow-md flex-shrink-0 w-[150px] sm:w-[160px] md:w-[180px] scrollSnap-align-start"
-
-
               >
                 {/* Book Image */}
                 <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
@@ -1371,6 +1293,10 @@ export default function Library() {
 
 
 
+
+
+
+
   return (
     <div className="p-6">
       {/* Header row with title and select */}
@@ -1389,7 +1315,7 @@ export default function Library() {
           {TABS.map((tab, i) => (
             <button
               key={i}
-              className={`w-[160px] h-[82px] text-sm rounded-[12px] border transition-colors duration-150
+              className={`w-[160px] h-[82px] text-sm rounded-[12px] border flex flex-col items-center justify-center gap-1 transition-colors duration-150
           ${i === activeTab
                   ? "bg-red-600 text-white border-red-600"
                   : "bg-white text-gray-700 border-gray-300 hover:border-red-400"}`}
@@ -1398,11 +1324,13 @@ export default function Library() {
               }}
               onClick={() => setActiveTab(i)}
             >
-              {tab}
+              <span>{tab.icon}</span>
+              <span className="font-semibold">{tab.label}</span>
             </button>
           ))}
         </div>
       </div>
+
 
       {/* Book rendering */}
       {loading ? (
