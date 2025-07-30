@@ -28,6 +28,7 @@ const CURRENT_LOGGED_IN_USER_ID = "SOME_CURRENT_USER_ID"; // Placeholder: Replac
 export default function BookDetails() {
   const params = useParams();
   const bookId = params.id;
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,9 +47,7 @@ export default function BookDetails() {
         // Using `fetch` here as per your original component.
         // If you want to use axios for this initial book detail fetch as well,
         // you'd need to import your 'api' instance from lib/api.js and use it.
-        const response = await fetch(
-          `http://localhost:3000/api/v1/books/${bookId}/storefront`
-        );
+        const response = await fetch(`${BASE_URL}/books/${bookId}/storefront`);
 
         if (!response.ok) {
           if (response.status === 404) {
