@@ -251,6 +251,7 @@ export default function Home({ initialReaderToken }) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     const storedToken = localStorage.getItem("access_token");
@@ -260,7 +261,7 @@ export default function Home({ initialReaderToken }) {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/v1/books");
+        const response = await fetch(`${BASE_URL}/books`);
         const result = await response.json();
         const formattedBooks = result.data.map((book) => ({
           id: book.id,
