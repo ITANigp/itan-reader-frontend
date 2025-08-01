@@ -26,7 +26,7 @@ const Footer = ({ hiddenPage }) => {
     pathname.startsWith("/author") || pathname.startsWith("/dashboard");
 
   return (
-    <footer className={`${hiddenPage} bg-[#000000] w-full hidden`}>
+    <footer className={`bg-[#000000] w-full hidden`}>
       <section className="bg-[#000000] w-full max-w-7xl mx-auto px-4 pt-8 pb-0 flex flex-col gap-8">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-8">
           {/* Logo & Socials */}
