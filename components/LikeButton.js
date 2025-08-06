@@ -169,7 +169,7 @@ const LikeButton = ({ bookId, userToken }) => {
         onClick={handleLikeToggle}
         disabled={isLoading || !userToken} // Disable if loading or not authenticated
         className={`
-          relative p-3 rounded-full transition-all duration-300 ease-in-out
+          relative p-1 rounded-full transition-all duration-300 ease-in-out
           focus:outline-none focus:ring-2 focus:ring-offset-2
           ${
             isLiked
@@ -212,7 +212,7 @@ const LikeButton = ({ bookId, userToken }) => {
           // Heart icon (using a simple SVG for demonstration)
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
+            className="h-4 w-4"
             fill={isLiked ? "red" : "none"} // Fill with red if liked, else none
             viewBox="0 0 24 24"
             stroke={isLiked ? "red" : "currentColor"} // Stroke with red if liked, else currentColor
