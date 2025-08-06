@@ -85,7 +85,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
           >
-            Home of Black Fiction Novels
+            Home Of Black Fiction Novels
           </motion.h1>
           <motion.p
             className="text-lg md:text-2xl xl:text-3xl mb-5 leading-relaxed"
@@ -93,8 +93,16 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, delay: 0.3, ease: "easeOut" }}
           >
-            Explore the richest collection of <br /> afrocentric fiction 
+            Explore the richest collection of <br /> afrocentric fiction
           </motion.p>
+          <motion.h1
+            className="pb-4 tiny:text-xl text-xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold mb-3"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          >
+            Enjoy Unlimited Reading with a 2 week free Trial
+          </motion.h1>
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -102,9 +110,9 @@ export default function Home() {
           >
             <Link
               href="/reader/sign_up"
-              className="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700 transition"
+              className="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700 transition lg:px-8 lg:py-4 xl:px-8 xl:py-4"
             >
-              Get started
+              Get started for free
             </Link>
           </motion.div>
         </div>
@@ -329,7 +337,7 @@ export default function Home() {
             </motion.p>
           </div>
         </motion.div>
-      </section>     
+      </section>
 
       <section className="bg-black text-white py-16 md:py-24 xl:py-32 px-4 md:px-8">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6 lg:gap-8">
