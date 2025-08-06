@@ -78,31 +78,36 @@ export default function Home() {
         </div>
 
         {/* Hero Text & CTA */}
-        <div className="relative z-20 flex flex-col items-center text-center h-full px-4 pt-8 md:pt-16">
+        <div className="relative z-20 flex flex-col items-center text-center px-4 sm:px-6 md:px-8 max-w-6xl mx-auto pt-8 sm:pt-12 md:pt-12 lg:pt-16">
           <motion.h1
-            className="tiny:text-2xl text-3xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold mb-3"
+            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold mb-4 sm:mb-6 md:mb-8 leading-tight max-w-5xl"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: "easeOut" }}
           >
             Home Of Black Fiction Novels
           </motion.h1>
+
           <motion.p
-            className="text-lg md:text-2xl xl:text-3xl mb-5 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-4 sm:mb-6 md:mb-8 leading-relaxed font-light max-w-4xl"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, delay: 0.3, ease: "easeOut" }}
+            transition={{ duration: 1.1, delay: 0.2, ease: "easeOut" }}
           >
-            Explore the richest collection of <br /> afrocentric fiction
+            Explore The Richest Collection Of
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>Afrocentric Fiction
           </motion.p>
-          <motion.h1
-            className="pb-4 tiny:text-xl text-xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold mb-3"
+
+          <motion.h2
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl font-medium mb-6 sm:mb-8 md:mb-10 leading-tight max-w-4xl"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut" }}
+            transition={{ duration: 1.1, delay: 0.4, ease: "easeOut" }}
           >
-            Enjoy Unlimited Reading with a 2 week free Trial
-          </motion.h1>
+            Enjoy Unlimited Reading with a 2-week free Trial
+          </motion.h2>
+
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -110,7 +115,7 @@ export default function Home() {
           >
             <Link
               href="/reader/sign_up"
-              className="bg-red-600 text-white px-6 py-3 rounded-md shadow-md hover:bg-red-700 transition lg:px-8 lg:py-4 xl:px-8 xl:py-4"
+              className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-base sm:text-lg md:text-xl px-6 sm:px-8 md:px-12 lg:px-16 py-3 sm:py-4 md:py-5 rounded-lg transition-colors duration-300 shadow-lg"
             >
               Get started for free
             </Link>
@@ -444,7 +449,11 @@ export default function Home() {
             With ITAN Global Publishing, authors can self-publish their works,
             manage their books, and royalties all in one platform.
           </p>
-          <Link href="/" className="bg-red-700 px-6 py-2 rounded font-medium">
+          <Link
+            href="https://publish.itan.app/author/sign_up"
+            target="_blank"
+            className="bg-red-700 px-6 py-2 rounded font-medium"
+          >
             Learn More
           </Link>
         </div>
