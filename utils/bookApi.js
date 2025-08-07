@@ -67,6 +67,21 @@ export async function getAllBook() {
   }
 }
 
+// Batch like status
+export const getBatchLikeStatus = async (bookIds, userToken) => {
+  if (!userToken || !bookIds.length) return {};
+  
+  try {
+    const response = await api.post('/likes/batch_status', 
+      { book_ids: bookIds },
+      { headers: { Authorization: `Bearer ${userToken}` }}
+    );
+    return response.data; // Returns { book_id: like_status }
+  } catch (error) {
+    console.error('Error fetching batch like status:', error);
+    return {};
+  }
+};
 
 // Api for Book Review
 

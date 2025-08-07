@@ -11,7 +11,6 @@
 // import BuyButton from "@/components/reader/BuyButton";
 // import Link from "next/link";
 
-
 // export default function Home({ initialReaderToken, initialBookId }) {
 //   // Placeholder for userToken. In a real app, this would come from your auth context/store.
 //   const [userToken, setUserToken] = useState(initialReaderToken || null);
@@ -209,34 +208,6 @@
 //   );
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -279,8 +250,18 @@ export default function Home({ initialReaderToken }) {
     fetchBooks();
   }, []);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600">
+        {error}
+      </div>
+    );
 
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
@@ -288,15 +269,15 @@ export default function Home({ initialReaderToken }) {
       <div className="hidden md:flex max-w-6xl mx-auto px-4 py-5 justify-end">
         <FreeTrialTimer />
       </div>
-      <div className="max-w-6xl mx-auto px-4"> {/* CONTAINER */}
-
+      <div className="max-w-6xl mx-auto px-4">
+        {" "}
+        {/* CONTAINER */}
         {/* Header */}
         <div className="flex justify-between items-center py-3 mb-2 md:hidden">
           <button className="bg-white w-8 h-8 rounded-full flex items-center justify-center text-base border border-gray-500 text-gray-500">
             ←
           </button>
         </div>
-
         {/* Hero */}
         <div>
           <div className="w-full h-40 md:h-60 relative rounded-lg overflow-hidden">
@@ -315,15 +296,23 @@ export default function Home({ initialReaderToken }) {
             </div>
           </div>
         </div>
-
-
         {/* Genres */}
         <section className="mt-6">
           <h2 className="font-semibold text-[17px] mb-3">Genres</h2>
           <div className="flex gap-3 overflow-x-auto no-scrollbar md:gap-4 px-1 -mx-1">
             {[
-              "Romance", "Fiction", "Adventure", "Sci-Fi", "Mystery", "Horror",
-              "Fantasy", "Thriller", "Biography", "Historical", "Poetry", "Drama"
+              "Romance",
+              "Fiction",
+              "Adventure",
+              "Sci-Fi",
+              "Mystery",
+              "Horror",
+              "Fantasy",
+              "Thriller",
+              "Biography",
+              "Historical",
+              "Poetry",
+              "Drama",
             ].map((genre, idx) => (
               <div
                 key={idx}
@@ -342,9 +331,6 @@ export default function Home({ initialReaderToken }) {
             ))}
           </div>
         </section>
-
-
-
         {/* Popular Trending */}
         {/* <section className="mt-8 w-full">
           <div className="flex justify-between items-center mb-3">
@@ -408,13 +394,13 @@ export default function Home({ initialReaderToken }) {
             ))}
           </div>
         </section> */}
-
-
         {/* Popular Trending */}
         <section className="mt-8">
           <div className="flex justify-between items-center mb-3">
             <h2 className="font-semibold text-[17px]">Popular Trending </h2>
-            <span className="text-red-600 text-xs cursor-pointer">See more →</span>
+            <span className="text-red-600 text-xs cursor-pointer">
+              See more →
+            </span>
           </div>
 
           <div className="flex gap-4 overflow-x-auto no-scrollbar md:overflow-x-auto">
@@ -425,14 +411,21 @@ export default function Home({ initialReaderToken }) {
               >
                 <div className="absolute top-2 right-2 z-10">
                   <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
-                    <LikeButton bookId={book.id} userToken={userToken} />
+                    <LikeButton
+                      bookId={book.id}
+                      userToken={userToken}
+                      section="popular-trending"
+                    />
                   </div>
                 </div>
 
                 {/* Book Image */}
                 <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
                   <Image
-                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    src={
+                      book.image ||
+                      `https://picsum.photos/150/220?random=${index + 20}`
+                    }
                     alt={book.title}
                     fill
                     className="object-cover rounded"
@@ -442,7 +435,9 @@ export default function Home({ initialReaderToken }) {
                 {/* Stars */}
                 <div className="flex items-center gap-0.5 mb-1">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-red-500 text-xs">★</span>
+                    <span key={i} className="text-red-500 text-xs">
+                      ★
+                    </span>
                   ))}
                 </div>
 
@@ -468,30 +463,22 @@ export default function Home({ initialReaderToken }) {
             ))}
           </div>
         </section>
-
-
         {/* Continue Reading */}
         <section className="mt-8">
           <h2 className="font-semibold text-[17px] mb-3">Continue Reading</h2>
-          <div
-            className="flex gap-[10px] md:gap-[24px] overflow-x-auto no-scrollbar"
-            style={{
-              width: '100%',
-              maxWidth: '1376px',
-              height: 'auto',
-              opacity: 1,
-            }}
-          >
+          <div className="flex gap-[10px] md:gap-[24px] overflow-x-auto no-scrollbar">
             {books.map((book, index) => (
               <div
-                key={index}
+                key={`continue-${index}`}
                 className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
               >
-
                 {/* Book Image */}
                 <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
                   <Image
-                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    src={
+                      book.image ||
+                      `https://picsum.photos/150/220?random=${index + 20}`
+                    }
                     alt={book.title}
                     fill
                     className="object-cover rounded"
@@ -500,130 +487,10 @@ export default function Home({ initialReaderToken }) {
 
                 {/* Page and continue Button */}
                 <div className="flex flex-col justify-center items-center mt-1">
-
                   <p className="text-xs text-gray-600 mb-1">Page 25 of 283</p>
-
                   <Button className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-7 py-1 rounded">
                     Continue
                   </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-
-        {/* Recommended for you */}
-        <section className="mt-8">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="font-semibold text-[17px]">Recommended for you</h2>
-          </div>
-
-          <div className="flex gap-4 overflow-x-auto no-scrollbar md:overflow-x-auto">
-            {books.map((book, index) => (
-              <div
-                key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
-              >
-                <div className="absolute top-2 right-2 z-10">
-                  <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
-                    <LikeButton bookId={book.id} userToken={userToken} />
-                  </div>
-                </div>
-
-                {/* Book Image */}
-                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                  <Image
-                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                    alt={book.title}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </div>
-
-                {/* Stars */}
-                <div className="flex items-center gap-0.5 mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-red-500 text-xs">★</span>
-                  ))}
-                </div>
-
-                {/* Title & Author */}
-                <p className="text-sm font-bold leading-snug">{book.title}</p>
-                <p className="text-xs text-gray-500 mb-1">
-                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
-                </p>
-
-                {/* Price and View Button */}
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-teal-600 font-bold text-[16px]">
-                    ${Number(book.price) / 100}
-                  </span>
-                  <Link
-                    href={`/reader/home/book-details/${book.id}`}
-                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
-                  >
-                    View details
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ITAN Originals */}
-        <section className="mt-8">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="font-semibold text-[17px]">ITAN Originals</h2>
-          </div>
-
-          <div className="flex gap-4 overflow-x-auto no-scrollbar md:overflow-visible md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 md:gap-6">
-            {books.map((book, index) => (
-              <div
-                key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:w-full md:shadow-md"
-              >
-                {/* Like Button */}
-                <div className="absolute top-2 right-2 z-10">
-                  <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
-                    <LikeButton bookId={book.id} userToken={userToken} />
-                  </div>
-                </div>
-
-                {/* Book Image */}
-                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                  <Image
-                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                    alt={book.title}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </div>
-
-                {/* Stars */}
-                <div className="flex items-center gap-0.5 mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-red-500 text-xs">★</span>
-                  ))}
-                </div>
-
-                {/* Title & Author */}
-                <p className="text-sm font-bold leading-snug">{book.title}</p>
-                <p className="text-xs text-gray-500 mb-1">
-                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
-                </p>
-
-                {/* Price and View Button */}
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-teal-600 font-bold text-[16px]">
-                    ${Number(book.price) / 100}
-                  </span>
-                  <Link
-                    href={`/reader/home/book-details/${book.id}`}
-                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
-                  >
-                    View details
-                  </Link>
                 </div>
               </div>
             ))}
