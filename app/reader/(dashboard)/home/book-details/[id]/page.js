@@ -137,7 +137,7 @@ export default function BookDetails() {
         }
 
         const contentRes = await api.get(
-          `/books/${bookData.unique_book_id}/content`,
+          `/books/${bookData.unique_book_id}/content?direct_url=true`,
           {
             headers: {
               Authorization: `Bearer ${reading_token}`,
@@ -150,8 +150,12 @@ export default function BookDetails() {
 
         // Check if we have a PDF URL to open
         if (content?.url) {
-          // Open the PDF in a new tab/window
-          window.open(content.url, "_blank");
+          // Navigate to flipbook reader with the PDF URL (don't encode since it's already a valid URL)
+          const urlParams = new URLSearchParams();
+          urlParams.set('url', content.url);
+          urlParams.set('title', bookData.title);
+          
+          router.push(`/reader/flipbook?${urlParams.toString()}`);
         } else if (content?.text) {
           // If it's text content, show in alert
           alert(
