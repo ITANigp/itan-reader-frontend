@@ -1,7 +1,7 @@
-import { useRouter } from "next/navigation";
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const TOKEN_KEY = "access-token"; // consistent key name for JWT
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -11,7 +11,21 @@ export const api = axios.create({
   },
 });
 
-// Register an author
+// Helper to store token
+const storeToken = (token) => {
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
+    console.warn("JWT token missing in response");
+  }
+};
+
+// Helper to get token
+// const getToken = () => {
+//   return localStorage.getItem(TOKEN_KEY);
+// };
+
+// Register a reader
 export const registerReader = async (
   email,
   password,
@@ -30,6 +44,11 @@ export const registerReader = async (
       },
     });
 
+    // Token might be in response.data.data.token OR in Authorization header
+    const token =
+      response.data?.data?.token || response.headers?.authorization?.split(" ")[1];
+    storeToken(token);
+
     return response.data;
   } catch (error) {
     console.error(
@@ -46,33 +65,58 @@ export const registerReader = async (
   }
 };
 
-
-
-// Sign in an author
+// Sign in a reader
 export const signInReader = async (email, password) => {
   try {
     const response = await api.post("/readers/sign_in", {
-      reader: { email, password, "rememberable_options": true },
+      reader: { email, password, rememberable_options: true },
     });
+
+    const token =
+      response.data?.data?.token || response.headers?.authorization?.split(" ")[1];
+    storeToken(token);
 
     return response.data;
   } catch (error) {
+    console.error("Login failed:", error.response?.data || error);
     throw error;
   }
 };
 
-// Sign out an author
-export const signOutAuthor = async () => {
+// Get current logged-in reader profile
+export const getReaderProfile = async (token) => {
   try {
-    await api.delete("/authors/sign_out");
-    localStorage.removeItem("authorInfo");
+    // const token = getToken();
 
-    const router = useRouter();
-    router.push("/author/sign_in");
+    if (!token) {
+      throw new Error("User not authenticated");
+    }
 
-    return { success: true };
+    const response = await api.get("/readers/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
   } catch (error) {
-    console.error("Sign-out failed:", error.response?.data || error);
+    console.error("Failed to fetch reader profile:", error.response?.data || error);
+    throw error;
   }
 };
 
+// Sign out a reader
+export const signOutReader = async () => {
+  try {
+    await api.delete("/readers/sign_out", {
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
+    localStorage.removeItem(TOKEN_KEY);
+    return { success: true };
+  } catch (error) {
+    console.error("Sign-out failed:", error.response?.data || error);
+    throw error;
+  }
+};
