@@ -14,7 +14,7 @@ const features = [
     icon: "🌍",
     title: "One Place. Infinite Stories.",
     description:
-      "From magical picture books to thrilling adventures – stories for every age.",
+      "From magical picture books to thrilling adventures.",
     gradient: "from-[#181818] via-[#232526] to-[#393939]",
   },
   {
@@ -64,7 +64,7 @@ export default function FeatureCarousel() {
                 {feature.title}
               </h4>
             </div>
-            <p className="text-base md:text-lg opacity-95 leading-relaxed font-medium tracking-tight">
+            <p className="text-base md:text-lg xl:mt-4 opacity-95 leading-relaxed font-medium tracking-tight">
               {feature.description}
             </p>
           </motion.div>

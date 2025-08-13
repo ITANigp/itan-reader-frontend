@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Bricolage_Grotesque } from "next/font/google";
+import CookiePreferences from "@/app/cookie-preferences/page";
 
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -83,108 +84,76 @@ const Footer = ({ hiddenPage }) => {
               </div>
             </div>
             {/* Mobile links */}
-            <div className="flex flex-col items-center sm:hidden mt-3 text-[13px] text-gray-400 gap-2">
+            <div className="flex flex-col items-center sm:hidden mt-3 text-[13px] text-gray-400 gap-2">              
               <Link
-                href="https://itanglobalpublishing.substack.com/"
-                target="_blank"
+                href="/cookie-preferences"                
+                aria-label="Cookie preferences"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
-                Author Resources
-              </Link>
-              <Link
-                href="mailto:support@itan.app"
-                target="_blank"
-                aria-label="Contact support via email"
-                className="cursor-pointer hover:text-[#EF5353]"
-              >
-                Help Center
+                Cookie preferences
               </Link>
               <Link
                 href="https://www.youtube.com/@itanIGP"
                 target="_blank"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
-                Youtube
+                FAQ
               </Link>
               <Link
                 href="https://itanglobalpublishing.substack.com/"
                 target="_blank"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
-                Blog
+                Add cookies
               </Link>
               <Link
-                href="#"
-                target="_blank"
+                href="#"                
                 className="cursor-pointer hover:text-[#EF5353]"
               >
-                Contact
+                Contact Us
               </Link>
               <Link
-                href="#"
-                target="_blank"
+                href="#"                
                 className="cursor-pointer hover:text-[#EF5353]"
               >
                 Content Policy
-              </Link>
-              <Link
-                href="/terms&conditions"
-                className="cursor-pointer hover:text-[#EF5353]"
-              >
-                Terms &amp; Conditions
-              </Link>
-              <Link
-                href="/privacy-policies"
-                className="cursor-pointer hover:text-[#EF5353]"
-              >
-                Privacy &amp; Policy
-              </Link>
+              </Link>              
             </div>
           </div>
           {/* Desktop links */}
-          <div className="hidden sm:grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] text-gray-400 min-w-[250px]">
+          <div className="hidden sm:grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] text-gray-400 min-w-[250px]">            
             <Link
-              href="https://itanglobalpublishing.substack.com/"
+              href="/"
               target="_blank"
               className="cursor-pointer hover:text-[#EF5353]"
             >
-              Author Resources
+              Cookies preferences
             </Link>
             <Link
-              href="https://itanglobalpublishing.substack.com/"
-              target="_blank"
-              className="cursor-pointer hover:text-[#EF5353]"
-            >
-              Blog
-            </Link>
-            <Link
-              href="mailto:support@itan.app"
-              target="_blank"
+              href="#"              
               aria-label="Contact support via email"
               className="cursor-pointer hover:text-[#EF5353]"
             >
-              Help Center
+              FAQ
             </Link>
             <Link
-              href="#"
-              target="_blank"
+              href="#"             
               className="cursor-pointer hover:text-[#EF5353]"
             >
-              Content Policy
+              Newsletter
             </Link>
             <Link
               href="https://www.youtube.com/@itanIGP"
               target="_blank"
               className="cursor-pointer hover:text-[#EF5353]"
             >
-              Youtube
+              Publish with IGP
             </Link>
             <Link
-              href="#"
-              target="_blank"
+              href="#"              
               className="cursor-pointer hover:text-[#EF5353]"
             >
-              Contact
+              Contact Us
             </Link>
           </div>
         </div>

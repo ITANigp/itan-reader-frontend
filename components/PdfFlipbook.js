@@ -1,16 +1,13 @@
 // app/components/PdfFlipbook.js
 "use client";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { Document, Page as ReactPdfPage, pdfjs } from "react-pdf";
 import HTMLFlipBook from "react-pageflip";
 
-// Configure react-pdf worker
-// This approach is generally more robust for Next.js and modern build systems.
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url
-).toString();
+// Configure react-pdf worker for Next.js
+// Use the correct worker version that matches react-pdf@10.0.1 (API version 5.3.31)
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.mjs`;
 
 // Import react-pdf stylesheets for text layer and annotations
 import "react-pdf/dist/Page/AnnotationLayer.css";
@@ -19,33 +16,86 @@ import "react-pdf/dist/Page/TextLayer.css";
 // A functional component for individual pages within the flipbook.
 // It needs to be forwardRef because HTMLFlipBook passes a ref to its children.
 const Page = React.forwardRef(({ pageNumber, width, height }, ref) => {
+  const [pageError, setPageError] = React.useState(null);
+
   return (
     <div
       ref={ref}
-      className="flex justify-center items-center bg-gray-100 border border-gray-300 shadow-md overflow-hidden relative" // Tailwind for styling the page container
+      className="flex justify-center items-center bg-gray-100 border border-gray-300 shadow-md overflow-hidden relative"
     >
-      <ReactPdfPage
-        pageNumber={pageNumber}
-        width={width}
-        height={height}
-        renderTextLayer={true} // Enable text selection
-        renderAnnotationLayer={true} // Enable links/annotations
-        className="w-full h-full" // Ensure PDF page takes full available space
-      />
-      {/* Optional: Page number overlay */}
-      <p className="absolute bottom-2 right-4 text-gray-600 text-sm">
-        Page {pageNumber}
-      </p>
+      {pageError ? (
+        <div className="flex flex-col items-center justify-center h-full">
+          <p className="text-red-600 mb-2">Failed to load page {pageNumber}</p>
+          <button 
+            onClick={() => {
+              setPageError(null);
+              // Force re-render
+            }}
+            className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      ) : (
+        <>
+          <ReactPdfPage
+            pageNumber={pageNumber}
+            width={width}
+            height={height}
+            renderTextLayer={true}
+            renderAnnotationLayer={true}
+            onLoadError={(error) => {
+              console.error(`Error loading page ${pageNumber}:`, error);
+              setPageError(error.message || `Failed to load page ${pageNumber}`);
+            }}
+            loading={
+              <div className="flex justify-center items-center h-full">
+                <p className="text-gray-500 text-sm">Loading page {pageNumber}...</p>
+              </div>
+            }
+            className="w-full h-full"
+          />
+          {/* Optional: Page number overlay */}
+          <p className="absolute bottom-2 right-4 text-gray-600 text-sm">
+            Page {pageNumber}
+          </p>
+        </>
+      )}
     </div>
   );
 });
 
 Page.displayName = "Page"; // Good practice for debugging with React DevTools
 
-function PdfFlipbook({ pdfUrl }) {
+function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pdfData, setPdfData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [documentReady, setDocumentReady] = useState(false);
   const bookRef = useRef(null);
+
+  // Ensure worker is properly configured
+  useEffect(() => {
+    if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.mjs`;
+    }
+    console.log("🔧 PDF.js worker configured:", pdfjs.GlobalWorkerOptions.workerSrc);
+  }, []);
+
+  // Memoize PDF options to prevent unnecessary reloads
+  const pdfOptions = useMemo(() => ({
+    cMapUrl: 'https://unpkg.com/pdfjs-dist@5.3.31/cmaps/',
+    cMapPacked: true,
+    standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@5.3.31/standard_fonts/',
+  }), []);
+
+  // Memoize file object to prevent unnecessary reloads
+  const fileObject = useMemo(() => {
+    if (!pdfData) return null;
+    return { data: pdfData };
+  }, [pdfData]);
 
   // Define base dimensions for the flipbook pages.
   // These will be used by react-pdf's Page component.
@@ -53,10 +103,66 @@ function PdfFlipbook({ pdfUrl }) {
   const basePageWidth = 500;
   const basePageHeight = 700;
 
+  // Fetch PDF with direct fetch (CORS configured on S3)
+  useEffect(() => {
+    const initializePdf = async () => {
+      if (!pdfUrl) return;
+      
+      setLoading(true);
+      setError(null);
+      setDocumentReady(false);
+      
+      try {
+        console.log("Initializing PDF from:", pdfUrl);
+        
+        // Fetch the PDF as an ArrayBuffer for better compatibility with react-pdf
+        const response = await fetch(pdfUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/pdf',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        console.log("PDF fetched as ArrayBuffer, size:", arrayBuffer.byteLength);
+        
+        // Pass ArrayBuffer directly to Document component
+        setPdfData(arrayBuffer);
+        console.log("PDF ArrayBuffer set successfully");
+      } catch (err) {
+        console.error("Error fetching PDF:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializePdf();
+  }, [pdfUrl]);
+
   // Callback for when the PDF document successfully loads
   const onDocumentLoadSuccess = useCallback(({ numPages }) => {
+    console.log("🎉 PDF Document loaded successfully with", numPages, "pages");
     setNumPages(numPages);
     setCurrentPage(1); // Reset to first page on new document load
+    setDocumentReady(true);
+  }, []);
+
+  // Callback for when document load fails
+  const onDocumentLoadError = useCallback((error) => {
+    console.error("❌ Error loading PDF document:", error);
+    console.error("Error details:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
+    setError(error.message || "Unknown PDF loading error");
+    setLoading(false);
+    setDocumentReady(false);
   }, []);
 
   // Callback for when the flipbook page changes
@@ -84,32 +190,73 @@ function PdfFlipbook({ pdfUrl }) {
         Interactive PDF Flipbook
       </h2>
 
-      {pdfUrl ? (
-        <div className="w-full max-w-5xl">
-          <Document
-            file={pdfUrl}
-            onLoadSuccess={onDocumentLoadSuccess}
-            onLoadError={(error) => console.error("Error loading PDF:", error)}
-            className="flex justify-center items-center w-full" // Center the document
+      {loading && (
+        <div className="flex justify-center items-center h-64">
+          <p className="text-lg text-gray-600">Loading PDF...</p>
+        </div>
+      )}
+
+      {error && (
+        <div className="flex flex-col items-center justify-center h-64">
+          <p className="text-lg text-red-600 mb-4">Error loading PDF: {error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
-            {numPages > 0 ? (
+            Retry
+          </button>
+        </div>
+      )}
+
+      {pdfData && !loading && !error ? (
+        <div className="w-full max-w-5xl">
+          {console.log("📄 Rendering Document component with fileObject:", fileObject)}
+          <Document
+            file={fileObject}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={onDocumentLoadError}
+            loading={
+              <div className="flex justify-center items-center h-64">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                  <p className="text-lg text-gray-600">Initializing PDF...</p>
+                </div>
+              </div>
+            }
+            error={
+              <div className="flex flex-col items-center justify-center h-64">
+                <p className="text-lg text-red-600 mb-4">Failed to load PDF document</p>
+                <button 
+                  onClick={() => {
+                    setError(null);
+                    setLoading(true);
+                    window.location.reload();
+                  }} 
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Retry
+                </button>
+              </div>
+            }
+            options={pdfOptions}
+            className="flex justify-center items-center w-full"
+          >
+            {numPages > 0 && documentReady ? (
               <>
                 <HTMLFlipBook
                   width={basePageWidth}
                   height={basePageHeight}
-                  size="stretch" // Allows the book to stretch to fit the container
+                  size="stretch"
                   minWidth={300}
-                  maxWidth={800} // Increased max-width for larger screens
+                  maxWidth={800}
                   minHeight={400}
-                  maxHeight={1100} // Increased max-height
+                  maxHeight={1100}
                   maxShadowOpacity={0.5}
                   showCover={true}
                   flippingTime={800}
                   onFlip={onFlip}
-                  className="my-flipbook shadow-lg rounded-lg overflow-hidden" // Tailwind for book styling
+                  className="my-flipbook shadow-lg rounded-lg overflow-hidden"
                   ref={bookRef}
-                  // Render all pages for the flipbook
-                  // You can optimize by rendering only visible pages in more complex scenarios
                 >
                   {Array.from(new Array(numPages), (el, index) => (
                     <Page
@@ -122,7 +269,12 @@ function PdfFlipbook({ pdfUrl }) {
                 </HTMLFlipBook>
               </>
             ) : (
-              <p className="text-lg text-gray-600">Loading PDF...</p>
+              <div className="flex justify-center items-center h-64">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+                  <p className="text-lg text-gray-600">Preparing pages...</p>
+                </div>
+              </div>
             )}
           </Document>
         </div>

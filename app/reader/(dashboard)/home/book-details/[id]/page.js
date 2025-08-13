@@ -21,10 +21,10 @@ import ReviewCard from "@/components/ReviewCard";
 import { api } from "@/utils/auth/readerApi";
 import axios from "axios";
 
-import { useAuth } from "@/contexts/AuthContext"; 
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function BookDetails() {
-  const { isLoggedIn, userId: currentUserId, authToken } = useAuth(); 
+  const { isLoggedIn, userId: currentUserId, authToken } = useAuth();
   const params = useParams();
   const router = useRouter();
   const bookId = params.id;
@@ -92,11 +92,32 @@ export default function BookDetails() {
     if (isTrialActive) {
       // console.log("reading_token beginning: ", reading_token);
       try {
+        // Get purchase data from localStorage with proper error handling
+        let purchaseData = {};
+        let purchase_id = null;
+
+        try {
+          const storedData = localStorage.getItem("purchaseBook");
+          if (storedData && storedData !== "[object Object]") {
+            purchaseData = JSON.parse(storedData);
+            purchase_id = purchaseData.id;
+          }
+        } catch (parseError) {
+          console.warn(
+            "Failed to parse purchase data from localStorage:",
+            parseError
+          );
+          // Clear invalid data
+          localStorage.removeItem("purchaseBook");
+        }
+
         const tokenRes = await api.post(
-          "/reading_tokens",
-          { book_id: bookData.unique_book_id,
-            content_type: "ebook"
-           },
+          "/purchases/refresh_reading_token",
+          {
+            book_id: bookData.unique_book_id,
+            content_type: "ebook",
+            purchase_id: purchase_id,
+          },
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -104,11 +125,19 @@ export default function BookDetails() {
           }
         );
 
-        const reading_token = tokenRes.reading_token;
+        console.log("Full tokenRes:", tokenRes);
+        const reading_token =
+          tokenRes.data?.reading_token ||
+          tokenRes.data?.data?.reading_token ||
+          tokenRes.reading_token;
         console.log("reading_token", reading_token);
 
+        if (!reading_token) {
+          throw new Error("No reading token received from server");
+        }
+
         const contentRes = await api.get(
-          `/books/${bookData.unique_book_id}/content`,
+          `/books/${bookData.unique_book_id}/content?direct_url=true`,
           {
             headers: {
               Authorization: `Bearer ${reading_token}`,
@@ -117,9 +146,29 @@ export default function BookDetails() {
         );
 
         const content = contentRes.data;
-        alert(
-          `Reading "${bookData.title}":\n\n${content.text.substring(0, 200)}...`
-        );
+        console.log("Full content response:", content);
+
+        // Check if we have a PDF URL to open
+        if (content?.url) {
+          // Navigate to flipbook reader with the PDF URL (don't encode since it's already a valid URL)
+          const urlParams = new URLSearchParams();
+          urlParams.set('url', content.url);
+          urlParams.set('title', bookData.title);
+          
+          router.push(`/reader/flipbook?${urlParams.toString()}`);
+        } else if (content?.text) {
+          // If it's text content, show in alert
+          alert(
+            `Reading "${bookData.title}":\n\n${content.text.substring(0, 200)}...`
+          );
+        } else {
+          // Fallback - show available content structure
+          const textContent =
+            content?.content || JSON.stringify(content, null, 2);
+          alert(
+            `Reading "${bookData.title}":\n\n${textContent.substring(0, 200)}...`
+          );
+        }
       } catch (err) {
         console.error("Read error:", err);
         alert("Unable to read book. Please try again.");
