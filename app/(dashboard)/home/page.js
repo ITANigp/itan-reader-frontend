@@ -215,7 +215,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import LikeButton from "@/components/LikeButton";
 import Link from "next/link";
-import FreeTrialTimer from "../../(components)/FreeTrialTimer";
+import FreeTrialTimer from "@/app/reader/(components)/FreeTrialTimer";
 
 export default function Home({ initialReaderToken }) {
   const [userToken, setUserToken] = useState(initialReaderToken || null);
@@ -457,7 +457,7 @@ export default function Home({ initialReaderToken }) {
                     ${Number(book.price) / 100}
                   </span>
                   <Link
-                    href={`/reader/home/book-details/${book.id}`}
+                    href={`/home/book-details/${book.id}`}
                     className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
                   >
                     View details

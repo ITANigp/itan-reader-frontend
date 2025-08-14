@@ -210,7 +210,7 @@ export default function SignIn() {
       localStorage.setItem("currentUserId", reader.data.id);
       if (reader?.data?.id) {
         setAuth(reader.data.token, reader.data.id);
-        router.push("/reader/home");
+        router.push("/home");
       }
     } catch (error) {
       setMessage(
