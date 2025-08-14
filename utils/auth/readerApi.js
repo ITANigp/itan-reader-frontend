@@ -105,6 +105,57 @@ export const getReaderProfile = async (token) => {
   }
 };
 
+// Create a new reader profile
+export const createReaderProfile = async (profileData, profileImage) => {
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const response = await api.post(
+      "/readers/profile",
+      {
+        reader: {
+          ...profileData,
+          profile_image: profileImage,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create reader profile:", error.response?.data || error);
+    throw error;
+  }
+};
+
+// Update existing reader profile
+export const updateReaderProfile = async (profileData, profileImage) => {
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const response = await api.put(
+      "/readers/profile",
+      {
+        reader: {
+          ...profileData,
+          profile_image: profileImage,
+        },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update reader profile:", error.response?.data || error);
+    throw error;
+  }
+};
+
+
 // Sign out a reader
 export const signOutReader = async () => {
   try {
