@@ -22,7 +22,7 @@ const CURRENT_LOGGED_IN_USER_ID = "SOME_CURRENT_USER_ID";
 
 export default function BookDetails() {
   const params = useParams();
-  const bookId = params.id;
+  const bookSlug = params.slug;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const [bookData, setBookData] = useState(null);
@@ -31,7 +31,7 @@ export default function BookDetails() {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   useEffect(() => {
-    if (!bookId) {
+    if (!bookSlug) {
       setLoading(false);
       return;
     }
@@ -39,7 +39,9 @@ export default function BookDetails() {
     const fetchBookDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${BASE_URL}/books/${bookId}/storefront`);
+        const response = await fetch(
+          `${BASE_URL}/api/v1/books/by-slug/${bookSlug}/`
+        );
         if (!response.ok) {
           setError(
             response.status === 404
@@ -62,7 +64,7 @@ export default function BookDetails() {
     };
 
     fetchBookDetails();
-  }, [bookId]);
+  }, [bookSlug]);
 
   const handleReviewCreated = (newReview) => {
     setBookData((prev) =>
@@ -155,7 +157,7 @@ export default function BookDetails() {
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
             <BuyButton
-              bookId={unique_book_id || bookId}
+              bookSlug={unique_book_id || bookSlug}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
             >
               Buy now ({displayPrice})
@@ -186,7 +188,7 @@ export default function BookDetails() {
                   <DialogTitle>Write a Review for "{title}"</DialogTitle>
                 </DialogHeader>
                 <ReviewForm
-                  bookId={unique_book_id || bookId}
+                  bookSlug={unique_book_id || bookSlug}
                   onReviewCreated={handleReviewCreated}
                   token={DUMMY_JWT_TOKEN}
                 />
