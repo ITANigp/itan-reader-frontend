@@ -6,21 +6,24 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LikeProvider } from "@/contexts/LikeContext";
 import { config } from "@fortawesome/fontawesome-svg-core";
-// import ReadersFooter from "@/app/reader/(components)/ReadersFooter";
+
+// Use dynamic import to fix the prerendering error
+import dynamic from 'next/dynamic';
+
+const ReadersFooter = dynamic(() => import("@/app/reader/(components)/ReadersFooter"), {
+  ssr: false,
+});
 
 export default function Layout({ children }) {
   const pathname = usePathname();
 
-  // Define the pages where you want to hide the footer
-  const hideFooterOnPages = [
-    "/reader/sign_up",
-    "/reader/sign_in",
-    "/terms&conditions",
-    "/privacy-policies",
-  ];
+  const signUpPage = pathname.endsWith("/reader/sign_up");
+  const signInPage = pathname.endsWith("/reader/sign_in");
+  const termsPage = pathname.endsWith("/terms&conditions");
+  const privacyPolicy = pathname.endsWith("/privacy-policies");
 
-  // Check if the current pathname is in the list of pages to hide the footer
-  const shouldHideFooter = hideFooterOnPages.includes(pathname);
+  const hideRegPage =
+    signUpPage || signInPage || termsPage || privacyPolicy ? "hidden" : "";
 
   return (
     <html lang="eng">
@@ -29,8 +32,8 @@ export default function Layout({ children }) {
           <AuthProvider>
             <LikeProvider>{children}</LikeProvider>
           </AuthProvider>
-          {/* Conditionally render the footer. It will now only be hidden on the specified pages. */}
-          // {!shouldHideFooter && <ReadersFooter />}
+          {/* The dynamic component is now used here */}
+          <ReadersFooter hiddenPage={hideRegPage} />
         </main>
       </body>
     </html>
