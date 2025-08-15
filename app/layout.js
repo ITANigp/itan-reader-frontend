@@ -6,7 +6,7 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LikeProvider } from "@/contexts/LikeContext";
 import { config } from "@fortawesome/fontawesome-svg-core";
-import ReadersFooter from "@/app/reader/(components)/ReadersFooter";
+// import ReadersFooter from "@/app/reader/(components)/ReadersFooter";
 
 export default function Layout({ children }) {
   const pathname = usePathname();
@@ -30,7 +30,7 @@ export default function Layout({ children }) {
             <LikeProvider>{children}</LikeProvider>
           </AuthProvider>
           {/* Conditionally render the footer. It will now only be hidden on the specified pages. */}
-          {!shouldHideFooter && <ReadersFooter />}
+          // {!shouldHideFooter && <ReadersFooter />}
         </main>
       </body>
     </html>
