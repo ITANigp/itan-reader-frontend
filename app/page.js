@@ -12,7 +12,6 @@ import "swiper/css/autoplay";
 import { Autoplay, Pagination } from "swiper/modules";
 import dynamic from "next/dynamic";
 import FAQ from "@/components/reader/FQA";
-import ReadersFooter from "@/app/reader/(components)/ReadersFooter";
 import Link from "next/link";
 
 // Dynamically import FeatureCarousel with SSR disabled
@@ -459,7 +458,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-      <ReadersFooter />
     </div>
   );
 }
