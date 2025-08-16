@@ -123,7 +123,7 @@ export default function BookDetails() {
 
   const authorName = author?.name?.trim() || "Unknown Author";
   const displayPrice = ebook_price
-    ? `₦${(ebook_price / 100).toFixed(2)}`
+    ? `$ ${(ebook_price / 100).toFixed(2)}`
     : "N/A";
   const displayGenre = categories?.length ? categories[0].main : "N/A";
   const displayPublicationDate = bookData.created_at
