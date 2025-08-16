@@ -40,7 +40,7 @@ export default function BookDetails() {
       try {
         setLoading(true);
         const response = await fetch(
-          `${BASE_URL}/api/v1/books/by-slug/${bookSlug}/`
+          `${BASE_URL}/books/by-slug/${bookSlug}/`
         );
         if (!response.ok) {
           setError(
@@ -51,9 +51,15 @@ export default function BookDetails() {
           return;
         }
         const jsonResponse = await response.json();
+        console.log("Book details response:", jsonResponse);
+        if (!jsonResponse) {
+          setError("Book data not found.");
+          setLoading(false);
+          return;
+        }
         setBookData({
-          ...jsonResponse.data.attributes,
-          unique_book_id: jsonResponse.data.id,
+          ...jsonResponse,
+          unique_book_id: jsonResponse.id,
         });
       } catch (err) {
         console.error(err);
@@ -260,7 +266,7 @@ export default function BookDetails() {
       </section>
 
       {/* More Books */}
-      <section>
+      {/* <section>
         <h3 className="text-lg sm:text-xl font-semibold mb-4">
           More Books by {authorName}
         </h3>
@@ -279,7 +285,7 @@ export default function BookDetails() {
         <p className="text-gray-600 mt-2 text-sm">
           (This section currently shows placeholders.)
         </p>
-      </section>
+      </section> */}
     </div>
   );
 }
