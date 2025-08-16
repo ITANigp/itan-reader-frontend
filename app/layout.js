@@ -6,25 +6,34 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LikeProvider } from "@/contexts/LikeContext";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import dynamic from "next/dynamic";
 
-// Use dynamic import to fix the prerendering error
-import dynamic from 'next/dynamic';
-
-const ReadersFooter = dynamic(() => import("@/app/reader/(components)/ReadersFooter"), {
-  ssr: false,
-});
-
+// import ReadersFooter from "@/app/reader/(components)/ReadersFooter";
+const ReadersFooter = dynamic(
+  () => import("@/app/reader/(components)/ReadersFooter"),
+  {
+    ssr: false,
+  }
+);
 export default function Layout({ children }) {
   const pathname = usePathname();
 
   const signUpPage = pathname.endsWith("/reader/sign_up");
   const signInPage = pathname.endsWith("/reader/sign_in");
-  const termsPage = pathname.endsWith("/terms&conditions");
   const privacyPolicy = pathname.endsWith("/privacy-policies");
-
+  const termsPage = pathname.endsWith("/terms&conditions");
+  const homePage = pathname.endsWith("/home");
+  const libraryPage = pathname.endsWith("/library");
+  
   const hideRegPage =
-    signUpPage || signInPage || termsPage || privacyPolicy ? "hidden" : "";
-
+    signUpPage ||
+    signInPage ||
+    termsPage ||
+    privacyPolicy ||
+    homePage ||
+    libraryPage
+      ? "hidden"
+      : "";
   return (
     <html lang="eng">
       <body>

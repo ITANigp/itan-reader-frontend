@@ -215,17 +215,6 @@
 // }
 
 
-
-
-
-
-
-
-
-
-
-
-
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -248,35 +237,39 @@ export default function SignUp() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+const handleSignup = async (e) => { 
+  e.preventDefault();
+  setLoading(true);
+  setMessage("");
 
-    try {
-      const reader = await api.post("/readers", {
-        reader: {
-          email,
-          password,
-          password_confirmation: passwordConfirmation,
-          first_name: firstName,
-          last_name: lastName,
-        },
-      });
+  try {
+    const reader = await api.post("/readers", {
+      reader: {
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+        first_name: firstName,
+        last_name: lastName,
+      },
+    });
 
-      if (reader?.data?.data?.id) {
-        setMessage("Registration successful! Redirecting...");
-        router.push("/reader/sign_in");
-      }
-    } catch (error) {
-      setMessage(
-        error.response?.data?.message || "Registration failed. Please try again."
-      );
-      console.error("Registration error:", error);
-    } finally {
-      setLoading(false);
+    if (reader?.data?.data?.token) {
+      localStorage.setItem("access-token", reader.data.data.token);
+      setMessage("Registration successful! Redirecting...");
+      router.push("/"); // go to home/dashboard
     }
-  };
+  } catch (error) {
+    setMessage(
+      error.response?.data?.message || "Registration failed. Please try again."
+    );
+    console.error("Registration error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+  console.log("JWT Token stored:", localStorage.getItem("jwtToken"));
+
 
   return (
 

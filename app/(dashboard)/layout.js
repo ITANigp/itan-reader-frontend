@@ -1,4 +1,4 @@
-import DashboardNav from "../(components)/DashboardNav";
+import DashboardNav from "@/app/reader/(components)/DashboardNav";
 
 export default function Layout({ children }) {
   return (
