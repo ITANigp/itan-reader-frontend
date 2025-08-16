@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-
 import "flowbite";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -42,6 +41,7 @@ export default function Layout({ children }) {
           <AuthProvider>
             <LikeProvider>{children}</LikeProvider>
           </AuthProvider>
+          {/* The dynamic component is now used here */}
           <ReadersFooter hiddenPage={hideRegPage} />
         </main>
       </body>
