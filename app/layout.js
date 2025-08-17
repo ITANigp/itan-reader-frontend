@@ -18,22 +18,24 @@ const ReadersFooter = dynamic(
 export default function Layout({ children }) {
   const pathname = usePathname();
 
-  const signUpPage = pathname.endsWith("/reader/sign_up");
-  const signInPage = pathname.endsWith("/reader/sign_in");
-  const privacyPolicy = pathname.endsWith("/privacy-policies");
-  const termsPage = pathname.endsWith("/terms&conditions");
-  const homePage = pathname.endsWith("/home");
-  const libraryPage = pathname.endsWith("/library");
+  // const signUpPage = pathname.endsWith("/reader/sign_up");
+  // const signInPage = pathname.endsWith("/reader/sign_in");
+  // const privacyPolicy = pathname.endsWith("/privacy-policies");
+  // const termsPage = pathname.endsWith("/terms&conditions");
+  // const homePage = pathname.endsWith("/home");
+  // const libraryPage = pathname.endsWith("/library");
   
-  const hideRegPage =
-    signUpPage ||
-    signInPage ||
-    termsPage ||
-    privacyPolicy ||
-    homePage ||
-    libraryPage
-      ? "hidden"
-      : "";
+  // const hideRegPage =
+  //   signUpPage ||
+  //   signInPage ||
+  //   termsPage ||
+  //   privacyPolicy ||
+  //   homePage ||
+  //   libraryPage
+  //     ? "hidden"
+  //     : "";
+ const showFooter = pathname === "/" || pathname.endsWith("/bookstore") ? "" : "hidden";
+  
   return (
     <html lang="eng">
       <body>
@@ -42,7 +44,7 @@ export default function Layout({ children }) {
             <LikeProvider>{children}</LikeProvider>
           </AuthProvider>
           {/* The dynamic component is now used here */}
-          <ReadersFooter hiddenPage={hideRegPage} />
+          <ReadersFooter hiddenPage={showFooter} />
         </main>
       </body>
     </html>
