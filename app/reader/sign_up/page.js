@@ -26,7 +26,7 @@ export default function SignUp() {
     setMessage("");
 
     try {
-      const reader = await api.post("/readers", {
+      const response = await api.post("/readers", {
         reader: {
           email,
           password,
@@ -36,21 +36,24 @@ export default function SignUp() {
         },
       });
 
-      if (reader?.data?.data?.token) {
-        localStorage.setItem("access-token", reader.data.data.token);
-        setMessage("Registration successful! Redirecting...");
-        router.push("/"); // go to home/dashboard
+      if (response?.data?.data) {
+        setMessage(
+          "Registration successful! Please check your email to confirm your account."
+        );
+
+        // App Router fix: use string URL
+        router.push(`/reader/confirm_email?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
       setMessage(
-        error.response?.data?.message ||
-          "Registration failed. Please try again."
+        error.response?.data?.message || "Registration failed. Please try again."
       );
       console.error("Registration error:", error);
     } finally {
       setLoading(false);
     }
   };
+
 
   // Move the localStorage access inside a useEffect hook
   useEffect(() => {
