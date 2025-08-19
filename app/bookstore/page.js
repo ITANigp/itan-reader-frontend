@@ -143,12 +143,13 @@ export default function Home() {
         </div>
       )}
 
-      <section className="relative h-auto md:h-[700px] flex flex-col-reverse lg:flex-row items-center justify-between px-4 lg:px-20 py-10 bg-slate-300 overflow-hidden">
+      {/* Desktop screen */}
+      <section className="hidden relative h-auto md:h-[700px] lg:flex flex-col-reverse lg:flex-row items-center justify-between md:px-5 xl:px-20 py-10 bg-slate-300 overflow-hidden">
         <div className="max-w-xl text-center lg:text-left mt-8 lg:mt-0">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
             Get lost in tales only African writers can tell
           </h1>
-          <p className="mt-4 text-sm sm:text-lg text-gray-700">
+          <p className="mt-4 text-sm sm:text-lg text-gray-700 ">
             With voices that echo, characters that breathe, and plots that pull
             you in.
           </p>
@@ -172,8 +173,36 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Tablet & Mobile Screen */}
+
+      <section className="lg:hidden flex flex-col items-center text-center bg-slate-300 pt-4">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mx-3">
+          Get lost in tales only African writers can tell
+        </h1>
+        <p className="mt-4 text-sm sm:text-lg text-gray-700 mx-3">
+          With voices that echo, characters that breathe, and plots that pull
+          you in.
+        </p>
+        <div className="">
+          <Image
+            src="/images/readers/landing/reader-landing-page.png"
+            alt="Happy man reading a tablet"
+            objectFit="contain"
+            width={400}
+            height={500}
+            className="rounded-lg w-[300px] h-[300px] sm:w-[400px] sm:h-[400px]"
+          />
+        </div>
+        <button className="px-6 sm:px-16 py-3 mb-12 bg-red-600 text-white text-base rounded-md hover:bg-red-700">
+          Explore our Book Store
+          <span className="ml-2">▼</span>
+        </button>
+      </section>
+
       <section className="bg-gray-50 px-4 py-10 md:px-6 md:py-16">
-        <h2 className="text-2xl font-semibold mb-6">Explore our Genres</h2>
+        <h2 className="text-2xl font-semibold mb-6 w-full text-center">
+          Explore our Genres
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {genres.map((genre) => (
             <div
