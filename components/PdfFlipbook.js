@@ -96,6 +96,7 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
   const [error, setError] = useState(null);
   const [documentReady, setDocumentReady] = useState(false);
   const [viewMode, setViewMode] = useState("flipbook"); // 'flipbook' or 'normal'
+  const [zoom, setZoom] = useState(1.0);
   const bookRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -263,6 +264,19 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
     }
   };
 
+  // Zoom control functions
+  const zoomIn = () => {
+    setZoom((prev) => Math.min(2.0, prev + 0.1));
+  };
+
+  const zoomOut = () => {
+    setZoom((prev) => Math.max(0.5, prev - 0.1));
+  };
+
+  const resetZoom = () => {
+    setZoom(1.0);
+  };
+
   return (
     <div className="flex flex-col items-center p-4 sm:p-6 md:p-8 bg-gray-50 min-h-screen">
       {/* Container for the entire flipbook component */}
@@ -297,6 +311,38 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
               <span className="xs:hidden">📄</span>
             </button>
           </div>
+
+          {/* Zoom Controls - moved to top */}
+          {viewMode === "flipbook" && (
+            <div className="sticky top-2 z-20 flex items-center gap-2 bg-white rounded-lg px-3 py-2 shadow-md mx-auto sm:mx-0 w-fit">
+              <button
+                onClick={zoomOut}
+                disabled={zoom <= 0.5}
+                className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                title="Zoom Out"
+              >
+                -
+              </button>
+              <span className="text-sm font-medium text-gray-700 min-w-[60px] text-center">
+                {Math.round(zoom * 100)}%
+              </span>
+              <button
+                onClick={zoomIn}
+                disabled={zoom >= 2.0}
+                className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                title="Zoom In"
+              >
+                +
+              </button>
+              <button
+                onClick={resetZoom}
+                className="px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-xs"
+                title="Reset Zoom"
+              >
+                Reset
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
