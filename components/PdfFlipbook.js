@@ -25,6 +25,11 @@ import "react-pdf/dist/Page/TextLayer.css";
 // It needs to be forwardRef because HTMLFlipBook passes a ref to its children.
 const Page = React.forwardRef(({ pageNumber, width, height }, ref) => {
   const [pageError, setPageError] = React.useState(null);
+  const deviceScale =
+    typeof window !== "undefined"
+      ? Math.min(2, Math.max(1.25, window.devicePixelRatio || 1.25))
+      : 1.25;
+  const useSvg = width <= 640;
 
   return (
     <div
@@ -51,8 +56,10 @@ const Page = React.forwardRef(({ pageNumber, width, height }, ref) => {
             pageNumber={pageNumber}
             width={width}
             height={height}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
+            renderMode={useSvg ? "svg" : "canvas"}
+            scale={useSvg ? undefined : deviceScale}
+            renderTextLayer={false}
+            renderAnnotationLayer={false}
             onLoadError={(error) => {
               console.error(`Error loading page ${pageNumber}:`, error);
               setPageError(
