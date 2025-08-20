@@ -6,6 +6,7 @@ import { User, Menu, ArrowLeft } from "lucide-react";
 import DashboardNav from "../(components)/DashboardNav";
 import ProfileSidebar from "../(components)/ProfileSidebar";
 import EditReaderProfile from "../(components)/EditProfileModal";
+import LogoutConfirmModal from "../(components)/LogoutConfirmModal";
 import { useAuth } from "../../../contexts/ProfileAuthContext";
 import { getReaderProfile } from "@/utils/auth/readerApi";
 import Link from "next/link";
@@ -15,6 +16,7 @@ export default function ProfilePage() {
   const { reader, setReader } = useAuth();
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const router = useRouter();
   
   useEffect(() => {
@@ -28,13 +30,20 @@ export default function ProfilePage() {
     fetchReader();
   }, [setReader]);
 
+    // Define the logout logic in the parent component
+  const handleLogout = () => {
+    setReader(null);
+    localStorage.removeItem("access_token");
+    router.push("/reader/sign_in");
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 relative">
       {/* Sticky Navigation */}
       <DashboardNav />
 
       {/* Main Content */}
-      <div className="flex flex-col p-4 sm:p-6 md:p-8 mt-16">
+      <div className="flex flex-col p-2 sm:p-6 md:p-8">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
@@ -71,13 +80,15 @@ export default function ProfilePage() {
 
           {/* Sidebar */}
           <div
-            className={`absolute md:relative z-50 w-64 bg-white shadow p-4 transform transition-transform duration-300 
-              md:translate-x-0 
+            className={`fixed inset-0 bg-white z-50 p-4 overflow-y-auto transform transition-transform duration-300
+            
+              flex flex-col justify-center items-center
+
               ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} 
-              md:top-0 top-[60px]`} // adjust top to match Profile header height
-            style={{ maxHeight: "calc(100vh - 60px)" }} // keep it from overflowing on mobile
+              md:relative md:w-64 md:h-auto md:translate-x-0 md:shadow md:block
+              md:top-0 md:top-0`}
           >
-            <ProfileSidebar />
+            <ProfileSidebar currentPage="Profile" setShowLogoutConfirm={setShowLogoutConfirm} />
           </div>
 
           {/* Main Content */}
@@ -152,6 +163,13 @@ export default function ProfilePage() {
             onClose={() => setIsEditOpen(false)}
           />
         )}
+
+        {/* Logout Confirmation Modal */}
+        <LogoutConfirmModal 
+          isOpen={showLogoutConfirm}
+          onClose={() => setShowLogoutConfirm(false)}
+          onConfirm={handleLogout}
+          />
       </div>
     </div>
   );
