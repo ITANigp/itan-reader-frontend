@@ -1,9 +1,31 @@
+import { Suspense } from "react";
+import Link from "next/link";
+import ResetPasswordClientComponent from "./ResetPasswordClientComponent";
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
+      <div className="max-w-md w-full mx-auto bg-white shadow-lg rounded-2xl p-8 text-center">
+        {/*
+          The Suspense boundary tells Next.js to wait for the client-side
+          component to render before trying to use a client-only hook like
+          useSearchParams.
+        */}
+        <Suspense fallback={<div>Loading password reset form...</div>}>
+          <ResetPasswordClientComponent />
+        </Suspense>
+      </div>
+    </div>
+  );
+}
+
+
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordClientComponent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("reset_password_token");
@@ -54,76 +76,72 @@ export default function ResetPasswordPage() {
 
   if (!token) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full bg-white shadow-lg rounded-2xl p-8 text-center">
-          <p className="text-[#E50913] font-semibold text-lg">Invalid or expired password reset link. Please try again.</p>
-          <div className="mt-4 text-sm text-gray-600">
-            <Link href="/reader/forgot_password" className="text-orange-600 font-medium hover:underline">
-              Request a new password reset link
-            </Link>
-          </div>
+      <div className="max-w-md w-full bg-white shadow-lg rounded-2xl p-8 text-center">
+        <p className="text-[#E50913] font-semibold text-lg">Invalid or expired password reset link. Please try again.</p>
+        <div className="mt-4 text-sm text-gray-600">
+          <Link href="/reader/forgot_password" className="text-orange-600 font-medium hover:underline">
+            Request a new password reset link
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-      <div className="max-w-md w-full mx-auto bg-white shadow-lg rounded-2xl p-8 text-center">
-        <h1 className="text-2xl md:text-3xl font-semibold mb-4 text-[#4e4c4c]">Reset Password</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="New password"
-              className="h-[46px] text-sm w-full p-2.5 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute top-3.5 right-3 text-gray-600"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Confirm new password"
-              className="h-[46px] text-sm w-full p-2.5 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
-              value={passwordConfirmation}
-              onChange={(e) => setPasswordConfirmation(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute top-3.5 right-3 text-gray-600"
-            >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-          </div>
-
+    <>
+      <h1 className="text-2xl md:text-3xl font-semibold mb-4 text-[#4e4c4c]">Reset Password</h1>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="New password"
+            className="h-[46px] text-sm w-full p-2.5 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#E50913] hover:bg-[#ba2129] text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute top-3.5 right-3 text-gray-600"
           >
-            {loading ? "Resetting..." : "Reset Password"}
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
-        </form>
-
-        {message && (
-          <p
-            className={`mt-4 text-center text-sm ${messageType === "success" ? "text-green-500" : "text-[#E50913]"}`}
+        </div>
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Confirm new password"
+            className="h-[46px] text-sm w-full p-2.5 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
+            value={passwordConfirmation}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute top-3.5 right-3 text-gray-600"
           >
-            {message}
-          </p>
-        )}
-      </div>
-    </div>
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#E50913] hover:bg-[#ba2129] text-white font-semibold py-2.5 rounded-lg text-sm transition-colors"
+        >
+          {loading ? "Resetting..." : "Reset Password"}
+        </button>
+      </form>
+
+      {message && (
+        <p
+          className={`mt-4 text-center text-sm ${messageType === "success" ? "text-green-500" : "text-[#E50913]"}`}
+        >
+          {message}
+        </p>
+      )}
+    </>
   );
 }
