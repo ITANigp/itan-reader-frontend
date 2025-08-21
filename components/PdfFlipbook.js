@@ -77,9 +77,9 @@ const Page = React.forwardRef(({ pageNumber, width, height }, ref) => {
             style={{ display: "block" }}
           />
           {/* Optional: Page number overlay */}
-          <p className="absolute bottom-2 right-4 text-gray-600 text-sm">
+          {/* <p className="absolute bottom-2 right-4 text-gray-600 text-sm">
             Page {pageNumber}
-          </p>
+          </p> */}
         </>
       )}
     </div>
