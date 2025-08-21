@@ -57,14 +57,14 @@ export default function Home() {
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
       {/* <div className="hidden md:flex max-w-8xl mx-auto px-4 py-5 justify-end"> */}
-      <div className="flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
+      <div className="hidden sm:flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
         <FreeTrialTimer />
       </div>
 
       {/* CONTAINER */}
       {/* <div className="max-w-7xl mx-auto px-4">  */}
       {/* <div className="max-w-8xl mx-auto px-4">  */}
-      <div className="max-w-[1440px] mx-auto px-4">
+      <div className="max-w-[1440px] mx-auto px-4 pt-5 sm:mt-0">
 
         {/* Header */}
         {/* <div className="flex justify-between items-center py-3 mb-2 md:hidden">
