@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Search, User } from "lucide-react";
+import { getReaderProfile } from "@/utils/auth/readerApi";
 import { useRouter, usePathname } from "next/navigation"; // Import usePathname
 import Image from "next/image";
 
@@ -34,7 +35,7 @@ const DashboardNav = () => {
     };
     fetchProfile();
   }, []);
-
+  
   useEffect(() => {
     // This effect handles the active tab based on the URL path
     const path = pathname.split("/")[1] || "home";
@@ -247,3 +248,4 @@ const DashboardNav = () => {
 };
 
 export default DashboardNav;
+

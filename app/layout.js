@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import "flowbite";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import {ProfileAuthProvider} from "@/contexts/ProfileAuthContext"
 import { LikeProvider } from "@/contexts/LikeContext";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import dynamic from "next/dynamic";
@@ -41,7 +42,9 @@ export default function Layout({ children }) {
       <body>
         <main className="bg-gray-100">
           <AuthProvider>
+            <ProfileAuthProvider>
             <LikeProvider>{children}</LikeProvider>
+            </ProfileAuthProvider>
           </AuthProvider>
           {/* The dynamic component is now used here */}
           <ReadersFooter hiddenPage={showFooter} />
