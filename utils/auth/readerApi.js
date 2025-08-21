@@ -3,6 +3,7 @@ import axios from "axios";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const TOKEN_KEY = "access-token"; // consistent key name for JWT
 
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
@@ -10,6 +11,24 @@ export const api = axios.create({
     Accept: "application/json",
   },
 });
+
+// Automatically redirect to sign-in if token is expired/invalid
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      // Remove token and redirect to sign-in page
+      localStorage.removeItem(TOKEN_KEY);
+      if (typeof window !== "undefined") {
+        window.location.href = "/reader/sign_in";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Helper to store token
 const storeToken = (token) => {
