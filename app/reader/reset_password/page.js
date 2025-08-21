@@ -1,31 +1,12 @@
+("use client");
+
 import { Suspense } from "react";
 import Link from "next/link";
-import ResetPasswordClientComponent from "./ResetPasswordClientComponent";
-
-export default function ResetPasswordPage() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-      <div className="max-w-md w-full mx-auto bg-white shadow-lg rounded-2xl p-8 text-center">
-        {/*
-          The Suspense boundary tells Next.js to wait for the client-side
-          component to render before trying to use a client-only hook like
-          useSearchParams.
-        */}
-        <Suspense fallback={<div>Loading password reset form...</div>}>
-          <ResetPasswordClientComponent />
-        </Suspense>
-      </div>
-    </div>
-  );
-}
-
-
-"use client";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function ResetPasswordClientComponent() {
+function ResetPasswordClientComponent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get("reset_password_token");
@@ -44,17 +25,20 @@ export default function ResetPasswordClientComponent() {
     setMessageType("info");
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/readers/password`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reader: {
-            password,
-            password_confirmation: passwordConfirmation,
-            reset_password_token: token,
-          },
-        }),
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/readers/password`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reader: {
+              password,
+              password_confirmation: passwordConfirmation,
+              reset_password_token: token,
+            },
+          }),
+        }
+      );
 
       if (res.ok) {
         setMessage("Password successfully reset! Redirecting to Sign In...");
@@ -77,9 +61,14 @@ export default function ResetPasswordClientComponent() {
   if (!token) {
     return (
       <div className="max-w-md w-full bg-white shadow-lg rounded-2xl p-8 text-center">
-        <p className="text-[#E50913] font-semibold text-lg">Invalid or expired password reset link. Please try again.</p>
+        <p className="text-[#E50913] font-semibold text-lg">
+          Invalid or expired password reset link. Please try again.
+        </p>
         <div className="mt-4 text-sm text-gray-600">
-          <Link href="/reader/forgot_password" className="text-orange-600 font-medium hover:underline">
+          <Link
+            href="/reader/forgot_password"
+            className="text-orange-600 font-medium hover:underline"
+          >
             Request a new password reset link
           </Link>
         </div>
@@ -89,7 +78,9 @@ export default function ResetPasswordClientComponent() {
 
   return (
     <>
-      <h1 className="text-2xl md:text-3xl font-semibold mb-4 text-[#4e4c4c]">Reset Password</h1>
+      <h1 className="text-2xl md:text-3xl font-semibold mb-4 text-[#4e4c4c]">
+        Reset Password
+      </h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
           <input
@@ -143,5 +134,22 @@ export default function ResetPasswordClientComponent() {
         </p>
       )}
     </>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
+      <div className="max-w-md w-full mx-auto bg-white shadow-lg rounded-2xl p-8 text-center">
+        {/*
+          The Suspense boundary tells Next.js to wait for the client-side
+          component to render before trying to use a client-only hook like
+          useSearchParams.
+        */}
+        <Suspense fallback={<div>Loading password reset form...</div>}>
+          <ResetPasswordClientComponent />
+        </Suspense>
+      </div>
+    </div>
   );
 }
