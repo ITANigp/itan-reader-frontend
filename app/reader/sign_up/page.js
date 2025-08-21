@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react"; // <-- Import useEffect
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,15 +18,17 @@ export default function SignUp() {
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("info");
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
+    setMessageType("info");
 
     try {
-      const reader = await api.post("/readers", {
+      const response = await api.post("/readers", {
         reader: {
           email,
           password,
@@ -36,27 +38,27 @@ export default function SignUp() {
         },
       });
 
-      if (reader?.data?.data?.token) {
-        localStorage.setItem("access-token", reader.data.data.token);
-        setMessage("Registration successful! Redirecting...");
-        router.push("/"); // go to home/dashboard
+      if (response?.data?.data) {
+        setMessage(
+          "Registration successful! Please check your email to confirm your account."
+        );
+        setMessageType("success");
+        router.push(`/reader/confirm_email?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
       setMessage(
-        error.response?.data?.message ||
-          "Registration failed. Please try again."
+        error.response?.data?.message || "Registration failed. Please try again."
       );
+      setMessageType("error");
       console.error("Registration error:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Move the localStorage access inside a useEffect hook
   useEffect(() => {
-    // This code will only run in the browser after the component is mounted
     console.log("JWT Token stored:", localStorage.getItem("jwtToken"));
-  }, []); // The empty dependency array ensures this runs only once
+  }, []);
 
   return (
     <main className="flex flex-col md:flex-row min-h-screen bg-white my-5">
@@ -188,7 +190,7 @@ export default function SignUp() {
 
             {message && (
               <p
-                className="text-sm text-[#E50913] text-center"
+                className={`text-sm text-center ${messageType === "success" ? "text-green-500" : "text-[#E50913]"}`}
                 aria-live="polite"
               >
                 {message}
