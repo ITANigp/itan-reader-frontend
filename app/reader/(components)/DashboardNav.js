@@ -3,11 +3,10 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Search, User } from "lucide-react";
-import { getReaderProfile } from "@/utils/auth/readerApi";
+import { getReaderProfile, signOutReader } from "@/utils/auth/readerApi";
 import { useRouter, usePathname } from "next/navigation"; // Import usePathname
 import Image from "next/image";
 
-import { getReaderProfile, signOutReader } from "@/utils/auth/readerApi";
 
 const DashboardNav = () => {
   // Use a different state for mobile menu to avoid conflicts
