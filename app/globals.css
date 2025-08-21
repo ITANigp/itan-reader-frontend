@@ -22,6 +22,7 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -56,6 +57,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
   }
+
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -90,7 +92,38 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Scoped fixes for flipbook PDF rendering on small screens */
+.my-flipbook .react-pdf__Page {
+  box-sizing: border-box;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.my-flipbook .react-pdf__Page__canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+.my-flipbook .react-pdf__Page__textContent,
+.my-flipbook .react-pdf__Page__annotations {
+  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  overflow: visible !important;
+}
+
+/* Flipbook canvas clarity */
+.my-flipbook canvas {
+  image-rendering: optimizeQuality;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
