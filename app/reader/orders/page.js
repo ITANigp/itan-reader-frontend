@@ -24,7 +24,7 @@ export default function OrdersPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 relative">
       <DashboardNav />
-      <div className="flex flex-col p-2 sm:p-6 md:p-8 mt-12">
+      <div className="flex flex-col p-2 sm:p-6 md:p-8">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <Link
@@ -60,7 +60,7 @@ export default function OrdersPage() {
               md:relative md:w-64 md:h-auto md:translate-x-0 md:shadow md:block
             `}
           >
-            <ProfileSidebar currentPage="Orders" setShowLogoutConfirm={setShowLogoutConfirm} />
+            <ProfileSidebar currentPage="Orders" setShowLogoutConfirm={setShowLogoutConfirm} setIsSidebarOpen={setIsSidebarOpen}/>
           </div>
           <div className="flex-1 mt-6 md:mt-0 md:ml-6">
             <div className="bg-white rounded-xl shadow p-6">
