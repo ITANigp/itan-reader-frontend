@@ -84,9 +84,9 @@ const Footer = ({ hiddenPage }) => {
               </div>
             </div>
             {/* Mobile links */}
-            <div className="flex flex-col items-center sm:hidden mt-3 text-[13px] text-gray-400 gap-2">              
+            <div className="flex flex-col items-center sm:hidden mt-3 text-[13px] text-gray-400 gap-2">
               <Link
-                href="/cookie-preferences"                
+                href="/cookie-preferences"
                 aria-label="Cookie preferences"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
@@ -106,22 +106,16 @@ const Footer = ({ hiddenPage }) => {
               >
                 Add cookies
               </Link>
-              <Link
-                href="#"                
-                className="cursor-pointer hover:text-[#EF5353]"
-              >
+              <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
                 Contact Us
               </Link>
-              <Link
-                href="#"                
-                className="cursor-pointer hover:text-[#EF5353]"
-              >
+              <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
                 Content Policy
-              </Link>              
+              </Link>
             </div>
           </div>
           {/* Desktop links */}
-          <div className="hidden sm:grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] text-gray-400 min-w-[250px]">            
+          <div className="hidden sm:grid grid-cols-2 gap-x-6 gap-y-2 text-[13px] text-gray-400 min-w-[250px]">
             <Link
               href="/"
               target="_blank"
@@ -130,16 +124,13 @@ const Footer = ({ hiddenPage }) => {
               Cookies preferences
             </Link>
             <Link
-              href="#"              
+              href="#"
               aria-label="Contact support via email"
               className="cursor-pointer hover:text-[#EF5353]"
             >
               FAQ
             </Link>
-            <Link
-              href="#"             
-              className="cursor-pointer hover:text-[#EF5353]"
-            >
+            <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
               Newsletter
             </Link>
             <Link
@@ -149,10 +140,7 @@ const Footer = ({ hiddenPage }) => {
             >
               Publish with IGP
             </Link>
-            <Link
-              href="#"              
-              className="cursor-pointer hover:text-[#EF5353]"
-            >
+            <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
               Contact Us
             </Link>
           </div>

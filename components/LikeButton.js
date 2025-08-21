@@ -1,173 +1,229 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { api } from "@/utils/auth/readerApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLike } from "@/contexts/LikeContext";
 
-/**
- * LikeButton Component
- *
- * A reusable React component for liking and unliking a book.
- * It handles the UI state (liked/unliked, loading, error) and
- * interacts with the backend API.
- *
- * Props:
- * - bookId: The UUID of the book to like/unlike. (string, required)
- * - userToken: The JWT token of the authenticated user. (string | null, required)
- * If null, the button will prompt the user to log in.
- *
- * Usage:
- * <LikeButton bookId="some-book-uuid-123" userToken={yourUserJwtToken} />
- */
-const LikeButton = ({ bookId, userToken }) => {
-  // State to track if the current user has liked this book
+const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
+  const { authToken } = useAuth();
+  const { likeCache, updateLikeStatus } = useLike();
   const [isLiked, setIsLiked] = useState(false);
-  // State to store the ID of the 'like' record, needed for DELETE requests
   const [likeId, setLikeId] = useState(null);
-  // State to manage loading status during API calls
-  const [isLoading, setIsLoading] = useState(true);
-  // State to store any error messages
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // useEffect to fetch the initial like status when the component mounts
-  // or when bookId/userToken changes.
-  useEffect(() => {
-    const fetchInitialLikeStatus = async () => {
-      if (!bookId) {
-        setError("Book ID is missing.");
-        setIsLoading(false);
-        return;
-      }
+  // Only allow API calls from specific sections to prevent infinite loops
+  const canFetchApi = section === "popular-trending" || section === "default";
 
-      // If no user token, we can't check like status for this user
-      if (!userToken) {
-        setIsLiked(false);
-        setLikeId(null);
-        setIsLoading(false);
-        return;
-      }
+  // Memoize the token to prevent unnecessary re-renders
+  const memoizedToken = useMemo(() => authToken, [authToken]);
 
-      setIsLoading(true);
-      setError(null);
+  // Get cached data for this book - don't memoize to ensure fresh cache checks
+  const cachedData = likeCache[bookId];
 
-      try {
-        // IMPORTANT: The GET /likes/:bookId endpoint should return a 200 OK
-        // with the like data if found, or a 404 Not Found if not liked.
-        const response = await api.get(`/likes/${bookId}`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        });
-
-        // If the request succeeds (Axios only resolves for 2xx status codes by default)
-        if (response.status === 200) {
-          const data = response.data; // Axios puts response data on .data property
-          setIsLiked(true); // User has liked the book
-          setLikeId(data.id); // Store the like ID for unliking
-        }
-      } catch (err) {
-        // Axios errors have a 'response' object if it's an HTTP error
-        if (err.response && err.response.status === 404) {
-          // If the status endpoint returns 404, it means no like found
-          setIsLiked(false); // User has NOT liked the book
-          setLikeId(null); // No like ID to store
-        } else {
-          // Handle other errors (network issues, 401 Unauthorized, 5xx server errors, etc.)
-          const errorMessage = err.response?.data?.message || err.message;
-          setError(`Error fetching like status: ${errorMessage}`);
-          console.error("Error fetching initial like status:", err);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInitialLikeStatus();
-  }, [bookId, userToken]); // Re-run effect if bookId or userToken changes
-
-  // Function to handle the like/unlike toggle
-  const handleLikeToggle = async () => {
-    if (!userToken) {
-      setError("Please log in to like or unlike a book.");
+  const fetchLikeStatus = useCallback(async () => {
+    if (!canFetchApi) {
+      console.log(
+        `LikeButton: [${section}] Fetch blocked - not authorized section`
+      );
       return;
     }
 
-    if (isLoading) return; // Prevent multiple clicks while an operation is in progress
+    // Check cache first before making API call
+    const currentCachedData = likeCache[bookId];
+    if (currentCachedData) {
+      console.log(
+        `LikeButton: [${section}] Using cached data for ${bookId}`,
+        currentCachedData
+      );
+      setIsLiked(currentCachedData.isLiked);
+      setLikeId(currentCachedData.likeId || currentCachedData.likeCount);
+      setIsLoading(false);
+      return;
+    }
+
+    console.log(
+      `LikeButton: [${section}] Fetching like status for book ${bookId}`
+    );
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await api.get(`/likes/${bookId}`, {
+        headers: { Authorization: `Bearer ${memoizedToken}` },
+      });
+
+      console.log(
+        `LikeButton: [${section}] Response for ${bookId}:`,
+        response.data
+      );
+
+      if (response.status === 200) {
+        const data = response.data;
+        setIsLiked(true);
+        setLikeId(data.id);
+
+        // Update cache - use callback to prevent dependency issues
+        updateLikeStatus(bookId, true, data.id);
+      }
+    } catch (err) {
+      if (err.response?.status === 404) {
+        // Book not liked - this is normal
+        setIsLiked(false);
+        setLikeId(null);
+
+        // Update cache
+        updateLikeStatus(bookId, false, null);
+      } else {
+        const errorMessage = err.response?.data?.message || err.message;
+        setError(`Error fetching like status: ${errorMessage}`);
+        console.error("Error fetching initial like status:", err);
+      }
+    } finally {
+      console.log(`LikeButton: [${section}] Finished loading for ${bookId}`);
+      setIsLoading(false);
+    }
+  }, [
+    bookId,
+    memoizedToken,
+    canFetchApi,
+    section,
+    updateLikeStatus,
+    likeCache,
+  ]);
+
+  // Initialize state ONLY when bookId changes - avoid cache dependency
+  useEffect(() => {
+    console.log(`LikeButton: [${section}] useEffect triggered for ${bookId}`, {
+      cachedData: !!cachedData,
+      memoizedToken: !!memoizedToken,
+      bookId,
+      canFetchApi,
+    });
+
+    if (canFetchApi && memoizedToken && bookId) {
+      // Only fetch if this section is authorized and we have token and bookId
+      console.log(
+        `LikeButton: [${section}] Checking for ${bookId} (authorized section)`
+      );
+      fetchLikeStatus();
+    } else if (!canFetchApi) {
+      // Other sections wait for cache or show default state
+      console.log(`LikeButton: [${section}] Read-only mode for ${bookId}`);
+      setIsLiked(false);
+      setLikeId(null);
+      setIsLoading(false);
+    } else {
+      // No token or bookId - set defaults
+      setIsLiked(false);
+      setLikeId(null);
+      setIsLoading(false);
+    }
+  }, [bookId, memoizedToken]); // REMOVED cachedData and fetchLikeStatus to prevent loops
+
+  // Separate effect to update from cache when available
+  useEffect(() => {
+    if (cachedData) {
+      console.log(
+        `LikeButton: [${section}] Cache updated for ${bookId}`,
+        cachedData
+      );
+      setIsLiked(cachedData.isLiked);
+      setLikeId(cachedData.likeId || cachedData.likeCount);
+      setIsLoading(false);
+    }
+  }, [cachedData, bookId, section]); // Watch only cache changes
+
+  // Remove the second useEffect completely to prevent loops
+
+  const handleLikeToggle = useCallback(async () => {
+    if (!memoizedToken) {
+      setError("Please log in to like books");
+      return;
+    }
+
+    if (isLoading) {
+      console.log(`LikeButton: Already loading for ${bookId}, skipping...`);
+      return;
+    }
+
+    console.log(
+      `LikeButton: Toggle like for ${bookId}, current state: ${isLiked}`
+    );
 
     setIsLoading(true);
     setError(null);
 
     try {
       if (isLiked) {
-        // User wants to UNLIKE the book (DELETE request)
+        // Unlike
         if (!likeId) {
           setError("Cannot unlike: Like ID is missing. Please refresh.");
           setIsLoading(false);
           return;
         }
 
-        // CORRECTED: DELETE request should target the specific 'like' record by its ID
+        console.log(`LikeButton: Unliking ${bookId} with likeId ${likeId}`);
         const response = await api.delete(`/likes/${likeId}`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+          headers: { Authorization: `Bearer ${memoizedToken}` },
         });
 
         if (response.status === 204 || response.status === 200) {
-          // 204 No Content is common for successful DELETE
           setIsLiked(false);
-          setLikeId(null); // Clear likeId as the like record no longer exists
-          console.log("Book unliked successfully!");
-        } else {
-          // This else block might be redundant if Axios throws for non-2xx statuses
-          const errorData = response.data;
-          setError(
-            `Failed to unlike book: ${errorData?.message || response.statusText || response.status}`
-          );
-          console.error("Failed to unlike book:", errorData);
+          setLikeId(null);
+          updateLikeStatus(bookId, false, null);
+          console.log(`LikeButton: Successfully unliked ${bookId}!`);
         }
       } else {
-        // User wants to LIKE the book (POST request)
-        // CORRECTED: Pass the data payload directly as the second argument for Axios POST
+        // Like
+        console.log(`LikeButton: Liking ${bookId}`);
         const response = await api.post(
-          `/likes`,
-          { book_id: bookId }, // Data payload for the request body
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-              "Content-Type": "application/json",
-            },
-          }
+          "/likes",
+          { book_id: bookId },
+          { headers: { Authorization: `Bearer ${memoizedToken}` } }
         );
 
-        if (response.status === 201) {
-          // 201 Created is common for successful POST
+        if (response.status === 201 || response.status === 200) {
           const data = response.data;
-          // Assuming your POST endpoint returns the newly created like's ID
+          console.log(`LikeButton: Like response for ${bookId}:`, data);
+
+          const newLikeId = data.like_id || data.id;
           setIsLiked(true);
-          setLikeId(data.id || data.like_id); // Use 'id' or 'like_id' based on backend response
-          console.log("Book liked successfully!", data);
-        } else {
-          // This else block might be redundant if Axios throws for non-2xx statuses
-          const errorData = response.data;
-          setError(
-            `Failed to like book: ${errorData?.message || response.statusText || response.status}`
+          setLikeId(newLikeId);
+          updateLikeStatus(bookId, true, newLikeId);
+          console.log(
+            `LikeButton: Successfully liked ${bookId}! ID: ${newLikeId}`
           );
-          console.error("Failed to like book:", errorData);
         }
       }
+
+      onLikeChange?.(bookId, !isLiked);
     } catch (err) {
+      console.error(
+        `LikeButton: Error for ${bookId}:`,
+        err.response?.status,
+        err.message
+      );
       const errorMessage = err.response?.data?.message || err.message;
       setError(`Network error: ${errorMessage}`);
-      console.error("Network error during like/unlike:", err);
     } finally {
+      console.log(`LikeButton: Finished processing for ${bookId}`);
       setIsLoading(false);
     }
-  };
+  }, [
+    bookId,
+    isLiked,
+    likeId,
+    memoizedToken,
+    isLoading,
+    onLikeChange,
+    updateLikeStatus,
+  ]);
 
-  // Render the button/icon
   return (
-    <div className="flex flex-col items-center p-4">
+    <div className="flex flex-col items-center">
       <button
         onClick={handleLikeToggle}
-        disabled={isLoading || !userToken} // Disable if loading or not authenticated
+        disabled={!memoizedToken || isLoading}
         className={`
           relative p-1 rounded-full transition-all duration-300 ease-in-out
           focus:outline-none focus:ring-2 focus:ring-offset-2
@@ -179,7 +235,7 @@ const LikeButton = ({ bookId, userToken }) => {
           ${isLoading ? "cursor-not-allowed opacity-70" : "cursor-pointer"}
         `}
         title={
-          userToken
+          memoizedToken
             ? isLiked
               ? "Unlike this book"
               : "Like this book"
@@ -187,7 +243,6 @@ const LikeButton = ({ bookId, userToken }) => {
         }
       >
         {isLoading ? (
-          // Simple loading spinner (Tailwind CSS based)
           <svg
             className="animate-spin h-5 w-5 text-current"
             xmlns="http://www.w3.org/2000/svg"
@@ -209,13 +264,12 @@ const LikeButton = ({ bookId, userToken }) => {
             ></path>
           </svg>
         ) : (
-          // Heart icon (using a simple SVG for demonstration)
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"
-            fill={isLiked ? "red" : "none"} // Fill with red if liked, else none
+            fill={isLiked ? "red" : "none"}
             viewBox="0 0 24 24"
-            stroke={isLiked ? "red" : "currentColor"} // Stroke with red if liked, else currentColor
+            stroke={isLiked ? "red" : "currentColor"}
             strokeWidth="2"
           >
             <path
@@ -230,7 +284,7 @@ const LikeButton = ({ bookId, userToken }) => {
       {error && (
         <p className="mt-2 text-sm text-red-600 text-center">{error}</p>
       )}
-      {!userToken && !isLoading && (
+      {!memoizedToken && !isLoading && (
         <p className="mt-2 text-sm text-gray-500 text-center">
           Log in to like this book.
         </p>
