@@ -244,7 +244,7 @@ export default function Home() {
                 {/* Price and View Button */}
                 <div className="flex justify-between items-center mt-1">
                   <span className="text-teal-600 font-bold text-[16px]">
-                    ${Number(book.price) / 100}
+                    ${Number(book.price)}
                   </span>
                   <Link
                     href={`/home/book-details/${book.id}`}
