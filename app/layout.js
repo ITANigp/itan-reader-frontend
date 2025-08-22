@@ -35,7 +35,7 @@ export default function Layout({ children }) {
   //   libraryPage
   //     ? "hidden"
   //     : "";
- const showFooter = pathname === "/" || pathname.endsWith("/bookstore") ? "" : "hidden";
+ const showFooter = pathname === "/" || pathname.startsWith("/bookstore") ? "" : "hidden";
   
   return (
     <html lang="eng">
