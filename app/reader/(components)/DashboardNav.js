@@ -103,10 +103,11 @@ const DashboardNav = () => {
             </div>
 
             <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
-              {["Home", "Library"].map((item) => (
+              {["Home", "Library", "Profile"].map((item) => (
                 <Link
                   key={item}
-                  href={item === "Home" ? "/home" : `/${item.toLowerCase()}`}
+                  href={item === "Home" ? "/home" : item === "Profile"
+                  ? "/reader/profile-page" : `/${item.toLowerCase()}`}
                   onClick={() => setActiveTab(item)}
                   className={`text-base font-medium transition-colors ${
                     activeTab === item
@@ -148,7 +149,7 @@ const DashboardNav = () => {
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg">
                     <Link
-                      href="/reader/profile"
+                      href="/reader/profile-page"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -220,7 +221,7 @@ const DashboardNav = () => {
             ref={mobileMenuRef}
           >
             <ul className="text-gray-700">
-              {["Home", "Library"].map((item) => (
+              {["Home", "Library", "Profile"].map((item) => (
                 <li
                   key={item}
                   className={`px-4 py-2 cursor-pointer transition-colors ${
@@ -231,7 +232,13 @@ const DashboardNav = () => {
                   }`}
                 >
                   <Link
-                    href={item === "Home" ? "/home" : `/${item.toLowerCase()}`}
+                    href={
+                      item === "Home"
+                        ? "/home"
+                        : item === "Profile"
+                          ? "/reader/profile-page"
+                          : `/${item.toLowerCase()}`
+                    }
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {item}

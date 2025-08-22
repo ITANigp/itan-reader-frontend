@@ -220,7 +220,7 @@ export default function BookDetails() {
 
   const authorName = author?.name || "Unknown";
   const displayPrice = ebook_price
-    ? `$${(ebook_price / 100).toFixed(2)}`
+    ? `$${(ebook_price).toFixed(2)}`
     : "N/A";
   const displayGenre = categories?.[0]?.main || "N/A";
   const displayDate = created_at
