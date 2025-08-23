@@ -6,6 +6,7 @@ import { useAuth } from "../../../contexts/ProfileAuthContext";
 import DashboardNav from "../(components)/DashboardNav";
 import ProfileSidebar from "../(components)/ProfileSidebar";
 import LogoutConfirmModal from "../(components)/LogoutConfirmModal";
+import TwoFactorAuthPage from "../two_factor_auth/page"; 
 import Link from "next/link";
 import { ArrowLeft, Menu } from "lucide-react";
 
@@ -66,8 +67,10 @@ export default function Settings() {
                     </div>
                     <div className="flex-1 mt-6 md:mt-0 md:ml-6">
                         <div className="bg-white rounded-xl shadow p-6">
-                            <p>Manage your account settings here.</p>
+                            <h2 className="text-xl font-semibold mb-4">Security Settings</h2>
+                            <TwoFactorAuthPage />
                         </div>
+
                     </div>
                 </div>
             </div>
