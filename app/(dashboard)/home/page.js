@@ -89,17 +89,20 @@ export default function Home() {
         </div>
         {/* Hero */}
         <div className="mb-14">
-          <div className="w-full h-40 md:h-60 relative rounded-lg overflow-hidden">
+          <div className="w-full h-40 md:h-60 xl:h-96 relative rounded-lg overflow-hidden">
             <Image
-              src="https://picsum.photos/600/200?grayscale&random=1"
+              src="/images/readers/home-hero.png"
               alt="Hero"
               fill
               className="object-cover"
             />
 
             {/* Overlay Text */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-center px-4">
-              <h1 className="text-white text-base md:text-xl font-semibold leading-snug">
+            <div className="absolute inset-0 flex items-center justify-center px-4">
+              <h1
+                className="text-center text-white text-base sm:text-lg md:text-2xl font-bold leading-snug tracking-wide drop-shadow-lg bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent"
+                style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
+              >
                 Explore Untold African Stories in the Most Immersive Way
               </h1>
             </div>
