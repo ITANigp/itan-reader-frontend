@@ -106,11 +106,11 @@ export default function Home() {
           </div>
         </div>
         {/* Genres */}
-        {/* <section className="mt-6 mb-16">
+        <section className="mt-6 mb-16">
           <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">
             Genres
           </h2>
-          <div className="flex gap-3 overflow-x-auto no-scrollbar md:gap-4 px-1 -mx-1">
+          <div className="flex gap-3 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100 md:gap-4 px-1 -mx-1">
             {[
               "Romance",
               "Fiction",
@@ -141,7 +141,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </section> */}
+        </section>
         {/* Popular Trending */}
         {/* <section className="mt-8 w-full">
           <div className="flex justify-between items-center mb-3">
@@ -205,27 +205,19 @@ export default function Home() {
             ))}
           </div>
         </section> */}
-        {/* Popular Trending */}
+        {/* Ebooks based on genre */}
         {Object.entries(booksByGenre).map(([genre, genreBooks]) => (
           <section key={genre} className="mt-8 mb-10">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-[17px]">{genre}</h2>
               {/* You can add a 'See more' link or button here if needed */}
             </div>
-            <div className="
-                grid gap-4
-                grid-cols-2
-                sm:grid-cols-3
-                md:grid-cols-4
-                lg:grid-cols-5
-                xl:grid-cols-6
-                2xl:grid-cols-7
-              ">
+            <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {genreBooks.length ? (
                 genreBooks.map((book, index) => (
                   <div
                     key={book.id}
-                    className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative md:shadow-md"
+                    className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
                   >
                     <div className="absolute top-2 right-2 z-10">
                       <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
