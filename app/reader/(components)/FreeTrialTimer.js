@@ -2,78 +2,72 @@
 
 import React, { useState, useEffect, Fragment } from "react";
 
-export default function FreeTrialTimer({ initialDays = 13, initialHours = 59, initialMinutes = 40, initialSeconds = 3 }) {
+export default function FreeTrialTimer({ trial_start, trial_end }) {
   const [timeLeft, setTimeLeft] = useState({
-    days: initialDays,
-    hours: initialHours,
-    minutes: initialMinutes,
-    seconds: initialSeconds
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
   });
 
   const timeUnits = [
     { label: "Days", key: "days" },
     { label: "Hours", key: "hours" },
     { label: "Minutes", key: "minutes" },
-    { label: "Seconds", key: "seconds" }
+    { label: "Seconds", key: "seconds" },
   ];
 
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prevTime => {
-        let { days, hours, minutes, seconds } = prevTime;
+    console.log("FreeTrialTimer trial_start:", trial_start);
+    console.log("FreeTrialTimer trial_end:", trial_end);
+    if (!trial_end) return;
+    const endTime = new Date(trial_end).getTime();
+    console.log("Parsed endTime (ms):", endTime);
 
-        if (seconds > 0) {
-          seconds--;
-        } else if (minutes > 0) {
-          minutes--;
-          seconds = 59;
-        } else if (hours > 0) {
-          hours--;
-          minutes = 59;
-          seconds = 59;
-        } else if (days > 0) {
-          days--;
-          hours = 23;
-          minutes = 59;
-          seconds = 59;
-        } else {
-          // Timer has reached zero
-          clearInterval(timer);
-          return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-        }
+    const updateTimer = () => {
+      const now = Date.now();
+      const diff = endTime - now;
+      console.log("Timer update - now:", now, "diff:", diff);
 
-        return { days, hours, minutes, seconds };
-      });
-    }, 1000);
+      if (diff <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
 
+      const days = Math.floor(diff / (24 * 60 * 60 * 1000));
+      const hours = Math.floor(
+        (diff % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)
+      );
+      const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+      const seconds = Math.floor((diff % (60 * 1000)) / 1000);
+
+      console.log("Time left:", { days, hours, minutes, seconds });
+      setTimeLeft({ days, hours, minutes, seconds });
+    };
+
+    updateTimer();
+    const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [trial_end]);
 
-  const formatNumber = (num) => {
-    return num.toString().padStart(2, '0');
-  };
+  const formatNumber = (num) => num.toString().padStart(2, "0");
 
   return (
     <div className="flex items-center space-x-4 text-sm mt-2">
-      {/* Label */}
       <span className="text-black font-medium">Free trial:</span>
-
-      {/* Timer */}
       <div className="flex items-end space-x-4">
         {timeUnits.map(({ label, key }, i) => (
           <Fragment key={label}>
             <div className="flex flex-col items-center">
-              {/* Gradient border */}
               <div className="p-[3px] rounded-full bg-gradient-to-br from-red-600 to-red-900">
                 <div className="w-10 h-10 bg-white text-red-700 rounded-full flex items-center justify-center font-bold text-base">
                   {formatNumber(timeLeft[key])}
                 </div>
               </div>
-              <span className="text-black text-xs font-normal mt-1">{label}</span>
+              <span className="text-black text-xs font-normal mt-1">
+                {label}
+              </span>
             </div>
-
-            {/* Colons */}
             {i < timeUnits.length - 1 && (
               <span className="text-red-700 font-bold text-lg pb-4">:</span>
             )}
@@ -81,8 +75,5 @@ export default function FreeTrialTimer({ initialDays = 13, initialHours = 59, in
         ))}
       </div>
     </div>
-
-
-
   );
 }

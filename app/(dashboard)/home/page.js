@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getReaderProfile } from "@/utils/auth/readerApi";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import LikeButton from "@/components/LikeButton";
@@ -12,7 +13,49 @@ export default function Home() {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [trialStart, setTrialStart] = useState(null);
+  const [trialEnd, setTrialEnd] = useState(null);
+  const [likedBookIds, setLikedBookIds] = useState([]);
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  useEffect(() => {
+    const fetchLikedBooks = async () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        try {
+          console.log("Fetching liked books from:", `${BASE_URL}/likes`);
+          const response = await fetch(`${BASE_URL}/likes`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          console.log("Liked books API status:", response.status);
+          const result = await response.json();
+          console.log("Liked books API response:", result);
+          // Extract liked book IDs from result.data array
+          // Extract liked book IDs and ensure they are strings for comparison
+          const likedBookIds = Array.isArray(result.data)
+            ? result.data.map(like => String(like.book.id))
+            : [];
+          console.log("home/page.js: likedBookIds extracted:", likedBookIds);
+          setLikedBookIds(likedBookIds);
+        } catch (err) {
+          console.error("Error fetching liked books:", err);
+        }
+      }
+    };
+    fetchLikedBooks();
+  }, []);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("access_token");
+      if (token) {
+        const { data } = await getReaderProfile(token);
+        setTrialStart(data.trial_start);
+        setTrialEnd(data.trial_end);
+      }
+    };
+    fetchProfile();
+  }, []);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("access_token");
@@ -24,12 +67,16 @@ export default function Home() {
       try {
         const response = await fetch(`${BASE_URL}/books`);
         const result = await response.json();
+        // Extract main category names for each book
         const formattedBooks = result.data.map((book) => ({
           id: book.id,
           title: book.attributes.title,
           author: book.attributes.author.name,
           price: book.attributes.ebook_price,
           image: book.attributes.cover_image_url,
+          mainCategories: Array.isArray(book.attributes.categories)
+            ? book.attributes.categories.map((cat) => cat.main).filter(Boolean)
+            : [],
         }));
         setBooks(formattedBooks);
       } catch (err) {
@@ -54,18 +101,33 @@ export default function Home() {
       </div>
     );
 
+  // Group books by main category names
+  const booksByGenre = books.reduce((acc, book) => {
+    const genres = book.mainCategories.length
+      ? book.mainCategories
+      : ["Itan Originals"];
+    genres.forEach((genre) => {
+      if (!acc[genre]) acc[genre] = [];
+      acc[genre].push(book);
+    });
+    return acc;
+  }, {});
+
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
-      {/* <div className="hidden md:flex max-w-8xl mx-auto px-4 py-5 justify-end"> */}
+      {/* Mobile-only timer, centered and contained */}
+      <div className="flex sm:hidden w-full justify-center items-center pt-4 pb-2">
+        <div className="max-w-[180px] w-full flex justify-center items-center">
+          <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} mobile />
+        </div>
+      </div>
+      {/* Desktop/Tablet timer, right-aligned */}
       <div className="hidden sm:flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
-        <FreeTrialTimer />
+        <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} />
       </div>
 
       {/* CONTAINER */}
-      {/* <div className="max-w-7xl mx-auto px-4">  */}
-      {/* <div className="max-w-8xl mx-auto px-4">  */}
       <div className="max-w-[1440px] mx-auto px-4 pt-5 sm:mt-0">
-
         {/* Header */}
         {/* <div className="flex justify-between items-center py-3 mb-2 md:hidden">
           <button className="bg-white w-8 h-8 rounded-full flex items-center justify-center text-base border border-gray-500 text-gray-500">
@@ -74,17 +136,20 @@ export default function Home() {
         </div>
         {/* Hero */}
         <div className="mb-14">
-          <div className="w-full h-40 md:h-60 relative rounded-lg overflow-hidden">
+          <div className="w-full h-40 md:h-60 xl:h-96 relative rounded-lg overflow-hidden">
             <Image
-              src="https://picsum.photos/600/200?grayscale&random=1"
+              src="/images/readers/home-hero.png"
               alt="Hero"
               fill
               className="object-cover"
             />
 
             {/* Overlay Text */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-center px-4">
-              <h1 className="text-white text-base md:text-xl font-semibold leading-snug">
+            <div className="absolute inset-0 flex items-center justify-center px-4">
+              <h1
+                className="text-center text-white text-base sm:text-lg md:text-2xl font-bold leading-snug tracking-wide drop-shadow-lg bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent"
+                style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
+              >
                 Explore Untold African Stories in the Most Immersive Way
               </h1>
             </div>
@@ -92,8 +157,10 @@ export default function Home() {
         </div>
         {/* Genres */}
         <section className="mt-6 mb-16">
-          <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">Genres</h2>
-          <div className="flex gap-3 overflow-x-auto no-scrollbar md:gap-4 px-1 -mx-1">
+          <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">
+            Genres
+          </h2>
+          <div className="flex gap-3 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100 md:gap-4 px-1 -mx-1">
             {[
               "Romance",
               "Fiction",
@@ -188,117 +255,82 @@ export default function Home() {
             ))}
           </div>
         </section> */}
-        {/* Popular Trending */}
-        <section className="mt-8">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="font-semibold text-[17px]">Popular Trending </h2>
-            <span className="text-red-600 text-xs cursor-pointer">
-              See more →
-            </span>
-          </div>
-
-          <div className="flex gap-4 overflow-x-auto no-scrollbar md:overflow-x-auto">
-            {books.map((book, index) => (
-              <div
-                key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
-              >
-                <div className="absolute top-2 right-2 z-10">
-                  <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
-                    <LikeButton
-                      bookId={book.id}
-                      userToken={userToken}
-                      section="popular-trending"
-                    />
-                  </div>
-                </div>
-
-                {/* Book Image */}
-                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                  <Image
-                    src={
-                      book.image ||
-                      `https://picsum.photos/150/220?random=${index + 20}`
-                    }
-                    alt={book.title}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </div>
-
-                {/* Stars */}
-                <div className="flex items-center gap-0.5 mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-red-500 text-xs">
-                      ★
-                    </span>
-                  ))}
-                </div>
-
-                {/* Title & Author */}
-                <p className="text-sm font-bold leading-snug">{book.title}</p>
-                <p className="text-xs text-gray-500 mb-1">
-                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
-                </p>
-
-                {/* Price and View Button */}
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-teal-600 font-bold text-[16px]">
-                    ${Number(book.price)}
-                  </span>
-                  <Link
-                    href={`/home/book-details/${book.id}`}
-                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
-                  >
-                    View details
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-        {/* Continue Reading */}
-        <section className="mt-8 mb-16">
-          <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">Continue Reading</h2>
-          <div
-            className="flex gap-[10px] md:gap-[24px] overflow-x-auto no-scrollbar"
-            style={{
-              width: '100%',
-              maxWidth: '1376px',
-              height: 'auto',
-              opacity: 1,
-            }}
-          >
-            {books.map((book, index) => (
-              <div
-                key={`continue-${index}`}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
-              >
-                {/* Book Image */}
-                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                  <Image
-                    src={
-                      book.image ||
-                      `https://picsum.photos/150/220?random=${index + 20}`
-                    }
-                    alt={book.title}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </div>
-
-                {/* Page and continue Button */}
-                <div className="flex flex-col justify-center items-center mt-1">
-                  <p className="text-xs text-gray-600 mb-1">Page 25 of 283</p>
-                  <Button className="bg-red-600 hover:bg-red-700 text-white text-xs font-medium px-7 py-1 rounded">
-                    Continue
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
+        {/* Ebooks based on genre */}
+        {Object.entries(booksByGenre).map(([genre, genreBooks]) => (
+          <section key={genre} className="mt-8 mb-10">
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="font-semibold text-[17px]">{genre}</h2>
+              {/* You can add a 'See more' link or button here if needed */}
+            </div>
+            <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+              {genreBooks.length ? (
+                genreBooks.map((book, index) => {
+                  const isLiked = likedBookIds.includes(String(book.id));
+                  console.log('home/page.js: rendering LikeButton', {
+                    bookId: String(book.id),
+                    isLiked,
+                    likedBookIds,
+                    genre,
+                  });
+                  return (
+                    <div
+                      key={book.id}
+                      className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
+                    >
+                      <div className="absolute top-2 right-2 z-10">
+                        <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
+                          <LikeButton
+                            bookId={String(book.id)}
+                            userToken={userToken}
+                            section={genre}
+                            isLiked={isLiked}
+                          />
+                        </div>
+                      </div>
+                      <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
+                        <Image
+                          src={
+                            book.image ||
+                            `https://picsum.photos/150/220?random=${index + 20}`
+                          }
+                          alt={book.title}
+                          fill
+                          className="object-cover rounded"
+                        />
+                      </div>
+                      <div className="flex items-center gap-0.5 mb-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span key={i} className="text-red-500 text-xs">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                      <p className="text-sm font-bold leading-snug">
+                        {book.title}
+                      </p>
+                      <p className="text-xs text-gray-500 mb-1">
+                        By: {book?.author?.trim() ? book.author : "Jane Doe"}
+                      </p>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-teal-600 font-bold text-[16px]">
+                          ${Number(book.price)}
+                        </span>
+                        <Link
+                          href={`/home/book-details/${book.id}`}
+                          className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
+                        >
+                          View details
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-gray-500">No books found in this genre.</p>
+              )}
+            </div>
+          </section>
+        ))}
       </div>
     </div>
   );

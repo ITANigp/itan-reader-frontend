@@ -389,24 +389,41 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
                 </HTMLFlipBook>
               ) : (
                 /* Normal PDF View */
-                <div className="w-full">
-                  <div className="flex flex-col items-center space-y-4">
-                    {/* Single page view for normal mode */}
-                    <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-                      <ReactPdfPage
-                        pageNumber={currentPage}
-                        width={Math.min(800, window.innerWidth * 0.9)}
-                        renderTextLayer={true}
-                        renderAnnotationLayer={true}
-                        loading={
-                          <div className="flex justify-center items-center h-64">
-                            <p className="text-gray-500 text-sm">
-                              Loading page {currentPage}...
-                            </p>
-                          </div>
-                        }
-                        className="w-full h-full"
-                      />
+                <div
+                  className="w-full max-w-none bg-white py-8 px-0"
+                  style={{ minHeight: "80vh" }}
+                >
+                  <div className="flex flex-col gap-8 items-center">
+                    <div className="flex flex-col gap-8 items-center">
+                      {/* Prompt only for normal PDF reader */}
+                      <p className="flex items-center justify-center gap-2 text-center font-bold mb-6 text-base sm:text-lg md:text-xl bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-sm">
+                        <span className="inline-block animate-bounce text-2xl">
+                          ⬇️
+                        </span>
+                        <span>Scroll down to read the book</span>
+                      </p>
+                      {Array.from({ length: numPages }, (_, i) => (
+                        <div
+                          className="flex justify-center w-full"
+                          key={`pdf-page-container-${i + 1}`}
+                        >
+                          <ReactPdfPage
+                            key={`pdf-page-${i + 1}`}
+                            pageNumber={i + 1}
+                            width={Math.min(900, window.innerWidth * 0.98)}
+                            renderTextLayer={true}
+                            renderAnnotationLayer={true}
+                            loading={
+                              <div className="flex justify-center items-center h-64">
+                                <p className="text-gray-500 text-lg font-bold">
+                                  Loading page {i + 1}...
+                                </p>
+                              </div>
+                            }
+                            className="w-full h-full border-b border-gray-200"
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
