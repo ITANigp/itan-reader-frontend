@@ -37,22 +37,43 @@ export default function BookDetails() {
   const [isTrialActive, setIsTrialActive] = useState(false);
   const [daysLeftInTrial, setDaysLeftInTrial] = useState(0);
 
-  // Simulate trial logic (in future: move to context too)
+  // Real trial logic: fetch trial dates from user profile
   useEffect(() => {
-    if (isLoggedIn) {
-      const trialEnd = new Date();
-      trialEnd.setDate(trialEnd.getDate() + 10); // Fake 10-day trial
-      const today = new Date();
-      const daysLeft = Math.ceil((trialEnd - today) / (1000 * 60 * 60 * 24));
-
-      if (daysLeft > 0) {
-        setIsTrialActive(true);
-        setDaysLeftInTrial(daysLeft);
-      } else {
+    async function fetchTrialInfo() {
+      if (!isLoggedIn || !authToken) return;
+      try {
+        // Try common profile endpoints
+        let response;
+        try {
+          response = await api.get("/readers/profile", {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+        } catch (err) {
+          // Fallback to /profile/me if /readers/profile fails
+          response = await api.get("/profile/me", {
+            headers: { Authorization: `Bearer ${authToken}` },
+          });
+        }
+        const { trial_start, trial_end } = response.data.data || {};
+        if (trial_start && trial_end) {
+          const now = new Date();
+          const start = new Date(trial_start);
+          const end = new Date(trial_end);
+          let daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+          if (daysLeft < 0) daysLeft = 0;
+          setIsTrialActive(daysLeft > 0);
+          setDaysLeftInTrial(daysLeft);
+        } else {
+          setIsTrialActive(false);
+          setDaysLeftInTrial(0);
+        }
+      } catch (err) {
         setIsTrialActive(false);
+        setDaysLeftInTrial(0);
       }
     }
-  }, [isLoggedIn]);
+    fetchTrialInfo();
+  }, [isLoggedIn, authToken]);
 
   useEffect(() => {
     if (!bookId) return;
@@ -152,9 +173,9 @@ export default function BookDetails() {
         if (content?.url) {
           // Navigate to flipbook reader with the PDF URL (don't encode since it's already a valid URL)
           const urlParams = new URLSearchParams();
-          urlParams.set('url', content.url);
-          urlParams.set('title', bookData.title);
-          
+          urlParams.set("url", content.url);
+          urlParams.set("title", bookData.title);
+
           router.push(`/reader/flipbook?${urlParams.toString()}`);
         } else if (content?.text) {
           // If it's text content, show in alert
@@ -216,12 +237,8 @@ export default function BookDetails() {
     created_at,
   } = bookData;
 
-  console.log("Book Details inFo: ", bookData);
-
   const authorName = author?.name || "Unknown";
-  const displayPrice = ebook_price
-    ? `$${(ebook_price).toFixed(2)}`
-    : "N/A";
+  const displayPrice = ebook_price ? `$${ebook_price.toFixed(2)}` : "N/A";
   const displayGenre = categories?.[0]?.main || "N/A";
   const displayDate = created_at
     ? new Date(created_at).toLocaleDateString("en-US", {
@@ -239,7 +256,7 @@ export default function BookDetails() {
 
   return (
     <div className="space-y-10 px-6 py-10">
-      <Link href="/" className="text-blue-600 hover:underline">
+      <Link href="/home" className="text-blue-600 hover:underline">
         ← Back to Books
       </Link>
 
