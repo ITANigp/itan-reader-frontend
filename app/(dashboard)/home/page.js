@@ -115,14 +115,18 @@ export default function Home() {
 
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
-      {/* <div className="hidden md:flex max-w-8xl mx-auto px-4 py-5 justify-end"> */}
+      {/* Mobile-only timer, centered and contained */}
+      <div className="flex sm:hidden w-full justify-center items-center pt-4 pb-2">
+        <div className="max-w-[180px] w-full flex justify-center items-center">
+          <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} mobile />
+        </div>
+      </div>
+      {/* Desktop/Tablet timer, right-aligned */}
       <div className="hidden sm:flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
         <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} />
       </div>
 
       {/* CONTAINER */}
-      {/* <div className="max-w-7xl mx-auto px-4">  */}
-      {/* <div className="max-w-8xl mx-auto px-4">  */}
       <div className="max-w-[1440px] mx-auto px-4 pt-5 sm:mt-0">
         {/* Header */}
         {/* <div className="flex justify-between items-center py-3 mb-2 md:hidden">
