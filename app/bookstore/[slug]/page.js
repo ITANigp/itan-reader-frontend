@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ export default function BookDetails() {
   const params = useParams();
   const bookSlug = params.slug;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const router = useRouter()
 
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -123,7 +124,7 @@ export default function BookDetails() {
 
   const authorName = author?.name?.trim() || "Unknown Author";
   const displayPrice = ebook_price
-    ? `$ ${(ebook_price / 100).toFixed(2)}`
+    ? `$ ${(ebook_price).toFixed(2)}`
     : "N/A";
   const displayGenre = categories?.length ? categories[0].main : "N/A";
   const displayPublicationDate = bookData.created_at
@@ -141,7 +142,7 @@ export default function BookDetails() {
     : "No ratings yet";
 
   return (
-    <div className="space-y-10 px-4 sm:px-6 py-10">
+    <div className="space-y-10 px-4 sm:px-6 py-10 bg-slate-50">
       {/* Header */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="mx-auto md:mx-0">
@@ -162,16 +163,32 @@ export default function BookDetails() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-            <BuyButton
+            {/* <BuyButton
               bookSlug={unique_book_id || bookSlug}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
             >
               Buy now ({displayPrice})
-            </BuyButton>
-            <Button variant="outline" className="w-full sm:w-auto">
+            </BuyButton> */}
+            <p
+              className="bg-blue-500 hover:bg-blue-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
+              onClick={() => {
+                router.push("/reader/sign_up");
+              }}
+            >
+              Read Now
+            </p>
+            <p
+              className="bg-green-500 hover:bg-green-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
+              onClick={() => {
+                router.push("/reader/sign_up");
+              }}
+            >
+              Write a Review
+            </p>
+            {/* <Button variant="outline" className="w-full sm:w-auto">
               Add to Wishlist
-            </Button>
-            {ebook_file_url && (
+            </Button> */}
+            {/* {ebook_file_url && (
               <Button
                 variant="secondary"
                 className="w-full sm:w-auto"
@@ -179,8 +196,8 @@ export default function BookDetails() {
               >
                 Read Sample
               </Button>
-            )}
-            <Dialog
+            )} */}
+            {/* <Dialog
               open={isReviewModalOpen}
               onOpenChange={setIsReviewModalOpen}
             >
@@ -199,7 +216,7 @@ export default function BookDetails() {
                   token={DUMMY_JWT_TOKEN}
                 />
               </DialogContent>
-            </Dialog>
+            </Dialog> */}
           </div>
         </div>
       </div>
@@ -207,7 +224,7 @@ export default function BookDetails() {
       {/* Description */}
       <section>
         <h3 className="text-lg sm:text-xl font-semibold mb-2">
-          Publisher’s Description
+          Book’s Description
         </h3>
         <p className="text-gray-700 leading-relaxed">
           {description || "No description available."}
@@ -240,29 +257,27 @@ export default function BookDetails() {
 
       {/* Reviews */}
       <section>
-        <h3 className="text-lg sm:text-xl font-semibold mb-4">
-          Customer Reviews
-        </h3>
         {reviews?.length ? (
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {reviews.map((review) => (
-              <div className="min-w-[250px]" key={review.id}>
-                <ReviewCard
-                  review={review}
-                  currentUserIsOwner={
-                    review.user_id === CURRENT_LOGGED_IN_USER_ID
-                  }
-                  onDeleteSuccess={handleReviewDeleted}
-                  token={DUMMY_JWT_TOKEN}
-                />
-              </div>
-            ))}
+          <div>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4">
+              Customer Reviews
+            </h3>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {reviews.map((review) => (
+                <div className="min-w-[250px]" key={review.id}>
+                  <ReviewCard
+                    review={review}
+                    currentUserIsOwner={
+                      review.user_id === CURRENT_LOGGED_IN_USER_ID
+                    }
+                    onDeleteSuccess={handleReviewDeleted}
+                    token={DUMMY_JWT_TOKEN}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        ) : (
-          <p className="text-gray-600">
-            No customer reviews yet. Be the first!
-          </p>
-        )}
+        ) : null}
       </section>
 
       {/* More Books */}
