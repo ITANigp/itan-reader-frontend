@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { Search, User } from "lucide-react";
 import { getReaderProfile, signOutReader } from "@/utils/auth/readerApi";
-import { useRouter, usePathname } from "next/navigation"; // Import usePathname
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 
 
@@ -41,6 +41,9 @@ const DashboardNav = () => {
     switch (path.toLowerCase()) {
       case "library":
         setActiveTab("Library");
+        break;
+      case "profile":
+        setActiveTab("Profile");
         break;
       default:
         setActiveTab("Home");
@@ -135,7 +138,7 @@ const DashboardNav = () => {
 
               <div className="relative">
                 <button
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  // onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200"
                 >
                   <User className="w-4 h-4 text-gray-600" />
@@ -146,7 +149,7 @@ const DashboardNav = () => {
                   </span>
                 </button>
 
-                {dropdownOpen && (
+                {/* {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg">
                     <Link
                       href="/reader/profile-page"
@@ -165,7 +168,7 @@ const DashboardNav = () => {
                       Logout
                     </button>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>
