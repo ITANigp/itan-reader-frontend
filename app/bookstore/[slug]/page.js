@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ export default function BookDetails() {
   const params = useParams();
   const bookSlug = params.slug;
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const router = useRouter()
 
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -123,7 +124,7 @@ export default function BookDetails() {
 
   const authorName = author?.name?.trim() || "Unknown Author";
   const displayPrice = ebook_price
-    ? `$ ${(ebook_price / 100).toFixed(2)}`
+    ? `$ ${(ebook_price).toFixed(2)}`
     : "N/A";
   const displayGenre = categories?.length ? categories[0].main : "N/A";
   const displayPublicationDate = bookData.created_at
@@ -162,12 +163,19 @@ export default function BookDetails() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-            <BuyButton
+            {/* <BuyButton
               bookSlug={unique_book_id || bookSlug}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
             >
               Buy now ({displayPrice})
-            </BuyButton>
+            </BuyButton> */}
+            <p 
+              className="bg-blue-500 hover:bg-blue-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
+              onClick={() => {
+                router.push("/reader/sign_up");
+              }}>
+              Read Now
+            </p>
             <Button variant="outline" className="w-full sm:w-auto">
               Add to Wishlist
             </Button>
@@ -207,7 +215,7 @@ export default function BookDetails() {
       {/* Description */}
       <section>
         <h3 className="text-lg sm:text-xl font-semibold mb-2">
-          Publisher’s Description
+          Book’s Description
         </h3>
         <p className="text-gray-700 leading-relaxed">
           {description || "No description available."}
