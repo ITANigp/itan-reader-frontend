@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/utils/auth/readerApi";
 import axios from "axios";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Heart, PlayCircle } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +18,7 @@ import {
   FaHeadphonesAlt,
 } from "react-icons/fa";
 
+// Flipbook loader (used on /reader/flipbook page)
 const PdfFlipbook = dynamic(() => import("@/components/PdfFlipbook"), {
   ssr: false,
   loading: () => <p>Loading reader...</p>,
@@ -26,7 +26,14 @@ const PdfFlipbook = dynamic(() => import("@/components/PdfFlipbook"), {
 
 export default function Library() {
   const router = useRouter();
-  const { authToken, isLoggedIn, logout, isLoadingAuth } = useAuth();
+  const {
+    authToken,
+    isLoggedIn,
+    logout,
+    userId: currentUserId,
+    isLoadingAuth,
+  } = useAuth();
+
   const [activeTab, setActiveTab] = useState(0);
 
   const [boughtBooks, setBoughtBooks] = useState([]);
@@ -45,6 +52,57 @@ export default function Library() {
     { label: "My Wishlist", icon: <FaHeart className="text-lg" /> },
     { label: "Audiobooks", icon: <FaHeadphonesAlt className="text-lg" /> },
   ];
+
+  // ✅ Fixed: handleReadNow accepts bookData
+  const handleReadNow = useCallback(
+    async (bookData) => {
+      if (!isLoggedIn || !authToken || !currentUserId) {
+        router.push("/reader/sign_up");
+        return;
+      }
+
+      try {
+        // Refresh reading token
+        const tokenRes = await api.post(
+          "/purchases/refresh_reading_token",
+          {
+            book_id: bookData.unique_book_id,
+            content_type: "ebook",
+            purchase_id: bookData.purchase_id || null,
+          },
+          { headers: { Authorization: `Bearer ${authToken}` } }
+        );
+
+        const reading_token =
+          tokenRes.data?.reading_token || tokenRes.data?.data?.reading_token;
+
+        if (!reading_token) throw new Error("No reading token received");
+
+        // Get book content
+        const contentRes = await api.get(
+          `/books/${bookData.unique_book_id}/content?direct_url=true`,
+          { headers: { Authorization: `Bearer ${reading_token}` } }
+        );
+
+        const content = contentRes.data;
+
+        if (content?.url) {
+          // Navigate to flipbook with url + title
+          const urlParams = new URLSearchParams();
+          urlParams.set("url", content.url);
+          urlParams.set("title", bookData.title);
+
+          router.push(`/reader/flipbook?${urlParams.toString()}`);
+        } else {
+          alert("Book content unavailable.");
+        }
+      } catch (err) {
+        console.error("Read error:", err);
+        alert("Unable to read book. Please try again.");
+      }
+    },
+    [isLoggedIn, authToken, currentUserId, router]
+  );
 
   // Function to fetch data using your custom 'api' instance
   const fetchData = async (endpoint, setStateFunction, tabName) => {
@@ -92,13 +150,13 @@ export default function Library() {
       setIsLoadingBooks(true);
       setErrorFetchingBooks(null);
 
-      // Removed the fetchData call for '/audiobooks'
       Promise.all([
         fetchData("/purchases", setBoughtBooks, "Bought Books"),
         fetchData("/reader/current_reads", setCurrentReads, "Current Reads"),
         fetchData("/reader/finished_books", setFinishedBooks, "Finished Books"),
         fetchData("/likes", setWishlist, "Wishlist"),
       ]).finally(() => {
+        console.log("Display Bought Books: ", boughtBooks);
         setIsLoadingBooks(false);
       });
     } else if (!isLoadingAuth && !authToken) {
@@ -192,9 +250,7 @@ export default function Library() {
 
                 <div className="w-full h-[220px] md:h-[260px] relative rounded overflow-hidden mb-2">
                   <Image
-                    src={
-                      `${book.cover_image_url}`
-                    }
+                    src={`${book.cover_image_url}`}
                     alt={book.title || "Book Title"}
                     fill
                     className="object-cover rounded"
@@ -207,7 +263,7 @@ export default function Library() {
                   )}
                 </div>
 
-                {!isCurrentReads && !isWishlist && (
+                {/* {!isCurrentReads && !isWishlist && (
                   <div className="flex items-center gap-0.5 mb-1">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <span key={i} className="text-red-500 text-xs">
@@ -215,7 +271,7 @@ export default function Library() {
                       </span>
                     ))}
                   </div>
-                )}
+                )} */}
 
                 <p className="text-sm font-bold leading-snug">{book.title}</p>
                 <p className="text-xs text-gray-500 mb-1">
@@ -243,6 +299,12 @@ export default function Library() {
                       <span className="text-teal-600 font-bold text-[16px]">
                         {/* ${book.ebook_price} */}
                       </span>
+                      <div
+                        onClick={() => handleReadNow(book)}
+                        className="text-green-500 py-1 px-3 rounded-md cursor-pointer"
+                      >
+                        Read
+                      </div>
                       <Link
                         href={`/home/book-details/${book.id}`}
                         className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
