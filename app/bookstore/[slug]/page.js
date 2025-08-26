@@ -142,7 +142,7 @@ export default function BookDetails() {
     : "No ratings yet";
 
   return (
-    <div className="space-y-10 px-4 sm:px-6 py-10">
+    <div className="space-y-10 px-4 sm:px-6 py-10 bg-slate-50">
       {/* Header */}
       <div className="flex flex-col md:flex-row gap-6">
         <div className="mx-auto md:mx-0">
@@ -169,17 +169,26 @@ export default function BookDetails() {
             >
               Buy now ({displayPrice})
             </BuyButton> */}
-            <p 
+            <p
               className="bg-blue-500 hover:bg-blue-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
               onClick={() => {
                 router.push("/reader/sign_up");
-              }}>
+              }}
+            >
               Read Now
             </p>
-            <Button variant="outline" className="w-full sm:w-auto">
+            <p
+              className="bg-green-500 hover:bg-green-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
+              onClick={() => {
+                router.push("/reader/sign_up");
+              }}
+            >
+              Write a Review
+            </p>
+            {/* <Button variant="outline" className="w-full sm:w-auto">
               Add to Wishlist
-            </Button>
-            {ebook_file_url && (
+            </Button> */}
+            {/* {ebook_file_url && (
               <Button
                 variant="secondary"
                 className="w-full sm:w-auto"
@@ -187,8 +196,8 @@ export default function BookDetails() {
               >
                 Read Sample
               </Button>
-            )}
-            <Dialog
+            )} */}
+            {/* <Dialog
               open={isReviewModalOpen}
               onOpenChange={setIsReviewModalOpen}
             >
@@ -207,7 +216,7 @@ export default function BookDetails() {
                   token={DUMMY_JWT_TOKEN}
                 />
               </DialogContent>
-            </Dialog>
+            </Dialog> */}
           </div>
         </div>
       </div>
@@ -248,29 +257,27 @@ export default function BookDetails() {
 
       {/* Reviews */}
       <section>
-        <h3 className="text-lg sm:text-xl font-semibold mb-4">
-          Customer Reviews
-        </h3>
         {reviews?.length ? (
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {reviews.map((review) => (
-              <div className="min-w-[250px]" key={review.id}>
-                <ReviewCard
-                  review={review}
-                  currentUserIsOwner={
-                    review.user_id === CURRENT_LOGGED_IN_USER_ID
-                  }
-                  onDeleteSuccess={handleReviewDeleted}
-                  token={DUMMY_JWT_TOKEN}
-                />
-              </div>
-            ))}
+          <div>
+            <h3 className="text-lg sm:text-xl font-semibold mb-4">
+              Customer Reviews
+            </h3>
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {reviews.map((review) => (
+                <div className="min-w-[250px]" key={review.id}>
+                  <ReviewCard
+                    review={review}
+                    currentUserIsOwner={
+                      review.user_id === CURRENT_LOGGED_IN_USER_ID
+                    }
+                    onDeleteSuccess={handleReviewDeleted}
+                    token={DUMMY_JWT_TOKEN}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        ) : (
-          <p className="text-gray-600">
-            No customer reviews yet. Be the first!
-          </p>
-        )}
+        ) : null}
       </section>
 
       {/* More Books */}
