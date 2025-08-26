@@ -36,18 +36,18 @@ const DashboardNav = () => {
   }, []);
   
   useEffect(() => {
-    // This effect handles the active tab based on the URL path
-    const path = pathname.split("/")[1] || "home";
-    switch (path.toLowerCase()) {
-      case "library":
-        setActiveTab("Library");
-        break;
-      case "profile":
-        setActiveTab("Profile");
-        break;
-      default:
-        setActiveTab("Home");
-        break;
+    const parts = pathname.split("/").filter(Boolean);
+    const mainSegment = parts[0]?.toLowerCase(); 
+    const subSegment = parts[1]?.toLowerCase(); 
+
+    if (mainSegment === "library") {
+      setActiveTab("Library");
+    } else if (mainSegment === "reader" && subSegment === "profile-page") {
+      setActiveTab("Profile");
+    } else if (mainSegment === "home") {
+      setActiveTab("Home");
+    } else {
+      setActiveTab("Home");
     }
   }, [pathname]);
 
