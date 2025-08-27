@@ -106,7 +106,7 @@ const Footer = ({ hiddenPage }) => {
               >
                 Add cookies
               </Link>
-              <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
+              <Link href="mailto:support@itan.app" className="cursor-pointer hover:text-[#EF5353]">
                 Contact Us
               </Link>
               <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
