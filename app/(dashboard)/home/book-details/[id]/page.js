@@ -61,8 +61,10 @@ export default function BookDetails() {
           const end = new Date(trial_end);
           let daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
           if (daysLeft < 0) daysLeft = 0;
-          setIsTrialActive(daysLeft > 0);
-          setDaysLeftInTrial(daysLeft);
+          // setIsTrialActive(daysLeft > 0);
+          // setDaysLeftInTrial(daysLeft);
+          setIsTrialActive(false);
+          setDaysLeftInTrial(0);
         } else {
           setIsTrialActive(false);
           setDaysLeftInTrial(0);
@@ -86,6 +88,7 @@ export default function BookDetails() {
           ...response.data.data.attributes,
           unique_book_id: response.data.data.id,
         });
+        console.log("Home Single Book Info: ", bookData)
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404) {
@@ -137,7 +140,7 @@ export default function BookDetails() {
           {
             book_id: bookData.unique_book_id,
             content_type: "ebook",
-            purchase_id: purchase_id,
+            purchase_id: bookData.id,
           },
           {
             headers: {
@@ -276,31 +279,20 @@ export default function BookDetails() {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4">
-            <Button onClick={handleReadNow}>
-              {isLoggedIn
-                ? isTrialActive
-                  ? "Read Now (Trial)"
-                  : "Purchase to Read"
-                : "Read Now (Login)"}
-            </Button>
+            {isLoggedIn && isTrialActive ? (
+              <Button onClick={handleReadNow}> Read Now (Trial)</Button>
+            ) : null}
 
             <BuyButton
               bookId={unique_book_id}
-              className="bg-green-600 text-white"
+              className="bg-green-600 text-white rounded-md px-2"
             >
-              Buy eBook ({displayPrice})
+              {isLoggedIn && !isTrialActive
+                ? "Purchase to Read"
+                : `Buy eBook (${displayPrice})`}
             </BuyButton>
 
             <Button variant="outline">Add to Wishlist</Button>
-
-            {ebook_file_url && (
-              <Button
-                variant="secondary"
-                onClick={() => window.open(ebook_file_url, "_blank")}
-              >
-                Read Sample
-              </Button>
-            )}
 
             <Dialog
               open={isReviewModalOpen}

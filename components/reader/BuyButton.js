@@ -7,7 +7,7 @@ export default function BuyButton({
   bookId,
   contentType = "ebook", // Default to ebook, but allow overriding
   children = "Buy Book", // Allow custom button text or content
-  className = "px-4 py-2 bg-green-600 text-white rounded m-40", // Customizable styling
+  className,
   onPurchaseSuccess, // Callback for successful purchase initiation
   onPurchaseError, // Callback for failed purchase initiation
 }) {
