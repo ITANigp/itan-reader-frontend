@@ -19,7 +19,7 @@ export default function BuyButton({
       if (!jwtToken) {
         // Handle case where no token is found, e.g., redirect to login
         console.error("No access token found. Please log in.");
-        router.push("/login"); // Example: redirect to login page
+        router.push("/reader/sign_in"); 
         return;
       }
 
