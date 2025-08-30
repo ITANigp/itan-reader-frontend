@@ -55,7 +55,7 @@ export default function Library() {
 
   // ✅ Fixed: handleReadNow accepts bookData
   const handleReadNow = useCallback(
-    async (bookData) => {
+    async (bookData, bookId, purchaseId, readingToken) => {
       if (!isLoggedIn || !authToken || !currentUserId) {
         router.push("/reader/sign_up");
         return;
@@ -66,9 +66,9 @@ export default function Library() {
         const tokenRes = await api.post(
           "/purchases/refresh_reading_token",
           {
-            book_id: bookData.unique_book_id,
+            book_id: bookId,
             content_type: "ebook",
-            purchase_id: bookData.purchase_id || null,
+            // purchase_id: purchaseId || null,
           },
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
@@ -80,7 +80,7 @@ export default function Library() {
 
         // Get book content
         const contentRes = await api.get(
-          `/books/${bookData.unique_book_id}/content?direct_url=true`,
+          `/books/${bookId}/content?direct_url=true`,
           { headers: { Authorization: `Bearer ${reading_token}` } }
         );
 
@@ -169,6 +169,10 @@ export default function Library() {
       console.log("No authentication token found. User needs to log in.");
     }
   }, [authToken, isLoadingAuth]);
+
+  useEffect(() => {
+    console.log("📚 Latest Bought Books:", boughtBooks);
+  }, [boughtBooks]);
 
   // Handle initial loading and not-logged-in states
   if (isLoadingAuth) {
@@ -300,7 +304,14 @@ export default function Library() {
                         {/* ${book.ebook_price} */}
                       </span>
                       <div
-                        onClick={() => handleReadNow(book)}
+                        onClick={() =>
+                          handleReadNow(
+                            book,
+                            book.id, 
+                            item.id, 
+                            item.reading_token
+                          )
+                        }
                         className="text-green-500 py-1 px-3 rounded-md cursor-pointer"
                       >
                         Read
