@@ -120,6 +120,7 @@ export default function BookDetails() {
     reviews_count,
     ebook_file_url,
     unique_book_id,
+    ebook_file_size_human,
   } = bookData;
 
   const authorName = author?.name?.trim() || "Unknown Author";
@@ -251,7 +252,7 @@ export default function BookDetails() {
         </div>
         <div>
           <strong>SIZE</strong>
-          <p>{displaySize}</p>
+          <p>{ebook_file_size_human}</p>
         </div>
       </div>
 
