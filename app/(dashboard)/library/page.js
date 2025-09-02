@@ -171,7 +171,7 @@ export default function Library() {
   }, [authToken, isLoadingAuth]);
 
   useEffect(() => {
-    console.log("📚 Latest Bought Books:", boughtBooks);
+    console.log("📚 Bought Books:", boughtBooks);
   }, [boughtBooks]);
 
   // Handle initial loading and not-logged-in states
@@ -279,7 +279,7 @@ export default function Library() {
 
                 <p className="text-sm font-bold leading-snug">{book.title}</p>
                 <p className="text-xs text-gray-500 mb-1">
-                  By: {book.author?.name || "Jane Doe"}
+                  By: {book?.author_name || "Anonymous"}
                 </p>
 
                 <div className="flex justify-between items-center mt-1">
@@ -307,8 +307,8 @@ export default function Library() {
                         onClick={() =>
                           handleReadNow(
                             book,
-                            book.id, 
-                            item.id, 
+                            book.id,
+                            item.id,
                             item.reading_token
                           )
                         }

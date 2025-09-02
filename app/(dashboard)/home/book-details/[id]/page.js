@@ -61,10 +61,10 @@ export default function BookDetails() {
           const end = new Date(trial_end);
           let daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
           if (daysLeft < 0) daysLeft = 0;
-          // setIsTrialActive(daysLeft > 0);
-          // setDaysLeftInTrial(daysLeft);
-          setIsTrialActive(false);
-          setDaysLeftInTrial(0);
+          setIsTrialActive(daysLeft > 0);
+          setDaysLeftInTrial(daysLeft);
+          // setIsTrialActive(false);
+          // setDaysLeftInTrial(0);
         } else {
           setIsTrialActive(false);
           setDaysLeftInTrial(0);
