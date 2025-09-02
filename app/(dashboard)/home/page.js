@@ -18,24 +18,19 @@ export default function Home() {
   const [likedBookIds, setLikedBookIds] = useState([]);
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+  // Fetch liked books
   useEffect(() => {
     const fetchLikedBooks = async () => {
       const token = localStorage.getItem("access_token");
       if (token) {
         try {
-          console.log("Fetching liked books from:", `${BASE_URL}/likes`);
           const response = await fetch(`${BASE_URL}/likes`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          console.log("Liked books API status:", response.status);
           const result = await response.json();
-          console.log("Liked books API response:", result);
-          // Extract liked book IDs from result.data array
-          // Extract liked book IDs and ensure they are strings for comparison
           const likedBookIds = Array.isArray(result.data)
-            ? result.data.map(like => String(like.book.id))
+            ? result.data.map((like) => String(like.book.id))
             : [];
-          console.log("home/page.js: likedBookIds extracted:", likedBookIds);
           setLikedBookIds(likedBookIds);
         } catch (err) {
           console.error("Error fetching liked books:", err);
@@ -45,6 +40,7 @@ export default function Home() {
     fetchLikedBooks();
   }, []);
 
+  // Fetch trial info
   useEffect(() => {
     const fetchProfile = async () => {
       const token = localStorage.getItem("access_token");
@@ -57,17 +53,18 @@ export default function Home() {
     fetchProfile();
   }, []);
 
+  // Get token
   useEffect(() => {
     const storedToken = localStorage.getItem("access_token");
     if (storedToken) setUserToken(storedToken);
   }, []);
 
+  // Fetch books
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         const response = await fetch(`${BASE_URL}/books`);
         const result = await response.json();
-        // Extract main category names for each book
         const formattedBooks = result.data.map((book) => ({
           id: book.id,
           title: book.attributes.title,
@@ -101,39 +98,46 @@ export default function Home() {
       </div>
     );
 
-  // Group books by main category names
+  // Group books by main category names, ensuring no duplicates
   const booksByGenre = books.reduce((acc, book) => {
     const genres = book.mainCategories.length
       ? book.mainCategories
       : ["Itan Originals"];
+
     genres.forEach((genre) => {
-      if (!acc[genre]) acc[genre] = [];
-      acc[genre].push(book);
+      if (!acc[genre]) acc[genre] = new Map(); // Map ensures uniqueness
+      if (!acc[genre].has(book.id)) {
+        acc[genre].set(book.id, book);
+      }
     });
     return acc;
   }, {});
 
+  // Convert Maps back to arrays for rendering
+  Object.keys(booksByGenre).forEach((genre) => {
+    booksByGenre[genre] = Array.from(booksByGenre[genre].values());
+  });
+
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
-      {/* Mobile-only timer, centered and contained */}
+      {/* Mobile-only timer */}
       <div className="flex sm:hidden w-full justify-center items-center pt-4 pb-2">
         <div className="max-w-[180px] w-full flex justify-center items-center">
-          <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} mobile />
+          <FreeTrialTimer
+            trial_start={trialStart}
+            trial_end={trialEnd}
+            mobile
+          />
         </div>
       </div>
-      {/* Desktop/Tablet timer, right-aligned */}
+
+      {/* Desktop/Tablet timer */}
       <div className="hidden sm:flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
         <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} />
       </div>
 
       {/* CONTAINER */}
       <div className="max-w-[1440px] mx-auto px-4 pt-5 sm:mt-0">
-        {/* Header */}
-        {/* <div className="flex justify-between items-center py-3 mb-2 md:hidden">
-          <button className="bg-white w-8 h-8 rounded-full flex items-center justify-center text-base border border-gray-500 text-gray-500">
-            ←
-          </button>
-        </div>
         {/* Hero */}
         <div className="mb-14">
           <div className="w-full h-40 md:h-60 xl:h-96 relative rounded-lg overflow-hidden">
@@ -143,8 +147,6 @@ export default function Home() {
               fill
               className="object-cover"
             />
-
-            {/* Overlay Text */}
             <div className="absolute inset-0 flex items-center justify-center px-4">
               <h1
                 className="text-center text-white text-base sm:text-lg md:text-2xl font-bold leading-snug tracking-wide drop-shadow-lg bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent"
@@ -155,7 +157,8 @@ export default function Home() {
             </div>
           </div>
         </div>
-        {/* Genres */}
+
+        {/* Genres section */}
         <section className="mt-6 mb-16">
           <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">
             Genres
@@ -168,7 +171,7 @@ export default function Home() {
               "Mystery",
               "Horror",
               "Fantasy",
-              "Thriller",     
+              "Thriller",
             ].map((genre, idx) => (
               <div
                 key={idx}
@@ -187,86 +190,17 @@ export default function Home() {
             ))}
           </div>
         </section>
-        {/* Popular Trending */}
-        {/* <section className="mt-8 w-full">
-          <div className="flex justify-between items-center mb-3">
-            <h2 className="font-semibold text-[17px]">Popular Trending</h2>
-            <span className="text-red-600 text-xs cursor-pointer">See more →</span>
-          </div>
 
-          <div
-            className="flex gap-[10px] overflow-x-auto sm:gap-[10px] sm:h-[364px] sm:px-[20px] lg:grid lg:grid-cols-[repeat(auto-fit,_minmax(180px,_1fr))] lg:gap-[24px] lg:h-[550px] lg:px-[40px]"
-            style={{
-              maxWidth: '2776px',
-            }}
-          >
-            {books.map((book, index) => (
-              <div
-                key={index}
-                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
-              >
-                <div className="absolute top-2 right-2 z-10">
-                  <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
-                    <LikeButton bookId={book.id} userToken={userToken} />
-                  </div>
-                </div>
-
-                
-                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
-                  <Image
-                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
-                    alt={book.title}
-                    fill
-                    className="object-cover rounded"
-                  />
-                </div>
-
-                
-                <div className="flex items-center gap-0.5 mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span key={i} className="text-red-500 text-xs">★</span>
-                  ))}
-                </div>
-
-                
-                <p className="text-sm font-bold leading-snug">{book.title}</p>
-                <p className="text-xs text-gray-500 mb-1">
-                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
-                </p>
-
-                
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-teal-600 font-bold text-[16px]">
-                    ${Number(book.price) / 100}
-                  </span>
-                  <Link
-                    href={`/reader/home/book-details/${book.id}`}
-                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
-                  >
-                    View details
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section> */}
-        {/* Ebooks based on genre */}
+        {/* Ebooks grouped by genre */}
         {Object.entries(booksByGenre).map(([genre, genreBooks]) => (
           <section key={genre} className="mt-8 mb-10">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-[17px]">{genre}</h2>
-              {/* You can add a 'See more' link or button here if needed */}
             </div>
             <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {genreBooks.length ? (
                 genreBooks.map((book, index) => {
                   const isLiked = likedBookIds.includes(String(book.id));
-                  console.log('home/page.js: rendering LikeButton', {
-                    bookId: String(book.id),
-                    isLiked,
-                    likedBookIds,
-                    genre,
-                  });
                   return (
                     <div
                       key={book.id}
