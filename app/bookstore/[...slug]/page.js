@@ -203,7 +203,7 @@ const {
         </div>
         <div>
           <strong>SIZE</strong>
-          <p>{displaySize}</p>
+          <p>{ebook_file_size_human}</p>
         </div>
       </div>
 

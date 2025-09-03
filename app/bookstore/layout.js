@@ -23,29 +23,23 @@ export default function Layout({ children }) {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex md:space-x-6 items-center">
-            <Link
-              href="#"
-              className="text-gray-700 hover:text-black font-medium"
-            >
-              Home
-            </Link>
-            <Link
-              href="#"
-              className="text-gray-700 hover:text-black font-medium"
-            >
-              Library
-            </Link>
             <input
               type="text"
               placeholder="Search for books..."
               className="px-4 py-2 rounded-md border border-gray-300 text-sm w-full md:w-96"
             />
-            <button className="px-4 py-2 text-gray-700 hover:text-black font-medium">
+            <Link
+              href="/reader/sign_in"
+              className="text-red-600 hover:bg-red-700 hover:text-white hover:border-0    bg-gray-200 border-2 border-b-0 border-red-600  font-medium rounded-md py-1 px-2"
+            >
               Sign In
-            </button>
-            <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+            </Link>
+            <Link
+              href="/reader/sign_up"
+              className="text-white hover:bg-red-700  bg-red-600  font-medium rounded-md py-1 px-2"
+            >
               Sign Up
-            </button>
+            </Link>
           </nav>
         </header>
 
@@ -54,28 +48,22 @@ export default function Layout({ children }) {
           <div className="md:hidden bg-white shadow-md absolute w-full z-10">
             <nav className="flex flex-col items-center py-4 space-y-4">
               <Link
-                href="#"
+                href="/reader/sign_in"
                 className="text-gray-700 hover:text-black font-medium"
               >
-                Home
+                Sign In
               </Link>
               <Link
-                href="#"
+                href="/reader/sign_up"
                 className="text-gray-700 hover:text-black font-medium"
               >
-                Library
+                Sign Up
               </Link>
               <input
                 type="text"
                 placeholder="Search for books..."
                 className="px-4 py-2 rounded-md border border-gray-300 text-sm w-11/12"
               />
-              <button className="w-11/12 px-4 py-2 text-gray-700 hover:text-black font-medium border-t">
-                Sign In
-              </button>
-              <button className="w-11/12 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
-                Sign Up
-              </button>
             </nav>
           </div>
         )}
