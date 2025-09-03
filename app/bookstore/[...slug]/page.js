@@ -115,9 +115,7 @@ const {
   reviews,
   reviews_count,
   ebook_file_size_human: size,
-  publication_date,
-  unique_book_id,
-  admin_feedback: book_revue
+  publication_date
 } = bookData;
 
   const authorName = author?.name?.trim() || "Unknown Author";
