@@ -4,24 +4,25 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
-const PdfFlipbook = dynamic(() => import('@/components/PdfFlipbook'), {
+const PdfFlipbook = dynamic(() => import("@/components/PdfFlipbook"), {
   ssr: false,
-  loading: () => <p>Loading flipbook...</p>,
+  loading: () => (
+    <div className="flex justify-center items-center min-h-screen">
+      Loading flipbook...
+    </div>
+  ),
 });
 
 function FlipbookContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [authToken, setAuthToken] = useState(null);
-  
-  const pdfUrl = searchParams.get('url');
-  const bookTitle = searchParams.get('title') || 'Book Reader';
 
-  console.log("Flipbook PDF URL:", pdfUrl);
+  const pdfUrl = searchParams.get("url");
+  const bookTitle = searchParams.get("title") || "Book Reader";
 
-  // Get auth token from localStorage
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     setAuthToken(token);
   }, []);
 
@@ -42,33 +43,47 @@ function FlipbookContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with back button */}
-      <div className="bg-white shadow-sm border-b p-4">
+      {/* Header with back + title */}
+      <div className="bg-white shadow-sm border-b p-4 sticky top-0 z-40">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Book Details
           </button>
           <h1 className="text-xl font-semibold text-gray-800 truncate max-w-md">
             {bookTitle}
           </h1>
-          <div className="w-32"></div> {/* Spacer for layout balance */}
+          <div className="w-32"></div>
         </div>
       </div>
 
-      {/* Flipbook container */}
-      <div className="py-4">
-        <PdfFlipbook 
-          pdfUrl={pdfUrl} 
-          authHeaders={authToken ? {
-            'Authorization': `Bearer ${authToken}`,
-            'Accept': 'application/pdf'
-          } : {}}
+      {/* Flipbook */}
+      <div className="py-2">
+        <PdfFlipbook
+          pdfUrl={pdfUrl}
+          authHeaders={
+            authToken
+              ? {
+                  Authorization: `Bearer ${authToken}`,
+                  Accept: "application/pdf",
+                }
+              : {}
+          }
         />
       </div>
     </div>
@@ -77,7 +92,13 @@ function FlipbookContent() {
 
 export default function FlipbookReaderPage() {
   return (
-    <Suspense fallback={<div className="flex justify-center items-center min-h-screen">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center min-h-screen">
+          Loading...
+        </div>
+      }
+    >
       <FlipbookContent />
     </Suspense>
   );
