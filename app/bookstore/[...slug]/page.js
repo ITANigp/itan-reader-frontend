@@ -17,14 +17,17 @@ import BuyButton from "@/components/reader/BuyButton";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewCard from "@/components/ReviewCard";
 
+// ✅ import our API helper
+import { getBookBySlug } from "@/utils/bookApi";
+
 const DUMMY_JWT_TOKEN = "YOUR_JWT_TOKEN_HERE";
 const CURRENT_LOGGED_IN_USER_ID = "SOME_CURRENT_USER_ID";
 
 export default function BookDetails() {
   const params = useParams();
-  const bookSlug = params.slug;
-  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const router = useRouter()
+  // const bookSlug = params.slug;
+  const bookSlug = Array.isArray(params.slug) ? params.slug.join("/") : params.slug;
+  const router = useRouter();
 
   const [bookData, setBookData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,24 +43,14 @@ export default function BookDetails() {
     const fetchBookDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `${BASE_URL}/books/by-slug/${bookSlug}/`
-        );
-        if (!response.ok) {
-          setError(
-            response.status === 404
-              ? "Book not found."
-              : `Failed to fetch book details: ${response.statusText}`
-          );
-          return;
-        }
-        const jsonResponse = await response.json();
-        console.log("Book details response:", jsonResponse);
+        const jsonResponse = await getBookBySlug(bookSlug, DUMMY_JWT_TOKEN);
+         console.log("Book details response:", jsonResponse);
+
         if (!jsonResponse) {
           setError("Book data not found.");
-          setLoading(false);
           return;
         }
+
         setBookData({
           ...jsonResponse,
           unique_book_id: jsonResponse.id,
@@ -73,6 +66,7 @@ export default function BookDetails() {
     fetchBookDetails();
   }, [bookSlug]);
 
+  // ---- Review Handlers ----
   const handleReviewCreated = (newReview) => {
     setBookData((prev) =>
       prev
@@ -100,6 +94,7 @@ export default function BookDetails() {
     );
   };
 
+  // ---- Loading & Error States ----
   if (loading)
     return <div className="text-center py-20">Loading book details...</div>;
   if (error)
@@ -107,36 +102,34 @@ export default function BookDetails() {
   if (!bookData)
     return <div className="text-center py-20">No book data available.</div>;
 
-  const {
-    title,
-    description,
-    ebook_price,
-    cover_image_url,
-    total_pages,
-    categories,
-    author,
-    average_rating,
-    reviews,
-    reviews_count,
-    ebook_file_url,
-    unique_book_id,
-    ebook_file_size_human,
-  } = bookData;
+  // ---- Book Data ----
+const {
+  title,
+  description,
+  ebook_price,
+  cover_image_url,
+  total_pages,
+  categories,
+  author,
+  average_rating,
+  reviews,
+  reviews_count,
+  ebook_file_size_human: size,
+  publication_date
+} = bookData;
 
   const authorName = author?.name?.trim() || "Unknown Author";
-  const displayPrice = ebook_price
-    ? `$ ${(ebook_price).toFixed(2)}`
-    : "N/A";
+  const displayPrice = ebook_price ? `$ ${(ebook_price).toFixed(2)}` : "N/A";
   const displayGenre = categories?.length ? categories[0].main : "N/A";
-  const displayPublicationDate = bookData.created_at
-    ? new Date(bookData.created_at).toLocaleDateString("en-US", {
+  const displayPublicationDate = publication_date
+    ? new Date(publication_date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       })
     : "N/A";
   const displayLength = total_pages ? `${total_pages} Pages` : "N/A";
-  const displaySize = "409.4 kb";
+  const displaySize = size ? `${size}` : "N/A";
   const displayRating = average_rating
     ? "★".repeat(Math.round(average_rating)) +
       "☆".repeat(5 - Math.round(average_rating))
@@ -164,60 +157,18 @@ export default function BookDetails() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-            {/* <BuyButton
-              bookSlug={unique_book_id || bookSlug}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
-            >
-              Buy now ({displayPrice})
-            </BuyButton> */}
             <p
               className="bg-blue-500 hover:bg-blue-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
-              onClick={() => {
-                router.push("/reader/sign_up");
-              }}
+              onClick={() => router.push("/reader/sign_up")}
             >
               Read Now
             </p>
             <p
               className="bg-green-500 hover:bg-green-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
-              onClick={() => {
-                router.push("/reader/sign_up");
-              }}
+              onClick={() => router.push("/reader/sign_up")}
             >
               Write a Review
             </p>
-            {/* <Button variant="outline" className="w-full sm:w-auto">
-              Add to Wishlist
-            </Button> */}
-            {/* {ebook_file_url && (
-              <Button
-                variant="secondary"
-                className="w-full sm:w-auto"
-                onClick={() => window.open(ebook_file_url, "_blank")}
-              >
-                Read Sample
-              </Button>
-            )} */}
-            {/* <Dialog
-              open={isReviewModalOpen}
-              onOpenChange={setIsReviewModalOpen}
-            >
-              <DialogTrigger asChild>
-                <Button variant="ghost" className="border w-full sm:w-auto">
-                  Write a Review
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Write a Review for "{title}"</DialogTitle>
-                </DialogHeader>
-                <ReviewForm
-                  bookSlug={unique_book_id || bookSlug}
-                  onReviewCreated={handleReviewCreated}
-                  token={DUMMY_JWT_TOKEN}
-                />
-              </DialogContent>
-            </Dialog> */}
           </div>
         </div>
       </div>
@@ -278,30 +229,10 @@ export default function BookDetails() {
               ))}
             </div>
           </div>
-        ) : null}
+        ) : (
+          <p className="text-gray-500">No reviews yet.</p>
+        )}
       </section>
-
-      {/* More Books */}
-      {/* <section>
-        <h3 className="text-lg sm:text-xl font-semibold mb-4">
-          More Books by {authorName}
-        </h3>
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {[...Array(4)].map((_, i) => (
-            <Image
-              key={i}
-              src="/rise-of-the-jumbies.jpg"
-              alt="More Book"
-              width={100}
-              height={150}
-              className="rounded object-cover flex-shrink-0"
-            />
-          ))}
-        </div>
-        <p className="text-gray-600 mt-2 text-sm">
-          (This section currently shows placeholders.)
-        </p>
-      </section> */}
     </div>
   );
 }
