@@ -18,6 +18,7 @@ import {
 import BuyButton from "@/components/reader/BuyButton";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewCard from "@/components/ReviewCard";
+import chunkText from "@/utils/chunkText"
 import { api } from "@/utils/auth/readerApi";
 import axios from "axios";
 
@@ -88,7 +89,7 @@ export default function BookDetails() {
           ...response.data.data.attributes,
           unique_book_id: response.data.data.id,
         });
-        console.log("Home Single Book Info: ", bookData)
+        // console.log("Home Single Book Info: ", bookData)
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404) {
@@ -106,6 +107,12 @@ export default function BookDetails() {
 
     fetchBookDetails();
   }, [bookId]);
+
+  useEffect(() => {
+    if (bookData) {
+      console.log("Home Single Book Info: ", bookData);
+    }
+  }, [bookData]);
 
   const handleReadNow = useCallback(async () => {
     if (!isLoggedIn || !authToken || !currentUserId) {
@@ -219,6 +226,8 @@ export default function BookDetails() {
     }));
   }, []);
 
+
+
   if (loading) return <div className="text-center py-20">Loading...</div>;
   if (error)
     return <div className="text-center text-red-500 py-20">{error}</div>;
@@ -233,9 +242,9 @@ export default function BookDetails() {
     categories,
     author,
     average_rating,
+    ebook_file_size_human,
     reviews,
     reviews_count,
-    ebook_file_url,
     unique_book_id,
     created_at,
   } = bookData;
@@ -332,10 +341,14 @@ export default function BookDetails() {
       )}
 
       <section>
-        <h3 className="text-xl font-semibold mb-2">Publisher’s Description</h3>
-        <p className="text-gray-700 leading-relaxed">
-          {description || "No description available."}
-        </p>
+        <h3 className="text-xl font-semibold mb-2">Book’s Description</h3>
+        <div className="text-gray-700 leading-relaxed space-y-4">
+          {description
+            ? chunkText(description, 300).map((para, idx) => (
+                <p key={idx}>{para}</p>
+              ))
+            : "No description available."}
+        </div>
       </section>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center border-t border-b py-4">
@@ -357,7 +370,7 @@ export default function BookDetails() {
         </div>
         <div>
           <strong>SIZE</strong>
-          <p>409.4 kb</p>
+          <p>{ebook_file_size_human}</p>
         </div>
       </div>
 
