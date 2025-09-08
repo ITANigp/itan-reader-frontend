@@ -50,7 +50,8 @@ export const registerReader = async (
   password,
   password_confirmation,
   first_name,
-  last_name
+  last_name,
+  recaptcha_token // 🔹 added here
 ) => {
   try {
     const response = await api.post("/readers", {
@@ -61,9 +62,9 @@ export const registerReader = async (
         first_name,
         last_name,
       },
+      recaptcha_token, // 🔹 send captcha token
     });
 
-    // Token might be in response.data.data.token OR in Authorization header
     const token =
       response.data?.data?.token || response.headers?.authorization?.split(" ")[1];
     storeToken(token);
@@ -84,11 +85,13 @@ export const registerReader = async (
   }
 };
 
+
 // Sign in a reader
-export const signInReader = async (email, password) => {
+export const signInReader = async (email, password, recaptcha_token) => {
   try {
     const response = await api.post("/readers/sign_in", {
       reader: { email, password, rememberable_options: true },
+      recaptcha_token, // 🔹 include captcha in payload
     });
 
     const token =
@@ -101,6 +104,7 @@ export const signInReader = async (email, password) => {
     throw error;
   }
 };
+
 
 // Get current logged-in reader profile
 export const getReaderProfile = async (token) => {

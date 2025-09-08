@@ -7,10 +7,12 @@ import { Eye, EyeOff } from "lucide-react";
 import { api } from "@/utils/auth/readerApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 export default function SignUp() {
   const router = useRouter();
-
+  
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,6 +22,7 @@ export default function SignUp() {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("info");
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState("");
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -28,6 +31,14 @@ export default function SignUp() {
     setMessageType("info");
 
     try {
+      if (!recaptchaToken) {
+        setMessage("reCAPTCHA not ready, please try again.");
+        setMessageType("error");
+        setLoading(false);
+        return;
+      }
+
+      // Send token with signup request
       const response = await api.post("/readers", {
         reader: {
           email,
@@ -36,6 +47,7 @@ export default function SignUp() {
           first_name: firstName,
           last_name: lastName,
         },
+        recaptcha_token: recaptchaToken, // 👈 important
       });
 
       if (response?.data?.data) {
@@ -176,6 +188,17 @@ export default function SignUp() {
                 value={passwordConfirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
               />
+            </div>
+            <div className="mt-3">
+              <label className="block mb-1 text-sm font-medium">
+                Verify You’re Human
+              </label>
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setRecaptchaToken(token)} // save token
+                />
+              </div>
             </div>
 
             <div className="flex items-center text-sm">
