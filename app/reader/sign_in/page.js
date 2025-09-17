@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { signInReader } from "@/utils/auth/readerApi";
@@ -17,6 +18,8 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
+
   const router = useRouter();
   const { setAuth } = useAuth();
 
@@ -25,11 +28,19 @@ export default function SignIn() {
     setLoading(true);
     setMessage("");
 
-    try {
-      const reader = await signInReader(email, password);
+    if (!recaptchaToken) {
+      setMessage("Please verify that you are not a robot.");
+      setLoading(false);
+      return;
+    }
 
-      // Check if backend returned error about unconfirmed email
-      if (reader.data?.error === "You have to confirm your email address before continuing.") {
+    try {
+      const reader = await signInReader(email, password, recaptchaToken);
+
+      if (
+        reader.data?.error ===
+        "You have to confirm your email address before continuing."
+      ) {
         router.push({
           pathname: "/reader/confirm_email",
           query: { email },
@@ -37,9 +48,9 @@ export default function SignIn() {
         return;
       }
 
-      // Login successful
       localStorage.setItem("access_token", reader.data.token);
       localStorage.setItem("currentUserId", reader.data.id);
+
       if (reader?.data?.id) {
         setAuth(reader.data.token, reader.data.id);
         router.push("/home");
@@ -53,7 +64,6 @@ export default function SignIn() {
       setLoading(false);
     }
   };
-
 
   return (
     <main className="flex flex-col md:flex-row min-h-screen bg-white">
@@ -77,7 +87,8 @@ export default function SignIn() {
                 Dive into African stories that keep you hooked from page one.
               </h2>
               <p className="mt-2 mb-4 text-xs">
-                Whether you're searching for inspiration, escape — we've got the perfect story waiting for you.
+                Whether you're searching for inspiration, escape — we've got the
+                perfect story waiting for you.
               </p>
             </div>
           </div>
@@ -107,7 +118,7 @@ export default function SignIn() {
                   className="pl-10 h-[46px] text-sm w-full p-2.5 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
                   placeholder="Enter Email Address"
                   required
-                  value={(router.query?.email) || email} 
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
@@ -136,7 +147,6 @@ export default function SignIn() {
                 </button>
               </div>
 
-                {/* Forgot Password link */}
               <div className="flex justify-end mt-1 mb-4">
                 <Link
                   href="/reader/forgot_password"
@@ -147,8 +157,24 @@ export default function SignIn() {
               </div>
             </div>
 
+            {/* ReCAPTCHA */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">
+                Verify You’re Human
+              </label>
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setRecaptchaToken(token)}
+                />
+              </div>
+            </div>
+
             {message && (
-              <p className="text-sm text-[#E50913] text-center" aria-live="polite">
+              <p
+                className="text-sm text-[#E50913] text-center"
+                aria-live="polite"
+              >
                 {message}
               </p>
             )}
@@ -182,7 +208,10 @@ export default function SignIn() {
 
             <p className="text-center text-sm text-gray-600 mt-4">
               Don’t have an account?{" "}
-              <Link href="/reader/sign_up" className="text-orange-600 font-medium">
+              <Link
+                href="/reader/sign_up"
+                className="text-orange-600 font-medium"
+              >
                 Sign Up
               </Link>
             </p>
