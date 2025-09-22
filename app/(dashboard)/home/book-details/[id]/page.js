@@ -297,7 +297,7 @@ export default function BookDetails() {
               className="bg-green-600 text-white rounded-md px-2"
             >
               {isLoggedIn && !isTrialActive
-                ? "Purchase to Read"
+                ? "Buy Now"
                 : `Buy eBook (${displayPrice})`}
             </BuyButton>
 
