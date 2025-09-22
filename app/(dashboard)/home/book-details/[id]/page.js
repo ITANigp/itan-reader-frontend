@@ -334,12 +334,6 @@ export default function BookDetails() {
           book!
         </div>
       )}
-      {isLoggedIn && !isTrialActive && (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-800 rounded-lg text-center font-medium">
-          ❗ Your trial has ended. Please purchase books to continue reading.
-        </div>
-      )}
-
       <section>
         <h3 className="text-xl font-semibold mb-2">Book’s Description</h3>
         <div className="text-gray-700 leading-relaxed space-y-4">
