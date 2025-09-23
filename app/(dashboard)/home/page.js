@@ -22,12 +22,10 @@ export default function Home() {
     const fetchLikedBooks = async () => {
       const token = localStorage.getItem("access_token");
       if (token) {
-        try {
-          console.log("Fetching liked books from:", `${BASE_URL}/likes`);
+        try {          
           const response = await fetch(`${BASE_URL}/likes`, {
             headers: { Authorization: `Bearer ${token}` },
-          });
-          console.log("Liked books API status:", response.status);
+          });          
 
           // Check if response is ok before trying to parse JSON
           if (!response.ok) {
@@ -55,14 +53,12 @@ export default function Home() {
           }
 
           // Now safely parse the JSON
-          const result = JSON.parse(responseText);
-          console.log("Liked books API response:", result);
+          const result = JSON.parse(responseText);          
 
           // Extract liked book IDs from result.data array
           const likedBookIds = Array.isArray(result.data)
             ? result.data.map((like) => String(like.book.id))
-            : [];
-          console.log("home/page.js: likedBookIds extracted:", likedBookIds);
+            : [];          
           setLikedBookIds(likedBookIds);
         } catch (err) {
           console.error("Error fetching liked books:", err);
@@ -311,18 +307,7 @@ export default function Home() {
             <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {genreBooks.length ? (
                 genreBooks.map((book, index) => {
-                  const isLiked = likedBookIds.includes(String(book.id));
-                  const uniqueKey = `${genre}-${book.id}`;
-                  console.log(
-                    "home/page.js: rendering book with key",
-                    uniqueKey,
-                    {
-                      bookId: String(book.id),
-                      isLiked,
-                      likedBookIds,
-                      genre,
-                    }
-                  );
+                  const isLiked = likedBookIds.includes(String(book.id));                                    
                   return (
                     <div
                       key={`${genre}-${book.id}`}
