@@ -1,8 +1,7 @@
 import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-const TOKEN_KEY = "access-token"; // consistent key name for JWT
-
+const TOKEN_KEY = "access_token"; // consistent key name for JWT
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -65,7 +64,8 @@ export const registerReader = async (
 
     // Token might be in response.data.data.token OR in Authorization header
     const token =
-      response.data?.data?.token || response.headers?.authorization?.split(" ")[1];
+      response.data?.data?.token ||
+      response.headers?.authorization?.split(" ")[1];
     storeToken(token);
 
     return response.data;
@@ -92,7 +92,8 @@ export const signInReader = async (email, password) => {
     });
 
     const token =
-      response.data?.data?.token || response.headers?.authorization?.split(" ")[1];
+      response.data?.data?.token ||
+      response.headers?.authorization?.split(" ")[1];
     storeToken(token);
 
     return response.data;
@@ -119,7 +120,10 @@ export const getReaderProfile = async (token) => {
 
     return response.data;
   } catch (error) {
-    console.error("Failed to fetch reader profile:", error.response?.data || error);
+    console.error(
+      "Failed to fetch reader profile:",
+      error.response?.data || error
+    );
     throw error;
   }
 };
@@ -144,7 +148,10 @@ export const createReaderProfile = async (profileData, profileImage) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Failed to create reader profile:", error.response?.data || error);
+    console.error(
+      "Failed to create reader profile:",
+      error.response?.data || error
+    );
     throw error;
   }
 };
@@ -169,11 +176,13 @@ export const updateReaderProfile = async (profileData, profileImage) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Failed to update reader profile:", error.response?.data || error);
+    console.error(
+      "Failed to update reader profile:",
+      error.response?.data || error
+    );
     throw error;
   }
 };
-
 
 // Sign out a reader
 export const signOutReader = async () => {
