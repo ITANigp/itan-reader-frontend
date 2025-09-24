@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 
 import BuyButton from "@/components/reader/BuyButton";
+import chunkText from "@/utils/chunkText";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewCard from "@/components/ReviewCard";
 
@@ -73,6 +74,12 @@ export default function BookDetails() {
     fetchBookDetails();
   }, [bookSlug]);
 
+  useEffect(() => {
+    if (bookData) {
+      console.log("Home Single Book Info: ", bookData);
+    }
+  }, [bookData]);
+
   const handleReviewCreated = (newReview) => {
     setBookData((prev) =>
       prev
@@ -120,6 +127,7 @@ export default function BookDetails() {
     reviews_count,
     ebook_file_url,
     unique_book_id,
+    ebook_file_size_human,
   } = bookData;
 
   const authorName = author?.name?.trim() || "Unknown Author";
@@ -127,8 +135,8 @@ export default function BookDetails() {
     ? `$ ${(ebook_price).toFixed(2)}`
     : "N/A";
   const displayGenre = categories?.length ? categories[0].main : "N/A";
-  const displayPublicationDate = bookData.created_at
-    ? new Date(bookData.created_at).toLocaleDateString("en-US", {
+  const displayPublicationDate = bookData.publication_date
+    ? new Date(bookData.publication_date).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -223,12 +231,14 @@ export default function BookDetails() {
 
       {/* Description */}
       <section>
-        <h3 className="text-lg sm:text-xl font-semibold mb-2">
-          Book’s Description
-        </h3>
-        <p className="text-gray-700 leading-relaxed">
-          {description || "No description available."}
-        </p>
+        <h3 className="text-xl font-semibold mb-2">Book’s Description</h3>
+        <div className="text-gray-700 leading-relaxed space-y-4">
+          {description
+            ? chunkText(description, 300).map((para, idx) => (
+                <p key={idx}>{para}</p>
+              ))
+            : "No description available."}
+        </div>
       </section>
 
       {/* Book Info */}
@@ -251,7 +261,7 @@ export default function BookDetails() {
         </div>
         <div>
           <strong>SIZE</strong>
-          <p>{displaySize}</p>
+          <p>{ebook_file_size_human}</p>
         </div>
       </div>
 

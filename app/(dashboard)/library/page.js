@@ -55,7 +55,7 @@ export default function Library() {
 
   // ✅ Fixed: handleReadNow accepts bookData
   const handleReadNow = useCallback(
-    async (bookData) => {
+    async (bookData, bookId, purchaseId, readingToken) => {
       if (!isLoggedIn || !authToken || !currentUserId) {
         router.push("/reader/sign_up");
         return;
@@ -66,9 +66,9 @@ export default function Library() {
         const tokenRes = await api.post(
           "/purchases/refresh_reading_token",
           {
-            book_id: bookData.unique_book_id,
+            book_id: bookId,
             content_type: "ebook",
-            purchase_id: bookData.purchase_id || null,
+            // purchase_id: purchaseId || null,
           },
           { headers: { Authorization: `Bearer ${authToken}` } }
         );
@@ -80,7 +80,7 @@ export default function Library() {
 
         // Get book content
         const contentRes = await api.get(
-          `/books/${bookData.unique_book_id}/content?direct_url=true`,
+          `/books/${bookId}/content?direct_url=true`,
           { headers: { Authorization: `Bearer ${reading_token}` } }
         );
 
@@ -107,9 +107,9 @@ export default function Library() {
   // Function to fetch data using your custom 'api' instance
   const fetchData = async (endpoint, setStateFunction, tabName) => {
     if (!authToken) {
-      console.log(
-        `Skipping fetch for ${tabName}: No authentication token available.`
-      );
+      // console.log(
+      //   `Skipping fetch for ${tabName}: No authentication token available.`
+      // );
       return;
     }
 
@@ -120,10 +120,10 @@ export default function Library() {
 
       if (response.data && Array.isArray(response.data.data)) {
         setStateFunction(response.data.data);
-        console.log(
-          `SUCCESS: Fetched ${tabName.toLowerCase()}:`,
-          response.data.data
-        );
+        // console.log(
+        //   `SUCCESS: Fetched ${tabName.toLowerCase()}:`,
+        //   response.data.data
+        // );
       } else {
         console.warn(
           `API response for ${tabName} did not contain an array in 'data' property:`,
@@ -136,7 +136,7 @@ export default function Library() {
       setErrorFetchingBooks(`Failed to load ${tabName}. Please try again.`);
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401 || error.response?.status === 403) {
-          console.log("Authentication failed or token expired. Logging out...");
+          // console.log("Authentication failed or token expired. Logging out...");
           logout();
           router.push("/login");
         }
@@ -156,7 +156,7 @@ export default function Library() {
         fetchData("/reader/finished_books", setFinishedBooks, "Finished Books"),
         fetchData("/likes", setWishlist, "Wishlist"),
       ]).finally(() => {
-        console.log("Display Bought Books: ", boughtBooks);
+        // console.log("Display Bought Books: ", boughtBooks);
         setIsLoadingBooks(false);
       });
     } else if (!isLoadingAuth && !authToken) {
@@ -166,9 +166,13 @@ export default function Library() {
       setWishlist([]);
       setAudioBooks([]);
       setIsLoadingBooks(false);
-      console.log("No authentication token found. User needs to log in.");
+      // console.log("No authentication token found. User needs to log in.");
     }
   }, [authToken, isLoadingAuth]);
+
+  useEffect(() => {
+    // console.log("📚 Bought Books:", boughtBooks);
+  }, [boughtBooks]);
 
   // Handle initial loading and not-logged-in states
   if (isLoadingAuth) {
@@ -275,7 +279,7 @@ export default function Library() {
 
                 <p className="text-sm font-bold leading-snug">{book.title}</p>
                 <p className="text-xs text-gray-500 mb-1">
-                  By: {book.author?.name || "Jane Doe"}
+                  By: {book?.author_name || "Anonymous"}
                 </p>
 
                 <div className="flex justify-between items-center mt-1">
@@ -300,7 +304,14 @@ export default function Library() {
                         {/* ${book.ebook_price} */}
                       </span>
                       <div
-                        onClick={() => handleReadNow(book)}
+                        onClick={() =>
+                          handleReadNow(
+                            book,
+                            book.id,
+                            item.id,
+                            item.reading_token
+                          )
+                        }
                         className="text-green-500 py-1 px-3 rounded-md cursor-pointer"
                       >
                         Read

@@ -18,6 +18,7 @@ import {
 import BuyButton from "@/components/reader/BuyButton";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewCard from "@/components/ReviewCard";
+import chunkText from "@/utils/chunkText";
 import { api } from "@/utils/auth/readerApi";
 import axios from "axios";
 
@@ -63,6 +64,8 @@ export default function BookDetails() {
           if (daysLeft < 0) daysLeft = 0;
           setIsTrialActive(daysLeft > 0);
           setDaysLeftInTrial(daysLeft);
+          // setIsTrialActive(false);
+          // setDaysLeftInTrial(0);
         } else {
           setIsTrialActive(false);
           setDaysLeftInTrial(0);
@@ -104,6 +107,8 @@ export default function BookDetails() {
     fetchBookDetails();
   }, [bookId]);
 
+  // Removed unnecessary logging effect
+
   const handleReadNow = useCallback(async () => {
     if (!isLoggedIn || !authToken || !currentUserId) {
       router.push("/reader/sign_up");
@@ -111,7 +116,6 @@ export default function BookDetails() {
     }
 
     if (isTrialActive) {
-      // console.log("reading_token beginning: ", reading_token);
       try {
         // Get purchase data from localStorage with proper error handling
         let purchaseData = {};
@@ -137,7 +141,7 @@ export default function BookDetails() {
           {
             book_id: bookData.unique_book_id,
             content_type: "ebook",
-            purchase_id: purchase_id,
+            purchase_id: bookData.id,
           },
           {
             headers: {
@@ -146,12 +150,10 @@ export default function BookDetails() {
           }
         );
 
-        console.log("Full tokenRes:", tokenRes);
         const reading_token =
           tokenRes.data?.reading_token ||
           tokenRes.data?.data?.reading_token ||
           tokenRes.reading_token;
-        console.log("reading_token", reading_token);
 
         if (!reading_token) {
           throw new Error("No reading token received from server");
@@ -167,7 +169,6 @@ export default function BookDetails() {
         );
 
         const content = contentRes.data;
-        console.log("Full content response:", content);
 
         // Check if we have a PDF URL to open
         if (content?.url) {
@@ -230,9 +231,9 @@ export default function BookDetails() {
     categories,
     author,
     average_rating,
+    ebook_file_size_human,
     reviews,
     reviews_count,
-    ebook_file_url,
     unique_book_id,
     created_at,
   } = bookData;
@@ -276,31 +277,20 @@ export default function BookDetails() {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4">
-            <Button onClick={handleReadNow}>
-              {isLoggedIn
-                ? isTrialActive
-                  ? "Read Now (Trial)"
-                  : "Purchase to Read"
-                : "Read Now (Login)"}
-            </Button>
+            {isLoggedIn && isTrialActive ? (
+              <Button onClick={handleReadNow}> Read Now (Trial)</Button>
+            ) : null}
 
             <BuyButton
               bookId={unique_book_id}
-              className="bg-green-600 text-white"
+              className="bg-green-600 text-white rounded-md px-2"
             >
-              Buy eBook ({displayPrice})
+              {isLoggedIn && !isTrialActive
+                ? "Buy Now"
+                : `Buy eBook (${displayPrice})`}
             </BuyButton>
 
             <Button variant="outline">Add to Wishlist</Button>
-
-            {ebook_file_url && (
-              <Button
-                variant="secondary"
-                onClick={() => window.open(ebook_file_url, "_blank")}
-              >
-                Read Sample
-              </Button>
-            )}
 
             <Dialog
               open={isReviewModalOpen}
@@ -333,17 +323,15 @@ export default function BookDetails() {
           book!
         </div>
       )}
-      {isLoggedIn && !isTrialActive && (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-800 rounded-lg text-center font-medium">
-          ❗ Your trial has ended. Please purchase books to continue reading.
-        </div>
-      )}
-
       <section>
-        <h3 className="text-xl font-semibold mb-2">Publisher’s Description</h3>
-        <p className="text-gray-700 leading-relaxed">
-          {description || "No description available."}
-        </p>
+        <h3 className="text-xl font-semibold mb-2">Book’s Description</h3>
+        <div className="text-gray-700 leading-relaxed space-y-4">
+          {description
+            ? chunkText(description, 300).map((para, idx) => (
+                <p key={idx}>{para}</p>
+              ))
+            : "No description available."}
+        </div>
       </section>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center border-t border-b py-4">
@@ -365,7 +353,7 @@ export default function BookDetails() {
         </div>
         <div>
           <strong>SIZE</strong>
-          <p>409.4 kb</p>
+          <p>{ebook_file_size_human}</p>
         </div>
       </div>
 

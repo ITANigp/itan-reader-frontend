@@ -22,23 +22,48 @@ export default function Home() {
     const fetchLikedBooks = async () => {
       const token = localStorage.getItem("access_token");
       if (token) {
-        try {
-          console.log("Fetching liked books from:", `${BASE_URL}/likes`);
+        try {          
           const response = await fetch(`${BASE_URL}/likes`, {
             headers: { Authorization: `Bearer ${token}` },
-          });
-          console.log("Liked books API status:", response.status);
-          const result = await response.json();
-          console.log("Liked books API response:", result);
+          });          
+
+          // Check if response is ok before trying to parse JSON
+          if (!response.ok) {
+            console.error(
+              `API Error: ${response.status} - ${response.statusText}`
+            );
+            // Still set empty array to avoid blocking the UI
+            setLikedBookIds([]);
+            return;
+          }
+
+          // Check if response has content before parsing
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            console.error("API returned non-JSON response:", contentType);
+            setLikedBookIds([]);
+            return;
+          }
+
+          const responseText = await response.text();
+          if (!responseText.trim()) {
+            console.error("API returned empty response");
+            setLikedBookIds([]);
+            return;
+          }
+
+          // Now safely parse the JSON
+          const result = JSON.parse(responseText);          
+
           // Extract liked book IDs from result.data array
-          // Extract liked book IDs and ensure they are strings for comparison
           const likedBookIds = Array.isArray(result.data)
-            ? result.data.map(like => String(like.book.id))
-            : [];
-          console.log("home/page.js: likedBookIds extracted:", likedBookIds);
+            ? result.data.map((like) => String(like.book.id))
+            : [];          
           setLikedBookIds(likedBookIds);
         } catch (err) {
           console.error("Error fetching liked books:", err);
+          // Still set empty array to avoid blocking the UI
+          setLikedBookIds([]);
         }
       }
     };
@@ -101,14 +126,27 @@ export default function Home() {
       </div>
     );
 
-  // Group books by main category names
+  // Group books by main category names, ensuring each book appears only once per genre
   const booksByGenre = books.reduce((acc, book) => {
     const genres = book.mainCategories.length
       ? book.mainCategories
       : ["Itan Originals"];
-    genres.forEach((genre) => {
+
+    // Use a Set to deduplicate genres for this book
+    const uniqueGenres = [...new Set(genres)];
+
+    uniqueGenres.forEach((genre) => {
       if (!acc[genre]) acc[genre] = [];
-      acc[genre].push(book);
+
+      // Check if this book already exists in this genre section
+      const bookExists = acc[genre].some(
+        (existingBook) => existingBook.id === book.id
+      );
+
+      // Only add the book if it doesn't already exist in this genre
+      if (!bookExists) {
+        acc[genre].push(book);
+      }
     });
     return acc;
   }, {});
@@ -118,7 +156,11 @@ export default function Home() {
       {/* Mobile-only timer, centered and contained */}
       <div className="flex sm:hidden w-full justify-center items-center pt-4 pb-2">
         <div className="max-w-[180px] w-full flex justify-center items-center">
-          <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} mobile />
+          <FreeTrialTimer
+            trial_start={trialStart}
+            trial_end={trialEnd}
+            mobile
+          />
         </div>
       </div>
       {/* Desktop/Tablet timer, right-aligned */}
@@ -265,16 +307,10 @@ export default function Home() {
             <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {genreBooks.length ? (
                 genreBooks.map((book, index) => {
-                  const isLiked = likedBookIds.includes(String(book.id));
-                  console.log('home/page.js: rendering LikeButton', {
-                    bookId: String(book.id),
-                    isLiked,
-                    likedBookIds,
-                    genre,
-                  });
+                  const isLiked = likedBookIds.includes(String(book.id));                                    
                   return (
                     <div
-                      key={book.id}
+                      key={`${genre}-${book.id}`}
                       className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
                     >
                       <div className="absolute top-2 right-2 z-10">

@@ -200,17 +200,6 @@ export default function SignUp() {
                 />
               </div>
             </div>
-
-            <div className="flex items-center text-sm">
-              <input type="checkbox" className="mr-2" defaultChecked />
-              <label>
-                Agree with{" "}
-                <a href="#" className="text-orange-600">
-                  Terms and Conditions
-                </a>
-              </label>
-            </div>
-
             {message && (
               <p
                 className={`text-sm text-center ${messageType === "success" ? "text-green-500" : "text-[#E50913]"}`}
