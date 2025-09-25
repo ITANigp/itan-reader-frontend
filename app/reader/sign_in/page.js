@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -20,16 +20,48 @@ export default function SignIn() {
   const router = useRouter();
   const { setAuth } = useAuth();
 
+  // Check for stored error messages on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedError = sessionStorage.getItem("login_error");
+      if (storedError) {
+        setMessage(storedError);
+      }
+    }
+  }, []);
+
+  const handleInputChange = (e, setter) => {
+    const value = e.target.value;
+    setter(value);
+
+    // Only clear error messages if user has typed at least 3 characters
+    // This ensures the error doesn't disappear too quickly
+    if (value.length > 3 && message) {
+      setMessage("");
+      sessionStorage.removeItem("login_error");
+    }
+  };
+
   const handleSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
+
+    // Only clear the message if it's not an error retry
+    if (!message.includes("No account found")) {
+      setMessage("");
+    }
 
     try {
       const reader = await signInReader(email, password);
 
-      // Check if backend returned error about unconfirmed email
-      if (reader.data?.error === "You have to confirm your email address before continuing.") {
+      // Clear any stored errors on successful login
+      sessionStorage.removeItem("login_error");
+
+      // Handle email confirmation redirection
+      if (
+        reader.data?.error ===
+        "You have to confirm your email address before continuing."
+      ) {
         router.push({
           pathname: "/reader/confirm_email",
           query: { email },
@@ -45,15 +77,49 @@ export default function SignIn() {
         router.push("/home");
       }
     } catch (error) {
-      setMessage(
-        error.response?.data?.message || "Login failed. Please try again."
-      );
+      // Simpler logging for authentication errors
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Sign-in attempt failed:", {
+          type: error?.type,
+          message: error?.message
+        });
+      }
+
+      // Safely extract the error message with fallbacks
+      let errorMsg;
+      if (typeof error === "string") {
+        errorMsg = error;
+      } else if (error?.message) {
+        errorMsg = error.message;
+      } else if (error?.type && error?.type === "USER_NOT_FOUND") {
+        errorMsg = "No account found with this email address. Please check your email or sign up.";
+      } else if (error?.response?.data?.error) {
+        errorMsg = error.response.data.error;
+      } else {
+        errorMsg = "Login failed. Please try again.";
+      }
+
+      // Set the message and ensure it's a string
+      setMessage(String(errorMsg));
+
+      // Store the error in sessionStorage to persist across re-renders
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("login_error", String(errorMsg));
+      }
+
+      // Handle special cases based on error.type
+      if (error && error.type === "EMAIL_NOT_CONFIRMED") {
+        router.push({
+          pathname: "/reader/confirm_email",
+          query: { email },
+        });
+      }
+
       console.error("Login error:", error);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <main className="flex flex-col md:flex-row min-h-screen bg-white">
@@ -77,7 +143,8 @@ export default function SignIn() {
                 Dive into African stories that keep you hooked from page one.
               </h2>
               <p className="mt-2 mb-4 text-xs">
-                Whether you're searching for inspiration, escape — we've got the perfect story waiting for you.
+                Whether you're searching for inspiration, escape — we've got the
+                perfect story waiting for you.
               </p>
             </div>
           </div>
@@ -107,8 +174,8 @@ export default function SignIn() {
                   className="pl-10 h-[46px] text-sm w-full p-2.5 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-300"
                   placeholder="Enter Email Address"
                   required
-                  value={(router.query?.email) || email} 
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={email}
+                  onChange={(e) => handleInputChange(e, setEmail)}
                 />
               </div>
             </div>
@@ -125,7 +192,7 @@ export default function SignIn() {
                   placeholder="Enter Password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setPassword)}
                 />
                 <button
                   type="button"
@@ -136,7 +203,7 @@ export default function SignIn() {
                 </button>
               </div>
 
-                {/* Forgot Password link */}
+              {/* Forgot Password link */}
               <div className="flex justify-end mt-1 mb-4">
                 <Link
                   href="/reader/forgot_password"
@@ -148,7 +215,10 @@ export default function SignIn() {
             </div>
 
             {message && (
-              <p className="text-sm text-[#E50913] text-center" aria-live="polite">
+              <p
+                className="text-sm text-[#E50913] text-center"
+                aria-live="polite"
+              >
                 {message}
               </p>
             )}
@@ -181,8 +251,11 @@ export default function SignIn() {
             </button>
 
             <p className="text-center text-sm text-gray-600 mt-4">
-              Don’t have an account?{" "}
-              <Link href="/reader/sign_up" className="text-orange-600 font-medium">
+              Don't have an account?{" "}
+              <Link
+                href="/reader/sign_up"
+                className="text-orange-600 font-medium"
+              >
                 Sign Up
               </Link>
             </p>
