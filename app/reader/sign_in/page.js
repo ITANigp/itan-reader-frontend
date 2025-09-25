@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { signInReader } from "@/utils/auth/readerApi";
@@ -17,6 +18,7 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState(null);
   const router = useRouter();
   const { setAuth } = useAuth();
 
@@ -51,8 +53,15 @@ export default function SignIn() {
       setMessage("");
     }
 
+    // Verify reCAPTCHA
+    if (!recaptchaToken) {
+      setMessage("Please verify that you are not a robot.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const reader = await signInReader(email, password);
+      const reader = await signInReader(email, password, recaptchaToken);
 
       // Clear any stored errors on successful login
       sessionStorage.removeItem("login_error");
@@ -211,6 +220,19 @@ export default function SignIn() {
                 >
                   Forgot Password?
                 </Link>
+              </div>
+            </div>
+
+            {/* ReCAPTCHA */}
+            <div>
+              <label className="block mb-1 text-sm font-medium">
+                Verify You're Human
+              </label>
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setRecaptchaToken(token)}
+                />
               </div>
             </div>
 
