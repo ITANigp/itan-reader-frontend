@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
-import ReCAPTCHA from "react-google-recaptcha";
 
 import { useAuth } from "@/contexts/AuthContext";
 import { signInReader } from "@/utils/auth/readerApi";
@@ -18,25 +17,47 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState(null);
-
   const router = useRouter();
   const { setAuth } = useAuth();
+
+  // Check for stored error messages on mount
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedError = sessionStorage.getItem("login_error");
+      if (storedError) {
+        setMessage(storedError);
+      }
+    }
+  }, []);
+
+  const handleInputChange = (e, setter) => {
+    const value = e.target.value;
+    setter(value);
+
+    // Only clear error messages if user has typed at least 3 characters
+    // This ensures the error doesn't disappear too quickly
+    if (value.length > 3 && message) {
+      setMessage("");
+      sessionStorage.removeItem("login_error");
+    }
+  };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
-    if (!recaptchaToken) {
-      setMessage("Please verify that you are not a robot.");
-      setLoading(false);
-      return;
+    // Only clear the message if it's not an error retry
+    if (!message.includes("No account found")) {
+      setMessage("");
     }
 
     try {
-      const reader = await signInReader(email, password, recaptchaToken);
+      const reader = await signInReader(email, password);
 
+      // Clear any stored errors on successful login
+      sessionStorage.removeItem("login_error");
+
+      // Handle email confirmation redirection
       if (
         reader.data?.error ===
         "You have to confirm your email address before continuing."
@@ -48,17 +69,52 @@ export default function SignIn() {
         return;
       }
 
+      // Login successful
       localStorage.setItem("access_token", reader.data.token);
       localStorage.setItem("currentUserId", reader.data.id);
-
       if (reader?.data?.id) {
         setAuth(reader.data.token, reader.data.id);
         router.push("/home");
       }
     } catch (error) {
-      setMessage(
-        error.response?.data?.message || "Login failed. Please try again."
-      );
+      // Simpler logging for authentication errors
+      if (process.env.NODE_ENV === 'development') {
+        console.log("Sign-in attempt failed:", {
+          type: error?.type,
+          message: error?.message
+        });
+      }
+
+      // Safely extract the error message with fallbacks
+      let errorMsg;
+      if (typeof error === "string") {
+        errorMsg = error;
+      } else if (error?.message) {
+        errorMsg = error.message;
+      } else if (error?.type && error?.type === "USER_NOT_FOUND") {
+        errorMsg = "No account found with this email address. Please check your email or sign up.";
+      } else if (error?.response?.data?.error) {
+        errorMsg = error.response.data.error;
+      } else {
+        errorMsg = "Login failed. Please try again.";
+      }
+
+      // Set the message and ensure it's a string
+      setMessage(String(errorMsg));
+
+      // Store the error in sessionStorage to persist across re-renders
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("login_error", String(errorMsg));
+      }
+
+      // Handle special cases based on error.type
+      if (error && error.type === "EMAIL_NOT_CONFIRMED") {
+        router.push({
+          pathname: "/reader/confirm_email",
+          query: { email },
+        });
+      }
+
       console.error("Login error:", error);
     } finally {
       setLoading(false);
@@ -119,7 +175,7 @@ export default function SignIn() {
                   placeholder="Enter Email Address"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setEmail)}
                 />
               </div>
             </div>
@@ -136,7 +192,7 @@ export default function SignIn() {
                   placeholder="Enter Password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => handleInputChange(e, setPassword)}
                 />
                 <button
                   type="button"
@@ -147,6 +203,7 @@ export default function SignIn() {
                 </button>
               </div>
 
+              {/* Forgot Password link */}
               <div className="flex justify-end mt-1 mb-4">
                 <Link
                   href="/reader/forgot_password"
@@ -154,19 +211,6 @@ export default function SignIn() {
                 >
                   Forgot Password?
                 </Link>
-              </div>
-            </div>
-
-            {/* ReCAPTCHA */}
-            <div>
-              <label className="block mb-1 text-sm font-medium">
-                Verify You’re Human
-              </label>
-              <div className="flex justify-center">
-                <ReCAPTCHA
-                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
-                  onChange={(token) => setRecaptchaToken(token)}
-                />
               </div>
             </div>
 
@@ -207,7 +251,7 @@ export default function SignIn() {
             </button>
 
             <p className="text-center text-sm text-gray-600 mt-4">
-              Don’t have an account?{" "}
+              Don't have an account?{" "}
               <Link
                 href="/reader/sign_up"
                 className="text-orange-600 font-medium"
