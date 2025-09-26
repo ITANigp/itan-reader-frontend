@@ -192,16 +192,11 @@ export default function Home() {
             {[
               "Romance",
               "Fiction",
-              "Adventure",
               "Sci-Fi",
               "Mystery",
               "Horror",
               "Fantasy",
               "Thriller",
-              "Biography",
-              "Historical",
-              "Poetry",
-              "Drama",
             ].map((genre, idx) => (
               <div
                 key={idx}
