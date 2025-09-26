@@ -18,7 +18,7 @@ import {
 import BuyButton from "@/components/reader/BuyButton";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewCard from "@/components/ReviewCard";
-import chunkText from "@/utils/chunkText"
+import chunkText from "@/utils/chunkText";
 import { api } from "@/utils/auth/readerApi";
 import axios from "axios";
 
@@ -226,8 +226,6 @@ export default function BookDetails() {
     }));
   }, []);
 
-
-
   if (loading) return <div className="text-center py-20">Loading...</div>;
   if (error)
     return <div className="text-center text-red-500 py-20">{error}</div>;
@@ -297,7 +295,7 @@ export default function BookDetails() {
               className="bg-green-600 text-white rounded-md px-2"
             >
               {isLoggedIn && !isTrialActive
-                ? "Purchase to Read"
+                ? "Buy Now"
                 : `Buy eBook (${displayPrice})`}
             </BuyButton>
 
@@ -334,12 +332,6 @@ export default function BookDetails() {
           book!
         </div>
       )}
-      {isLoggedIn && !isTrialActive && (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-800 rounded-lg text-center font-medium">
-          ❗ Your trial has ended. Please purchase books to continue reading.
-        </div>
-      )}
-
       <section>
         <h3 className="text-xl font-semibold mb-2">Book’s Description</h3>
         <div className="text-gray-700 leading-relaxed space-y-4">
