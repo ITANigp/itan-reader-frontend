@@ -125,8 +125,6 @@ export default function BookDetails() {
     average_rating,
     reviews,
     reviews_count,
-    ebook_file_url,
-    unique_book_id,
     ebook_file_size_human,
   } = bookData;
 
@@ -171,12 +169,6 @@ export default function BookDetails() {
 
           {/* Action Buttons */}
           <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
-            {/* <BuyButton
-              bookSlug={unique_book_id || bookSlug}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
-            >
-              Buy now ({displayPrice})
-            </BuyButton> */}
             <p
               className="bg-blue-500 hover:bg-blue-700 cursor-pointer text-white font-bold py-2 px-4 rounded w-full sm:w-auto"
               onClick={() => {
