@@ -267,7 +267,7 @@ export default function BookDetails() {
   return (
     <div className="space-y-10 px-6 py-10">
       <Link href="/home" className="text-blue-600 hover:underline">
-        ← Back to Books
+        ← Back to home
       </Link>
 
       <div className="flex flex-col md:flex-row gap-6">
