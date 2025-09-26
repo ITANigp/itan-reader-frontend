@@ -124,7 +124,7 @@ export default function Home() {
     );
   }
 
-  // Group books by main category names, ensuring no duplicates
+  // Group books by main category names, ensuring each book appears only once per genre
   const booksByGenre = books.reduce((acc, book) => {
     const genres = book.mainCategories.length
       ? book.mainCategories
@@ -171,6 +171,8 @@ export default function Home() {
               fill
               className="object-cover"
             />
+
+            {/* Overlay Text */}
             <div className="absolute inset-0 flex items-center justify-center px-4">
               <h1
                 className="text-center text-white text-base sm:text-lg md:text-2xl font-bold leading-snug tracking-wide drop-shadow-lg bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent"
@@ -181,8 +183,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* Genres section */}
+        {/* Genres */}
         <section className="mt-6 mb-16">
           <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">
             Genres
@@ -191,11 +192,16 @@ export default function Home() {
             {[
               "Romance",
               "Fiction",
+              "Adventure",
               "Sci-Fi",
               "Mystery",
               "Horror",
               "Fantasy",
               "Thriller",
+              "Biography",
+              "Historical",
+              "Poetry",
+              "Drama",
             ].map((genre, idx) => (
               <div
                 key={idx}
@@ -214,20 +220,83 @@ export default function Home() {
             ))}
           </div>
         </section>
+        {/* Popular Trending */}
+        {/* <section className="mt-8 w-full">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="font-semibold text-[17px]">Popular Trending</h2>
+            <span className="text-red-600 text-xs cursor-pointer">See more →</span>
+          </div>
 
-        {/* Ebooks grouped by genre */}
+          <div
+            className="flex gap-[10px] overflow-x-auto sm:gap-[10px] sm:h-[364px] sm:px-[20px] lg:grid lg:grid-cols-[repeat(auto-fit,_minmax(180px,_1fr))] lg:gap-[24px] lg:h-[550px] lg:px-[40px]"
+            style={{
+              maxWidth: '2776px',
+            }}
+          >
+            {books.map((book, index) => (
+              <div
+                key={index}
+                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
+              >
+                <div className="absolute top-2 right-2 z-10">
+                  <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
+                    <LikeButton bookId={book.id} userToken={userToken} />
+                  </div>
+                </div>
+
+                
+                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
+                  <Image
+                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    alt={book.title}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+
+                
+                <div className="flex items-center gap-0.5 mb-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className="text-red-500 text-xs">★</span>
+                  ))}
+                </div>
+
+                
+                <p className="text-sm font-bold leading-snug">{book.title}</p>
+                <p className="text-xs text-gray-500 mb-1">
+                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
+                </p>
+
+                
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-teal-600 font-bold text-[16px]">
+                    ${Number(book.price) / 100}
+                  </span>
+                  <Link
+                    href={`/reader/home/book-details/${book.id}`}
+                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
+                  >
+                    View details
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section> */}
+        {/* Ebooks based on genre */}
         {Object.entries(booksByGenre).map(([genre, genreBooks]) => (
           <section key={genre} className="mt-8 mb-10">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-[17px]">{genre}</h2>
+              {/* You can add a 'See more' link or button here if needed */}
             </div>
             <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {genreBooks.length ? (
                 genreBooks.map((book, index) => {
-                  const isLiked = likedBookIds.includes(String(book.id));
+                  const isLiked = likedBookIds.includes(String(book.id));                                    
                   return (
                     <div
-                      key={book.id}
+                      key={`${genre}-${book.id}`}
                       className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
                     >
                       <div className="absolute top-2 right-2 z-10">

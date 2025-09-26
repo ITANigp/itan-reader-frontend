@@ -89,7 +89,6 @@ export default function BookDetails() {
           ...response.data.data.attributes,
           unique_book_id: response.data.data.id,
         });
-        // console.log("Home Single Book Info: ", bookData)
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404) {
@@ -108,11 +107,7 @@ export default function BookDetails() {
     fetchBookDetails();
   }, [bookId]);
 
-  useEffect(() => {
-    if (bookData) {
-      console.log("Home Single Book Info: ", bookData);
-    }
-  }, [bookData]);
+  // Removed unnecessary logging effect
 
   const handleReadNow = useCallback(async () => {
     if (!isLoggedIn || !authToken || !currentUserId) {
@@ -121,7 +116,6 @@ export default function BookDetails() {
     }
 
     if (isTrialActive) {
-      // console.log("reading_token beginning: ", reading_token);
       try {
         // Get purchase data from localStorage with proper error handling
         let purchaseData = {};
@@ -156,12 +150,10 @@ export default function BookDetails() {
           }
         );
 
-        console.log("Full tokenRes:", tokenRes);
         const reading_token =
           tokenRes.data?.reading_token ||
           tokenRes.data?.data?.reading_token ||
           tokenRes.reading_token;
-        console.log("reading_token", reading_token);
 
         if (!reading_token) {
           throw new Error("No reading token received from server");
@@ -177,7 +169,6 @@ export default function BookDetails() {
         );
 
         const content = contentRes.data;
-        console.log("Full content response:", content);
 
         // Check if we have a PDF URL to open
         if (content?.url) {
