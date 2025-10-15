@@ -45,7 +45,10 @@ function ReviewCard({ review, currentUserIsOwner, onDeleteSuccess, token }) {
             month: "long",
             day: "numeric",
           })}{" "}
-          by {review.user_name || "Anonymous"}
+          by{" "}
+          {(review.reader && review.reader.name) ||
+            review.user_name ||
+            "Anonymous"}
         </p>
         {currentUserIsOwner && (
           <button
