@@ -1,21 +1,16 @@
 import axios from "axios";
-import { api } from "@/utils/auth/readerApi"
+import { api } from "@/utils/auth/readerApi";
 
 const BASE_API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export async function refreshReadingToken(readerToken, purchaseId) {
-
   try {
-    const response = await api.post(
-      `/purchases/refresh_reading_token`,
-      {
-    
-        headers: {
-          Authorization: `Bearer ${readerToken}`
-        },
-        body: JSON.stringify({ purchase_id: purchaseId }),
-      }
-    );
+    const response = await api.post(`/purchases/refresh_reading_token`, {
+      headers: {
+        Authorization: `Bearer ${readerToken}`,
+      },
+      body: JSON.stringify({ purchase_id: purchaseId }),
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -58,7 +53,7 @@ export async function getAllBook() {
     const response = await axios.get(`${BASE_API}/books/`);
 
     const data = response.data; // ✅ Correct for Axios
-    console.log("Fetched All Books: ", data);
+    // console.log("Fetched All Books: ", data);
 
     return data;
   } catch (error) {
@@ -70,15 +65,16 @@ export async function getAllBook() {
 // Batch like status
 export const getBatchLikeStatus = async (bookIds, userToken) => {
   if (!userToken || !bookIds.length) return {};
-  
+
   try {
-    const response = await api.post('/likes/batch_status', 
+    const response = await api.post(
+      "/likes/batch_status",
       { book_ids: bookIds },
-      { headers: { Authorization: `Bearer ${userToken}` }}
+      { headers: { Authorization: `Bearer ${userToken}` } }
     );
     return response.data; // Returns { book_id: like_status }
   } catch (error) {
-    console.error('Error fetching batch like status:', error);
+    console.error("Error fetching batch like status:", error);
     return {};
   }
 };
@@ -98,7 +94,7 @@ async function apiRequest(endpoint, method, token, data = null) {
     method: method,
     url: endpoint,
     headers: {
-      'Authorization': `Bearer ${token}`,
+      Authorization: `Bearer ${token}`,
     },
     // For POST/PUT, data goes into `data` property for axios
     data: data,
@@ -111,17 +107,22 @@ async function apiRequest(endpoint, method, token, data = null) {
     // Axios error handling provides error.response for server errors
     if (error.response) {
       // Server responded with a status other than 2xx range
-      console.error('API Error Response:', error.response.data);
-      console.error('Status:', error.response.status);
-      console.error('Headers:', error.response.headers);
-      throw new Error(error.response.data.message || `API Error: ${error.response.status} ${error.response.statusText}`);
+      // console.error("API Error Response:", error.response.data);
+      // console.error("Status:", error.response.status);
+      // console.error("Headers:", error.response.headers);
+      throw new Error(
+        error.response.data.message ||
+          `API Error: ${error.response.status} ${error.response.statusText}`
+      );
     } else if (error.request) {
       // Request was made but no response received
-      console.error('API Request Error:', error.request);
-      throw new Error('No response received from API. Please check your network connection or API server status.');
+      // console.error("API Request Error:", error.request);
+      throw new Error(
+        "No response received from API. Please check your network connection or API server status."
+      );
     } else {
       // Something else happened while setting up the request
-      console.error('Axios Setup Error:', error.message);
+      console.error("Axios Setup Error:", error.message);
       throw new Error(`Error setting up API request: ${error.message}`);
     }
   }
@@ -134,10 +135,34 @@ async function apiRequest(endpoint, method, token, data = null) {
  * @returns {Promise<object>} - The created review object.
  */
 export async function createReview(token, reviewData) {
-  // Axios expects the body directly, not wrapped in { review: ... }
-  // unless your backend specifically expects that nesting.
-  // Based on your initial prompt, it seems it expects { "review": { ... } }
-  return await apiRequest('reviews', 'POST', token, { review: reviewData });
+  // Make the API request with the review data
+  const response = await apiRequest("reviews", "POST", token, {
+    review: reviewData,
+  });
+
+  // Log the response for debugging
+  // console.log("API Review Response:", response);
+
+  // Transform the API response to match the expected format for immediate display
+  let formattedReview = {
+    // Basic review data
+    id: response?.data?.id || response?.id || `temp-${Date.now()}`,
+    rating: reviewData.rating || 0,
+    comment: reviewData.comment || "",
+    created_at: new Date().toISOString(),
+
+    // Try to get reviewer information from various response formats
+    reader: {
+      id: response?.data?.attributes?.reader_id || response?.reader_id,
+      name:
+        response?.data?.attributes?.reader_name ||
+        response?.reader_name ||
+        "You",
+    },
+  };
+
+  // console.log("Formatted Review for UI:", formattedReview);
+  return formattedReview;
 }
 
 /**
@@ -149,13 +174,13 @@ export async function createReview(token, reviewData) {
 export async function deleteReview(token, reviewId) {
   // Axios will resolve for 2xx status codes, and reject for others.
   // A 204 No Content response will result in response.data being empty.
-  return await apiRequest(`reviews/${reviewId}`, 'DELETE', token);
+
+  // Use the endpoint without additional prefixes (the baseURL already includes /api/v1/)
+  return await apiRequest(`reviews/${reviewId}`, "DELETE", token);
 }
 
 // Example: Fetching reviews for a book
 export async function getBookReviews(token, bookId) {
   // Assuming your API has an endpoint like GET /api/v1/books/:book_id/reviews
-  return await apiRequest(`books/${bookId}/reviews`, 'GET', token);
+  return await apiRequest(`books/${bookId}/reviews`, "GET", token);
 }
-
-

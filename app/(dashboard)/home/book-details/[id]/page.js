@@ -200,14 +200,42 @@ export default function BookDetails() {
     }
   }, [bookData, isLoggedIn, authToken, currentUserId, isTrialActive, router]);
 
-  const handleReviewCreated = useCallback((newReview) => {
-    setBookData((prev) => ({
-      ...prev,
-      reviews: [...(prev.reviews || []), newReview],
-      reviews_count: (prev.reviews_count || 0) + 1,
-    }));
-    setIsReviewModalOpen(false);
-  }, []);
+  const handleReviewCreated = useCallback(
+    (newReview) => {
+      // console.log("New review received in page component:", newReview);
+
+      // The review should already be properly formatted by createReview function
+      // But we'll do a final check to ensure everything is correct
+      const processedReview = {
+        ...newReview,
+        // Make sure we have an ID
+        id: newReview.id || `temp-${Date.now()}`,
+        // Make sure we have complete reader info
+        reader: {
+          ...(newReview.reader || {}),
+          id: newReview.reader?.id || currentUserId,
+          name: newReview.reader?.name || "You",
+        },
+      };
+
+      // console.log("Final review object being added to UI:", processedReview);
+
+      // Update the book data state with the new review
+      setBookData((prev) => {
+        const updatedData = {
+          ...prev,
+          reviews: [...(prev.reviews || []), processedReview],
+          reviews_count: (prev.reviews_count || 0) + 1,
+        };
+        // console.log("Updated book data with new review:", updatedData.reviews);
+        return updatedData;
+      });
+
+      // Close the review modal
+      setIsReviewModalOpen(false);
+    },
+    [currentUserId]
+  );
 
   const handleReviewDeleted = useCallback((deletedId) => {
     setBookData((prev) => ({
@@ -361,11 +389,14 @@ export default function BookDetails() {
         <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
         {reviews?.length > 0 ? (
           <div className="flex gap-4 overflow-x-auto">
-            {reviews.map((review) => (
+            {reviews.map((review, index) => (
               <ReviewCard
-                key={review.id}
+                key={review.id || `review-${index}`}
                 review={review}
-                currentUserIsOwner={review.user_id === currentUserId}
+                currentUserIsOwner={
+                  review.reader?.id === currentUserId ||
+                  review.user_id === currentUserId
+                }
                 onDeleteSuccess={handleReviewDeleted}
                 token={authToken}
               />

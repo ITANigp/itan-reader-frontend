@@ -4,7 +4,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const TOKEN_KEY = "access_token"; // consistent key name for JWT
 
 // Enable axios debugging in development
-const isDebug = process.env.NODE_ENV === "development";
+const isDebug = false; // Force disable debug mode for now
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -27,15 +27,15 @@ if (isDebug) {
             }
           : request.data;
 
-      console.log("API Request:", {
-        url: request.url,
-        method: request.method,
-        data: logData,
-      });
+      // console.log("API Request:", {
+      //   url: request.url,
+      //   method: request.method,
+      //   data: logData,
+      // });
       return request;
     },
     (error) => {
-      console.error("API Request Error:", error);
+      // console.error("API Request Error:", error);
       return Promise.reject(error);
     }
   );
@@ -134,12 +134,12 @@ export const signInReader = async (email, password, recaptcha_token) => {
     return response.data;
   } catch (error) {
     // Only log details in development mode
-    if (process.env.NODE_ENV === "development") {
-      console.log("Auth API response:", {
-        status: error?.response?.status,
-        data: error?.response?.data,
-      });
-    }
+    // if (process.env.NODE_ENV === "development") {
+    //   console.log("Auth API response:", {
+    //     status: error?.response?.status,
+    //     data: error?.response?.data,
+    //   });
+    // }
 
     // Standardize error handling - throw objects with type and message
     if (error?.response?.status === 401) {
