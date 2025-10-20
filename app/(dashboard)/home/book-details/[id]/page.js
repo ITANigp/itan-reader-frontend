@@ -18,7 +18,7 @@ import {
 import BuyButton from "@/components/reader/BuyButton";
 import ReviewForm from "@/components/ReviewForm";
 import ReviewCard from "@/components/ReviewCard";
-import chunkText from "@/utils/chunkText"
+import chunkText from "@/utils/chunkText";
 import { api } from "@/utils/auth/readerApi";
 import axios from "axios";
 
@@ -89,7 +89,6 @@ export default function BookDetails() {
           ...response.data.data.attributes,
           unique_book_id: response.data.data.id,
         });
-        // console.log("Home Single Book Info: ", bookData)
       } catch (err) {
         if (axios.isAxiosError(err)) {
           if (err.response?.status === 404) {
@@ -108,11 +107,7 @@ export default function BookDetails() {
     fetchBookDetails();
   }, [bookId]);
 
-  useEffect(() => {
-    if (bookData) {
-      console.log("Home Single Book Info: ", bookData);
-    }
-  }, [bookData]);
+  // Removed unnecessary logging effect
 
   const handleReadNow = useCallback(async () => {
     if (!isLoggedIn || !authToken || !currentUserId) {
@@ -121,7 +116,6 @@ export default function BookDetails() {
     }
 
     if (isTrialActive) {
-      // console.log("reading_token beginning: ", reading_token);
       try {
         // Get purchase data from localStorage with proper error handling
         let purchaseData = {};
@@ -156,12 +150,10 @@ export default function BookDetails() {
           }
         );
 
-        console.log("Full tokenRes:", tokenRes);
         const reading_token =
           tokenRes.data?.reading_token ||
           tokenRes.data?.data?.reading_token ||
           tokenRes.reading_token;
-        console.log("reading_token", reading_token);
 
         if (!reading_token) {
           throw new Error("No reading token received from server");
@@ -177,7 +169,6 @@ export default function BookDetails() {
         );
 
         const content = contentRes.data;
-        console.log("Full content response:", content);
 
         // Check if we have a PDF URL to open
         if (content?.url) {
@@ -209,14 +200,42 @@ export default function BookDetails() {
     }
   }, [bookData, isLoggedIn, authToken, currentUserId, isTrialActive, router]);
 
-  const handleReviewCreated = useCallback((newReview) => {
-    setBookData((prev) => ({
-      ...prev,
-      reviews: [...(prev.reviews || []), newReview],
-      reviews_count: (prev.reviews_count || 0) + 1,
-    }));
-    setIsReviewModalOpen(false);
-  }, []);
+  const handleReviewCreated = useCallback(
+    (newReview) => {
+      // console.log("New review received in page component:", newReview);
+
+      // The review should already be properly formatted by createReview function
+      // But we'll do a final check to ensure everything is correct
+      const processedReview = {
+        ...newReview,
+        // Make sure we have an ID
+        id: newReview.id || `temp-${Date.now()}`,
+        // Make sure we have complete reader info
+        reader: {
+          ...(newReview.reader || {}),
+          id: newReview.reader?.id || currentUserId,
+          name: newReview.reader?.name || "You",
+        },
+      };
+
+      // console.log("Final review object being added to UI:", processedReview);
+
+      // Update the book data state with the new review
+      setBookData((prev) => {
+        const updatedData = {
+          ...prev,
+          reviews: [...(prev.reviews || []), processedReview],
+          reviews_count: (prev.reviews_count || 0) + 1,
+        };
+        // console.log("Updated book data with new review:", updatedData.reviews);
+        return updatedData;
+      });
+
+      // Close the review modal
+      setIsReviewModalOpen(false);
+    },
+    [currentUserId]
+  );
 
   const handleReviewDeleted = useCallback((deletedId) => {
     setBookData((prev) => ({
@@ -225,8 +244,6 @@ export default function BookDetails() {
       reviews_count: (prev.reviews_count || 1) - 1,
     }));
   }, []);
-
-
 
   if (loading) return <div className="text-center py-20">Loading...</div>;
   if (error)
@@ -269,7 +286,7 @@ export default function BookDetails() {
   return (
     <div className="space-y-10 px-6 py-10">
       <Link href="/home" className="text-blue-600 hover:underline">
-        ← Back to Books
+        ← Back to home
       </Link>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -297,7 +314,7 @@ export default function BookDetails() {
               className="bg-green-600 text-white rounded-md px-2"
             >
               {isLoggedIn && !isTrialActive
-                ? "Purchase to Read"
+                ? "Buy Now"
                 : `Buy eBook (${displayPrice})`}
             </BuyButton>
 
@@ -334,12 +351,6 @@ export default function BookDetails() {
           book!
         </div>
       )}
-      {isLoggedIn && !isTrialActive && (
-        <div className="p-4 bg-red-100 border border-red-400 text-red-800 rounded-lg text-center font-medium">
-          ❗ Your trial has ended. Please purchase books to continue reading.
-        </div>
-      )}
-
       <section>
         <h3 className="text-xl font-semibold mb-2">Book’s Description</h3>
         <div className="text-gray-700 leading-relaxed space-y-4">
@@ -378,11 +389,14 @@ export default function BookDetails() {
         <h3 className="text-xl font-semibold mb-4">Customer Reviews</h3>
         {reviews?.length > 0 ? (
           <div className="flex gap-4 overflow-x-auto">
-            {reviews.map((review) => (
+            {reviews.map((review, index) => (
               <ReviewCard
-                key={review.id}
+                key={review.id || `review-${index}`}
                 review={review}
-                currentUserIsOwner={review.user_id === currentUserId}
+                currentUserIsOwner={
+                  review.reader?.id === currentUserId ||
+                  review.user_id === currentUserId
+                }
                 onDeleteSuccess={handleReviewDeleted}
                 token={authToken}
               />

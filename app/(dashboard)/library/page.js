@@ -107,9 +107,9 @@ export default function Library() {
   // Function to fetch data using your custom 'api' instance
   const fetchData = async (endpoint, setStateFunction, tabName) => {
     if (!authToken) {
-      console.log(
-        `Skipping fetch for ${tabName}: No authentication token available.`
-      );
+      // console.log(
+      //   `Skipping fetch for ${tabName}: No authentication token available.`
+      // );
       return;
     }
 
@@ -120,10 +120,10 @@ export default function Library() {
 
       if (response.data && Array.isArray(response.data.data)) {
         setStateFunction(response.data.data);
-        console.log(
-          `SUCCESS: Fetched ${tabName.toLowerCase()}:`,
-          response.data.data
-        );
+        // console.log(
+        //   `SUCCESS: Fetched ${tabName.toLowerCase()}:`,
+        //   response.data.data
+        // );
       } else {
         console.warn(
           `API response for ${tabName} did not contain an array in 'data' property:`,
@@ -136,7 +136,7 @@ export default function Library() {
       setErrorFetchingBooks(`Failed to load ${tabName}. Please try again.`);
       if (axios.isAxiosError(error)) {
         if (error.response?.status === 401 || error.response?.status === 403) {
-          console.log("Authentication failed or token expired. Logging out...");
+          // console.log("Authentication failed or token expired. Logging out...");
           logout();
           router.push("/login");
         }
@@ -156,7 +156,7 @@ export default function Library() {
         fetchData("/reader/finished_books", setFinishedBooks, "Finished Books"),
         fetchData("/likes", setWishlist, "Wishlist"),
       ]).finally(() => {
-        console.log("Display Bought Books: ", boughtBooks);
+        // console.log("Display Bought Books: ", boughtBooks);
         setIsLoadingBooks(false);
       });
     } else if (!isLoadingAuth && !authToken) {
@@ -166,12 +166,12 @@ export default function Library() {
       setWishlist([]);
       setAudioBooks([]);
       setIsLoadingBooks(false);
-      console.log("No authentication token found. User needs to log in.");
+      // console.log("No authentication token found. User needs to log in.");
     }
   }, [authToken, isLoadingAuth]);
 
   useEffect(() => {
-    console.log("📚 Bought Books:", boughtBooks);
+    // console.log("📚 Bought Books:", boughtBooks);
   }, [boughtBooks]);
 
   // Handle initial loading and not-logged-in states

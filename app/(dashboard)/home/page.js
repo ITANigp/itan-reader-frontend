@@ -3,69 +3,51 @@
 import { useState, useEffect } from "react";
 import { getReaderProfile } from "@/utils/auth/readerApi";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import LikeButton from "@/components/LikeButton";
 import Link from "next/link";
 import FreeTrialTimer from "@/app/reader/(components)/FreeTrialTimer";
+import TrialEndedNotification from "@/components/TrialEndedNotification";
+import LikeButton from "@/components/LikeButton";
 
 export default function Home() {
-  const [userToken, setUserToken] = useState("");
-  const [books, setBooks] = useState([]);
+  const [data, setData] = useState({
+    books: [],
+    likedBookIds: [],
+    trialStart: null,
+    trialEnd: null,
+    userToken: null,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [trialStart, setTrialStart] = useState(null);
-  const [trialEnd, setTrialEnd] = useState(null);
-  const [likedBookIds, setLikedBookIds] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
+
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  // Fetch liked books
+  // Centralized data fetching on component mount
   useEffect(() => {
-    const fetchLikedBooks = async () => {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        try {
-          const response = await fetch(`${BASE_URL}/likes`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const result = await response.json();
-          const likedBookIds = Array.isArray(result.data)
-            ? result.data.map((like) => String(like.book.id))
-            : [];
-          setLikedBookIds(likedBookIds);
-        } catch (err) {
-          console.error("Error fetching liked books:", err);
-        }
-      }
-    };
-    fetchLikedBooks();
-  }, []);
-
-  // Fetch trial info
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        const { data } = await getReaderProfile(token);
-        setTrialStart(data.trial_start);
-        setTrialEnd(data.trial_end);
-      }
-    };
-    fetchProfile();
-  }, []);
-
-  // Get token
-  useEffect(() => {
-    const storedToken = localStorage.getItem("access_token");
-    if (storedToken) setUserToken(storedToken);
-  }, []);
-
-  // Fetch books
-  useEffect(() => {
-    const fetchBooks = async () => {
+    const fetchAllData = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/books`);
-        const result = await response.json();
-        const formattedBooks = result.data.map((book) => ({
+        const storedToken = localStorage.getItem("access_token");
+        if (!storedToken) {
+          throw new Error("No access token found.");
+        }
+
+        const [profileResponse, booksResponse, likesResponse] =
+          await Promise.all([
+            getReaderProfile(storedToken),
+            fetch(`${BASE_URL}/books`),
+            fetch(`${BASE_URL}/likes`, {
+              headers: { Authorization: `Bearer ${storedToken}` },
+            }),
+          ]);
+
+        const [profileData, booksResult, likesResult] = await Promise.all([
+          profileResponse.data,
+          booksResponse.json(),
+          likesResponse.json(),
+        ]);
+
+        // Process fetched data
+        const formattedBooks = booksResult.data.map((book) => ({
           id: book.id,
           title: book.attributes.title,
           author: book.attributes.author.name,
@@ -75,70 +57,112 @@ export default function Home() {
             ? book.attributes.categories.map((cat) => cat.main).filter(Boolean)
             : [],
         }));
-        setBooks(formattedBooks);
+
+        const likedBookIds = Array.isArray(likesResult.data)
+          ? likesResult.data.map((like) => String(like.book.id))
+          : [];
+
+        // Update state with all fetched data
+        setData({
+          books: formattedBooks,
+          likedBookIds,
+          trialStart: profileData.trial_start,
+          trialEnd: profileData.trial_end,
+          userToken: storedToken,
+        });
       } catch (err) {
-        setError("Failed to load books.");
+        console.error("Error fetching data:", err);
+        setError("Failed to load content.");
       } finally {
         setLoading(false);
       }
     };
-    fetchBooks();
-  }, []);
 
-  if (loading)
+    fetchAllData();
+  }, [BASE_URL]);
+
+  const { books, likedBookIds, trialStart, trialEnd, userToken } = data;
+  const isTrialActive = trialEnd && new Date(trialEnd) > new Date();
+
+  // Notification effect (5 days max, once per day, 5 seconds each)
+  useEffect(() => {
+    if (!isTrialActive) {
+      const today = new Date().toDateString();
+      const storedData = JSON.parse(localStorage.getItem("shownDaysData")) || {
+        days: [],
+        count: 0,
+      };
+
+      if (!storedData.days.includes(today) && storedData.count < 5) {
+        setShowNotification(true);
+        const timeoutId = setTimeout(() => setShowNotification(false), 5000);
+
+        const updatedData = {
+          days: [...storedData.days, today],
+          count: storedData.count + 1,
+        };
+        localStorage.setItem("shownDaysData", JSON.stringify(updatedData));
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [isTrialActive]);
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         Loading...
       </div>
     );
-  if (error)
+  }
+
+  if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-600">
         {error}
       </div>
     );
+  }
 
-  // Group books by main category names, ensuring no duplicates
+  // Group books by main category names, ensuring each book appears only once per genre
   const booksByGenre = books.reduce((acc, book) => {
     const genres = book.mainCategories.length
       ? book.mainCategories
       : ["Itan Originals"];
-
     genres.forEach((genre) => {
-      if (!acc[genre]) acc[genre] = new Map(); // Map ensures uniqueness
-      if (!acc[genre].has(book.id)) {
-        acc[genre].set(book.id, book);
+      if (!acc[genre]) acc[genre] = [];
+      if (!acc[genre].some((b) => b.id === book.id)) {
+        acc[genre].push(book);
       }
     });
     return acc;
   }, {});
 
-  // Convert Maps back to arrays for rendering
-  Object.keys(booksByGenre).forEach((genre) => {
-    booksByGenre[genre] = Array.from(booksByGenre[genre].values());
-  });
-
   return (
     <div className="bg-white pb-10 text-black text-[14px] font-sans">
-      {/* Mobile-only timer */}
-      <div className="flex sm:hidden w-full justify-center items-center pt-4 pb-2">
-        <div className="max-w-[180px] w-full flex justify-center items-center">
-          <FreeTrialTimer
-            trial_start={trialStart}
-            trial_end={trialEnd}
-            mobile
-          />
+      {/* Conditionally render the FreeTrialTimer for mobile */}
+      {isTrialActive && (
+        <div className="flex sm:hidden w-full justify-center items-center pt-4 pb-2">
+          <div className="max-w-[180px] w-full flex justify-center items-center">
+            <FreeTrialTimer
+              trial_start={trialStart}
+              trial_end={trialEnd}
+              mobile
+            />
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Desktop/Tablet timer */}
-      <div className="hidden sm:flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
-        <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} />
-      </div>
+      {/* Conditionally render the FreeTrialTimer for desktop/tablet */}
+      {isTrialActive && (
+        <div className="hidden sm:flex justify-center md:justify-end items-center max-w-[1440px] mx-auto px-4 py-5">
+          <FreeTrialTimer trial_start={trialStart} trial_end={trialEnd} />
+        </div>
+      )}
 
       {/* CONTAINER */}
       <div className="max-w-[1440px] mx-auto px-4 pt-5 sm:mt-0">
-        {/* Hero */}
+        {/* Hero Section */}
         <div className="mb-14">
           <div className="w-full h-40 md:h-60 xl:h-96 relative rounded-lg overflow-hidden">
             <Image
@@ -147,6 +171,8 @@ export default function Home() {
               fill
               className="object-cover"
             />
+
+            {/* Overlay Text */}
             <div className="absolute inset-0 flex items-center justify-center px-4">
               <h1
                 className="text-center text-white text-base sm:text-lg md:text-2xl font-bold leading-snug tracking-wide drop-shadow-lg bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent"
@@ -157,8 +183,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* Genres section */}
+        {/* Genres */}
         <section className="mt-6 mb-16">
           <h2 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4">
             Genres
@@ -190,20 +215,83 @@ export default function Home() {
             ))}
           </div>
         </section>
+        {/* Popular Trending */}
+        {/* <section className="mt-8 w-full">
+          <div className="flex justify-between items-center mb-3">
+            <h2 className="font-semibold text-[17px]">Popular Trending</h2>
+            <span className="text-red-600 text-xs cursor-pointer">See more →</span>
+          </div>
 
-        {/* Ebooks grouped by genre */}
+          <div
+            className="flex gap-[10px] overflow-x-auto sm:gap-[10px] sm:h-[364px] sm:px-[20px] lg:grid lg:grid-cols-[repeat(auto-fit,_minmax(180px,_1fr))] lg:gap-[24px] lg:h-[550px] lg:px-[40px]"
+            style={{
+              maxWidth: '2776px',
+            }}
+          >
+            {books.map((book, index) => (
+              <div
+                key={index}
+                className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 shadow-md"
+              >
+                <div className="absolute top-2 right-2 z-10">
+                  <div className="bg-white rounded-full w-1 h-1 flex items-center justify-center">
+                    <LikeButton bookId={book.id} userToken={userToken} />
+                  </div>
+                </div>
+
+                
+                <div className="w-full h-[220px] lg:h-[260px] relative rounded overflow-hidden mb-2">
+                  <Image
+                    src={book.image || `https://picsum.photos/150/220?random=${index + 20}`}
+                    alt={book.title}
+                    fill
+                    className="object-cover rounded"
+                  />
+                </div>
+
+                
+                <div className="flex items-center gap-0.5 mb-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span key={i} className="text-red-500 text-xs">★</span>
+                  ))}
+                </div>
+
+                
+                <p className="text-sm font-bold leading-snug">{book.title}</p>
+                <p className="text-xs text-gray-500 mb-1">
+                  By: {book?.author?.trim() ? book.author : "Jane Doe"}
+                </p>
+
+                
+                <div className="flex justify-between items-center mt-1">
+                  <span className="text-teal-600 font-bold text-[16px]">
+                    ${Number(book.price) / 100}
+                  </span>
+                  <Link
+                    href={`/reader/home/book-details/${book.id}`}
+                    className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
+                  >
+                    View details
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section> */}
+        {/* Ebooks based on genre */}
         {Object.entries(booksByGenre).map(([genre, genreBooks]) => (
           <section key={genre} className="mt-8 mb-10">
             <div className="flex justify-between items-center mb-3">
               <h2 className="font-semibold text-[17px]">{genre}</h2>
+              {/* You can add a 'See more' link or button here if needed */}
             </div>
             <div className="flex gap-4 overflow-x-auto scrollbar scrollbar-thumb-gray-400 scrollbar-track-gray-100">
               {genreBooks.length ? (
                 genreBooks.map((book, index) => {
-                  const isLiked = likedBookIds.includes(String(book.id));
+                  const isLiked = likedBookIds.includes(String(book.id));                                    
                   return (
                     <div
-                      key={book.id}
+                      key={`${genre}-${book.id}`}
                       className="w-[150px] sm:w-[130px] lg:w-[180px] bg-white p-2 rounded relative flex-shrink-0 md:shadow-md"
                     >
                       <div className="absolute top-2 right-2 z-10">
@@ -261,6 +349,11 @@ export default function Home() {
           </section>
         ))}
       </div>
+
+      {/* Trial Ended Notification */}
+      {!isTrialActive && showNotification && (
+        <TrialEndedNotification onClose={() => setShowNotification(false)} />
+      )}
     </div>
   );
 }
