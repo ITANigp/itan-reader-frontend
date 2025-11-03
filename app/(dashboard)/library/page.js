@@ -87,10 +87,11 @@ export default function Library() {
         const content = contentRes.data;
 
         if (content?.url) {
-          // Navigate to flipbook with url + title
+          // Navigate to flipbook with url + title + bookId
           const urlParams = new URLSearchParams();
           urlParams.set("url", content.url);
           urlParams.set("title", bookData.title);
+          urlParams.set("bookId", bookId); // Pass the actual book ID
 
           router.push(`/reader/flipbook?${urlParams.toString()}`);
         } else {
