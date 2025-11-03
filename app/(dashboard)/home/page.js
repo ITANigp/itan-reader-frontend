@@ -169,6 +169,7 @@ export default function Home() {
               src="/images/readers/home-hero.png"
               alt="Hero"
               fill
+              priority
               className="object-cover"
             />
 
