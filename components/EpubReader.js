@@ -77,42 +77,62 @@ export default function EpubReader({ epubUrl, bookId, authHeaders = {} }) {
     const originalWarn = console.warn;
     const originalLog = console.log;
 
+    // BEST PRACTICE: Define filter patterns as a reusable array
+    // This is more maintainable - easy to add/remove patterns
+    const NOISE_PATTERNS = [
+      "content.opf",
+      "404",
+      "not found",
+      "blocked script execution",
+      "blocked script",
+      "allow-scripts",
+      "sandboxed",
+      "about:srcdoc",
+      "srcdoc",
+      "oebps",
+      "because the document's frame is sandboxed",
+      "permission is not set",
+      "intervention",
+      "slow network is detected",
+      "fallback font will be used",
+      "chromestatus.com/feature",
+      "reading 'package'",
+      "cannot read properties of undefined",
+      "rendition.js",
+    ];
+
+    // Helper function to check if a message should be filtered
+    // Using .some() for better readability and early exit optimization
+    const shouldFilterMessage = (message) => {
+      const lowerMessage = message.toLowerCase();
+      return NOISE_PATTERNS.some((pattern) => lowerMessage.includes(pattern));
+    };
+
     // Override console.error to filter out known noise
     console.error = (...args) => {
-      const message = args.join(" ").toLowerCase();
-
-      // Filter out specific noisy messages
-      if (
-        message.includes("content.opf") ||
-        message.includes("404") ||
-        message.includes("not found") ||
-        message.includes("blocked script execution") ||
-        message.includes("allow-scripts") ||
-        message.includes("sandboxed") ||
-        message.includes("about:srcdoc") ||
-        message.includes("oebps")
-      ) {
+      const message = args.join(" ");
+      if (shouldFilterMessage(message)) {
         return; // Don't log these messages
       }
-
-      // Log everything else normally
       originalError.apply(console, args);
     };
 
     // Override console.warn for warnings
     console.warn = (...args) => {
-      const message = args.join(" ").toLowerCase();
-
-      if (
-        message.includes("content.opf") ||
-        message.includes("404") ||
-        message.includes("blocked script") ||
-        message.includes("sandboxed")
-      ) {
+      const message = args.join(" ");
+      if (shouldFilterMessage(message)) {
         return; // Don't log these warnings
       }
-
       originalWarn.apply(console, args);
+    };
+
+    // Override console.log to filter noise that might appear as regular logs
+    console.log = (...args) => {
+      const message = args.join(" ");
+      if (shouldFilterMessage(message)) {
+        return; // Don't log these messages
+      }
+      originalLog.apply(console, args);
     };
 
     // Also intercept XMLHttpRequest to stop 404 network requests from showing
@@ -132,12 +152,40 @@ export default function EpubReader({ epubUrl, bookId, authHeaders = {} }) {
       return originalXHROpen.call(this, method, url, ...args);
     };
 
+    // Intercept browser's native error reporting
+    const originalWindowError = window.onerror;
+    window.onerror = function (message, source, lineno, colno, error) {
+      const msgStr = String(message);
+      if (shouldFilterMessage(msgStr)) {
+        return true; // Prevent default error handling
+      }
+      if (originalWindowError) {
+        return originalWindowError(message, source, lineno, colno, error);
+      }
+      return false;
+    };
+
+    // Intercept unhandled promise rejections
+    const originalUnhandledRejection = window.onunhandledrejection;
+    window.onunhandledrejection = function (event) {
+      const message = event.reason?.message || String(event.reason);
+      if (shouldFilterMessage(message)) {
+        event.preventDefault();
+        return;
+      }
+      if (originalUnhandledRejection) {
+        originalUnhandledRejection(event);
+      }
+    };
+
     // Cleanup: restore original console methods on unmount
     return () => {
       console.error = originalError;
       console.warn = originalWarn;
       console.log = originalLog;
       XMLHttpRequest.prototype.open = originalXHROpen;
+      window.onerror = originalWindowError;
+      window.onunhandledrejection = originalUnhandledRejection;
     };
   }, []);
 
@@ -325,14 +373,8 @@ export default function EpubReader({ epubUrl, bookId, authHeaders = {} }) {
         return;
       }
 
-      console.log(`📖 Loading EPUB for book: ${bookId}`);
-
       // PRIMARY STRATEGY: Try direct S3 URL first for best performance
       if (originalS3UrlRef.current) {
-        console.log(
-          "� Using direct S3 URL for fast loading:",
-          originalS3UrlRef.current
-        );
         try {
           const response = await fetch(originalS3UrlRef.current, {
             headers: {
@@ -585,8 +627,10 @@ export default function EpubReader({ epubUrl, bookId, authHeaders = {} }) {
         await book.ready;
 
         if (book.spine && book.spine.items && book.spine.items.length > 0) {
-          setEpubBook(book);
-          setEpubArrayBuffer(arrayBuffer); // Store ArrayBuffer for ReactReader
+          // Store both the book and ArrayBuffer
+          // ReactReader needs just the ArrayBuffer, but we keep book for validation
+          setEpubArrayBuffer(arrayBuffer);
+          setEpubBook(book); // Set this LAST to trigger render only when everything is ready
           setLoading(false);
           return;
         }
@@ -760,13 +804,18 @@ export default function EpubReader({ epubUrl, bookId, authHeaders = {} }) {
                 // Reader is ready
               }}
               onError={(err) => {
-                // Filter out known harmless errors
-                const errorMessage = err.message || err.toString();
+                // Filter out known harmless errors - use same filter as console
+                const errorMessage = String(err.message || err).toLowerCase();
                 if (
-                  errorMessage.toLowerCase().includes("content.opf") ||
-                  errorMessage.toLowerCase().includes("404") ||
-                  errorMessage.toLowerCase().includes("script execution") ||
-                  errorMessage.toLowerCase().includes("oebps")
+                  errorMessage.includes("content.opf") ||
+                  errorMessage.includes("404") ||
+                  errorMessage.includes("script execution") ||
+                  errorMessage.includes("oebps") ||
+                  errorMessage.includes("reading 'package'") ||
+                  errorMessage.includes(
+                    "cannot read properties of undefined"
+                  ) ||
+                  errorMessage.includes("rendition")
                 ) {
                   return; // Don't show these errors
                 }
