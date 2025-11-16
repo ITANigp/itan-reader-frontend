@@ -411,9 +411,10 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
           </Document>
         </div>
       ) : (
-        <p className="text-lg text-red-500 mt-4">
-          Please provide a valid PDF URL to display the flipbook.
-        </p>
+        // <p className="text-lg text-red-500 mt-4">
+        //   Please provide a valid PDF URL to display the flipbook.
+        // </p>
+        ""
       )}
 
       {numPages > 0 && (
