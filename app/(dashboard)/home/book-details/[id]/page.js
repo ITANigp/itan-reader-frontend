@@ -160,36 +160,64 @@ export default function BookDetails() {
         }
 
         const contentRes = await api.get(
-          `/books/${bookData.unique_book_id}/content?direct_url=true`,
+          `/books/${bookData.unique_book_id}/content`,
           {
             headers: {
               Authorization: `Bearer ${reading_token}`,
+              Accept:
+                "application/epub+zip, application/pdf, application/octet-stream, application/json",
             },
+            params: {
+              direct_url: true,
+              use_s3_direct: true,
+              optimize_for_frontend: true,
+            },
+            responseType: "json", // Try JSON first to see if we get metadata
           }
         );
 
         const content = contentRes.data;
 
-        // Check if we have a PDF URL to open
-        if (content?.url) {
-          // Navigate to flipbook reader with the PDF URL (don't encode since it's already a valid URL)
-          const urlParams = new URLSearchParams();
-          urlParams.set("url", content.url);
-          urlParams.set("title", bookData.title);
+        // Check if we have a direct S3 URL or metadata
+        if (content?.s3_url || content?.url) {
+          const fileUrl = content.s3_url || content.url;
+          const format = content.format || "unknown";
 
-          router.push(`/reader/flipbook?${urlParams.toString()}`);
-        } else if (content?.text) {
-          // If it's text content, show in alert
-          alert(
-            `Reading "${bookData.title}":\n\n${content.text.substring(0, 200)}...`
-          );
+          console.log("File URL:", fileUrl);
+          console.log("Book ID:", bookData.unique_book_id);
+          console.log("Detected format:", format);
+
+          // Determine the format from the URL or content metadata
+          if (
+            format.toLowerCase().includes("pdf") ||
+            fileUrl.includes(".pdf")
+          ) {
+            // Navigate to flipbook reader with the PDF URL and book ID
+            const urlParams = new URLSearchParams();
+            urlParams.set("url", fileUrl);
+            urlParams.set("title", bookData.title);
+            urlParams.set("bookId", bookData.unique_book_id);
+            router.push(`/reader/flipbook?${urlParams.toString()}`);
+          } else if (
+            format.toLowerCase().includes("epub") ||
+            fileUrl.includes(".epub")
+          ) {
+            // Navigate to EPUB reader with the S3 URL and book ID
+            const urlParams = new URLSearchParams();
+            urlParams.set("url", fileUrl);
+            urlParams.set("title", bookData.title);
+            urlParams.set("bookId", bookData.unique_book_id);
+            router.push(`/reader/flipbook?${urlParams.toString()}`);
+          } else {
+            // Unknown format, try the flipbook reader anyway
+            const urlParams = new URLSearchParams();
+            urlParams.set("url", fileUrl);
+            urlParams.set("title", bookData.title);
+            urlParams.set("bookId", bookData.unique_book_id);
+            router.push(`/reader/flipbook?${urlParams.toString()}`);
+          }
         } else {
-          // Fallback - show available content structure
-          const textContent =
-            content?.content || JSON.stringify(content, null, 2);
-          alert(
-            `Reading "${bookData.title}":\n\n${textContent.substring(0, 200)}...`
-          );
+          throw new Error("No file URL received from server");
         }
       } catch (err) {
         console.error("Read error:", err);
