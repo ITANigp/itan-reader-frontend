@@ -4,82 +4,163 @@ const PrivacyPolicy = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 text-gray-800">
       <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
-      <p className="text-sm text-gray-600">Last Updated: April 25, 2025</p>
+      <p className="text-sm text-gray-600">Last Updated: November 22, 2025</p>
 
-      <h2 className="text-2xl font-semibold mt-6">Privacy Notice</h2>
-      <p className="mt-4">
-        On this site, we only use cookies and similar tools (collectively,
-        "cookies") to provide services to you, including authenticating you,
-        preserving your settings, and delivering content. Other ITAN sites and
-        services may use cookies for additional purposes.
-      </p>
+      {/* --- PRIVACY NOTICE SECTION --- */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold">Privacy Notice</h2>
+        <div className="border-l-4 border-gray-300 pl-4 mt-4">
+          <p>
+            On this site, we only use cookies and similar tools (collectively,
+            "cookies") to provide services to you, including authenticating you,
+            preserving your settings, and delivering content. Other ITAN sites
+            and services may use cookies for additional purposes.
+          </p>
+        </div>
+      </div>
 
-      <h3 className="text-xl font-semibold mt-6">
-        What Personal Information Does ITAN Collect?
-      </h3>
-      <p className="mt-2">
-        We collect your personal information to provide and improve our products
-        and services:
-      </p>
-      <ul className="list-disc ml-6 mt-2">
-        <li>
-          <strong>Information You Give Us:</strong> We receive and store any
-          information you provide in relation to ITAN Services.
-        </li>
-        <li>
-          <strong>Automatic Information:</strong> We collect details about your
-          interactions with our services using cookies and other identifiers.
-        </li>
-        <li>
-          <strong>Information from Other Sources:</strong> We might receive
-          updated delivery addresses or other necessary information.
-        </li>
-      </ul>
+      {/* --- PERSONAL INFORMATION COLLECTION SECTION --- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">
+          What Personal Information Does ITAN Collect?
+        </h3>
+        <div className="border-l-4 border-gray-300 pl-4 mt-2">
+          <p>
+            We collect your personal information to provide and improve our
+            products and services:
+          </p>
 
-      <h3 className="text-xl font-semibold mt-6">
-        How We Use Your Information
-      </h3>
-      <ul className="list-disc ml-6 mt-2">
-        <li>Purchase and delivery of products and services.</li>
-        <li>Providing, troubleshooting, and improving our services.</li>
-        <li>Personalization and recommendations.</li>
-        <li>Legal compliance.</li>
-        <li>Communication and customer support.</li>
-        <li>Fraud prevention and security.</li>
-      </ul>
+          <ul className="list-disc ml-6 mt-2">
+            <li>
+              <strong>Information You Give Us:</strong> We receive and store any
+              information you provide in relation to ITAN Services.
+            </li>
+            <li>
+              <strong>Automatic Information:</strong> We collect details about
+              your interactions with our services using cookies and other
+              identifiers.
+            </li>
+            <li>
+              <strong>Information from Other Sources:</strong> We might receive
+              updated delivery addresses or other necessary information.
+            </li>
+          </ul>
+        </div>
+      </div>
 
-      <h3 className="text-xl font-semibold mt-6">
-        Does ITAN Share Your Information?
-      </h3>
-      <p className="mt-2">
-        We do not sell your personal information. We only share it with:
-      </p>
-      <ul className="list-disc ml-6 mt-2">
-        <li>
-          Third-party service providers for order fulfillment and support.
-        </li>
-        <li>Transactions involving third parties with your consent.</li>
-        <li>Business transfers and legal obligations.</li>
-      </ul>
+      {/* --- HOW WE USE YOUR INFO SECTION --- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">How We Use Your Information</h3>
+        <div className="border-l-4 border-gray-300 pl-4 mt-2">
+          <ul className="list-disc ml-6 mt-2">
+            <li>Purchase and delivery of products and services.</li>
+            <li>Providing, troubleshooting, and improving our services.</li>
+            <li>Personalization and recommendations.</li>
+            <li>Legal compliance.</li>
+            <li>Communication and customer support.</li>
+            <li>Fraud prevention and security.</li>
+          </ul>
+        </div>
+      </div>
 
-      <h3 className="text-xl font-semibold mt-6">Your Choices and Rights</h3>
-      <p className="mt-2">
-        You can manage cookie preferences and data settings via your browser.
-        You may also request access or deletion of your personal data as
-        permitted by law.
-      </p>
+      {/* --- USE OF GOOGLE ANALYTICS SECTION --- */}
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold">Use of Google Analytics</h2>
+        <div className="border-l-4 border-gray-300 pl-4 mt-4">
+          <p>
+            We use <strong>Google Analytics</strong>, a web analytics service
+            provided by <strong>Google LLC</strong>, to help us understand how
+            visitors interact with our website.
+          </p>
 
-      <h3 className="text-xl font-semibold mt-6">Children's Privacy</h3>
-      <p className="mt-2">
-        Our services are intended for adults. If you are under 18, you may use
-        our services only with parental guidance.
-      </p>
+          <p className="mt-4">
+            Google Analytics uses <strong>cookies</strong> and similar
+            technologies to collect and analyze information about your use of
+            our website (such as pages visited, time spent, and interactions).
+          </p>
 
-      <h3 className="text-xl font-semibold mt-6">Policy Updates</h3>
-      <p className="mt-2">
-        We may update this policy as our services evolve. Please check back for
-        updates.
-      </p>
+          <p className="mt-4">
+            The information generated by these cookies may be transmitted to and
+            stored by Google on servers in the United States or other countries.
+          </p>
+
+          <p className="mt-4">
+            We have enabled IP anonymization so that your IP address is
+            truncated before being transmitted to Google.
+          </p>
+
+          <p className="mt-4">
+            Google may use this information to evaluate website activity and
+            provide other services related to website usage.
+          </p>
+
+          <p className="mt-4">
+            You can learn more about how Google uses your data at:{" "}
+            <a
+              href="https://policies.google.com/technologies/partner-sites"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline"
+            >
+              https://policies.google.com/technologies/partner-sites
+            </a>
+          </p>
+        </div>
+      </div>
+
+      {/* --- SHARING INFORMATION SECTION --- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">
+          Does ITAN Share Your Information?
+        </h3>
+        <div className="border-l-4 border-gray-300 pl-4 mt-2">
+          <p>
+            We do not sell your personal information. We only share it with:
+          </p>
+
+          <ul className="list-disc ml-6 mt-2">
+            <li>
+              Third-party service providers for order fulfillment and support.
+            </li>
+            <li>Transactions involving third parties with your consent.</li>
+            <li>Business transfers and legal obligations.</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* --- USER RIGHTS SECTION --- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">Your Choices and Rights</h3>
+        <div className="border-l-4 border-gray-300 pl-4 mt-2">
+          <p>
+            You can manage cookie preferences and data settings via your
+            browser. You may also request access or deletion of your personal
+            data as permitted by law.
+          </p>
+        </div>
+      </div>
+
+      {/* --- CHILDREN'S PRIVACY SECTION --- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">Children's Privacy</h3>
+        <div className="border-l-4 border-gray-300 pl-4 mt-2">
+          <p>
+            Our services are intended for adults. If you are under 18, you may
+            use our services only with parental guidance.
+          </p>
+        </div>
+      </div>
+
+      {/* --- POLICY UPDATE SECTION --- */}
+      <div className="mt-8">
+        <h3 className="text-xl font-semibold">Policy Updates</h3>
+        <div className="border-l-4 border-gray-300 pl-4 mt-2">
+          <p>
+            We may update this policy as our services evolve. Please check back
+            for updates.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
