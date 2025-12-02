@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { FaRegStar } from "react-icons/fa"; // Import a star icon if needed
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -107,126 +108,79 @@ export default function BookDetails() {
     fetchBookDetails();
   }, [bookId]);
 
-  // Removed unnecessary logging effect
+  // 📚 Reusable Read Logic (Inspired by Library.js)
+  const startReading = useCallback(
+    async (bookData, bookId) => {
+      try {
+        // 1. Refresh reading token
+        const tokenRes = await api.post(
+          "/purchases/refresh_reading_token",
+          {
+            book_id: bookId,
+            content_type: "ebook",
+          },
+          { headers: { Authorization: `Bearer ${authToken}` } }
+        );
+
+        const reading_token =
+          tokenRes.data?.reading_token || tokenRes.data?.data?.reading_token;
+
+        if (!reading_token) throw new Error("No reading token received");
+
+        // 2. Get book content
+        const contentRes = await api.get(
+          `/books/${bookId}/content?direct_url=true&optimize_for_frontend=true`,
+          { headers: { Authorization: `Bearer ${reading_token}` } }
+        );
+
+        const content = contentRes.data;
+        const fileUrl = content?.s3_url || content?.url;
+        const format = content?.format || "unknown";
+
+        if (fileUrl) {
+          // 3. Navigate to flipbook with url + title + bookId
+          const urlParams = new URLSearchParams();
+          urlParams.set("url", fileUrl);
+          urlParams.set("title", bookData.title);
+          urlParams.set("bookId", bookId);
+          urlParams.set("format", format); // Add format for better client-side handling
+
+          router.push(`/reader/flipbook?${urlParams.toString()}`);
+        } else {
+          throw new Error("Book content URL unavailable.");
+        }
+      } catch (err) {
+        console.error("Read error:", err);
+        alert("Unable to read book. Please try again. " + err.message);
+      }
+    },
+    [authToken, router]
+  );
 
   const handleReadNow = useCallback(async () => {
+    if (!bookData) return;
+
     if (!isLoggedIn || !authToken || !currentUserId) {
       router.push("/reader/sign_up");
       return;
     }
 
     if (isTrialActive) {
-      try {
-        // Get purchase data from localStorage with proper error handling
-        let purchaseData = {};
-        let purchase_id = null;
-
-        try {
-          const storedData = localStorage.getItem("purchaseBook");
-          if (storedData && storedData !== "[object Object]") {
-            purchaseData = JSON.parse(storedData);
-            purchase_id = purchaseData.id;
-          }
-        } catch (parseError) {
-          console.warn(
-            "Failed to parse purchase data from localStorage:",
-            parseError
-          );
-          // Clear invalid data
-          localStorage.removeItem("purchaseBook");
-        }
-
-        const tokenRes = await api.post(
-          "/purchases/refresh_reading_token",
-          {
-            book_id: bookData.unique_book_id,
-            content_type: "ebook",
-            purchase_id: bookData.id,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          }
-        );
-
-        const reading_token =
-          tokenRes.data?.reading_token ||
-          tokenRes.data?.data?.reading_token ||
-          tokenRes.reading_token;
-
-        if (!reading_token) {
-          throw new Error("No reading token received from server");
-        }
-
-        const contentRes = await api.get(
-          `/books/${bookData.unique_book_id}/content`,
-          {
-            headers: {
-              Authorization: `Bearer ${reading_token}`,
-              Accept:
-                "application/epub+zip, application/pdf, application/octet-stream, application/json",
-            },
-            params: {
-              direct_url: true,
-              use_s3_direct: true,
-              optimize_for_frontend: true,
-            },
-            responseType: "json", // Try JSON first to see if we get metadata
-          }
-        );
-
-        const content = contentRes.data;
-
-        // Check if we have a direct S3 URL or metadata
-        if (content?.s3_url || content?.url) {
-          const fileUrl = content.s3_url || content.url;
-          const format = content.format || "unknown";
-
-          console.log("File URL:", fileUrl);
-          console.log("Book ID:", bookData.unique_book_id);
-          console.log("Detected format:", format);
-
-          // Determine the format from the URL or content metadata
-          if (
-            format.toLowerCase().includes("pdf") ||
-            fileUrl.includes(".pdf")
-          ) {
-            // Navigate to flipbook reader with the PDF URL and book ID
-            const urlParams = new URLSearchParams();
-            urlParams.set("url", fileUrl);
-            urlParams.set("title", bookData.title);
-            urlParams.set("bookId", bookData.unique_book_id);
-            router.push(`/reader/flipbook?${urlParams.toString()}`);
-          } else if (
-            format.toLowerCase().includes("epub") ||
-            fileUrl.includes(".epub")
-          ) {
-            // Navigate to EPUB reader with the S3 URL and book ID
-            const urlParams = new URLSearchParams();
-            urlParams.set("url", fileUrl);
-            urlParams.set("title", bookData.title);
-            urlParams.set("bookId", bookData.unique_book_id);
-            router.push(`/reader/flipbook?${urlParams.toString()}`);
-          } else {
-            // Unknown format, try the flipbook reader anyway
-            const urlParams = new URLSearchParams();
-            urlParams.set("url", fileUrl);
-            urlParams.set("title", bookData.title);
-            urlParams.set("bookId", bookData.unique_book_id);
-            router.push(`/reader/flipbook?${urlParams.toString()}`);
-          }
-        } else {
-          throw new Error("No file URL received from server");
-        }
-      } catch (err) {
-        console.error("Read error:", err);
-        alert("Unable to read book. Please try again.");
-      }
+      // ✅ Use the reusable logic for trial reading
+      await startReading(bookData, bookData.unique_book_id);
     } else {
+      // Fallback for non-trial/post-purchase (use old logic or alert)
       alert("Trial ended. Please purchase the book to continue reading.");
     }
-  }, [bookData, isLoggedIn, authToken, currentUserId, isTrialActive, router]);
+  }, [
+    bookData,
+    isLoggedIn,
+    authToken,
+    currentUserId,
+    isTrialActive,
+    router,
+    startReading,
+  ]);
 
   const handleReviewCreated = useCallback(
     (newReview) => {
