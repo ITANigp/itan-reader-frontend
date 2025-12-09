@@ -2,7 +2,7 @@ export const runtime = "edge";
 
 
 export default function Robots() {
-return `User-agent: *\nAllow: /\nSitemap: https://yourdomain.com/sitemap.xml`;
+return `User-agent: *\nAllow: /\nSitemap: https://itan.app/sitemap.xml`;
 }```
 # Folder: app/home/book-details/[id]/page.jsx
 export async function generateMetadata({ params }) {
