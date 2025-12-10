@@ -1,0 +1,78 @@
+export const runtime = "edge";
+
+
+export default function Robots() {
+return `User-agent: *\nAllow: /\nSitemap: https://itan.app/sitemap.xml`;
+}```
+# Folder: app/home/book-details/[id]/page.jsx
+export async function generateMetadata({ params }) {
+const { id } = params;
+
+
+const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books/${id}/storefront`);
+const { data } = await res.json();
+
+
+const book = data.attributes;
+
+
+return {
+title: `${book.title} — ${book.author?.name}`,
+description: book.description?.slice(0, 160),
+openGraph: {
+title: book.title,
+description: book.description?.slice(0, 160),
+images: [book.cover_image_url],
+type: "book",
+},
+robots: {
+index: true,
+follow: true,
+},
+};
+}
+
+export default async function BookDetailsPage({ params }) {
+const { id } = params;
+
+
+const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/books/${id}/storefront`, {
+cache: "no-cache",
+});
+
+
+const { data } = await res.json();
+
+
+const book = {
+...data.attributes,
+unique_book_id: data.id,
+};
+
+
+return (
+<>
+<script
+type="application/ld+json"
+dangerouslySetInnerHTML={{
+__html: JSON.stringify({
+"@context": "https://schema.org",
+"@type": "Book",
+name: book.title,
+author: book.author?.name,
+image: book.cover_image_url,
+description: book.description,
+genre: book.categories?.[0]?.main || "",
+offers: {
+"@type": "Offer",
+price: book.ebook_price,
+priceCurrency: "USD",
+availability: "https://schema.org/InStock",
+},
+}),
+}}
+/>
+<BookDetailsClient book={book} />
+</>
+);
+}
