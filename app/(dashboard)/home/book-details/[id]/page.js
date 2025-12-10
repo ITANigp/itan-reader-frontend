@@ -392,12 +392,16 @@
 //   );
 // }
 
+import getConfig from "next/config";
 import BookDetailsClient from "./BookDetailsClient";
 
 export async function generateMetadata({ params }) {
-  const { id } = params;
+  const resolved = await params; // <--- FIX
+  const { id } = resolved;
 
-  const apiUrl = process.env.API_URL;
+  const { serverRuntimeConfig } = getConfig();
+  const apiUrl = serverRuntimeConfig.API_URL;
+
   if (!apiUrl) {
     console.error("❌ Missing API_URL in server environment");
     return {};
@@ -422,9 +426,11 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BookDetailsPage({ params }) {
-  const { id } = params;
+  const resolved = await params; // <--- FIX
+  const { id } = resolved;
 
   const apiUrl = process.env.API_URL;
+
   if (!apiUrl) {
     console.error("❌ Missing API_URL in server environment");
     return <div>Error: Server API URL missing</div>;

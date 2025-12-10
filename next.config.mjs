@@ -1,6 +1,9 @@
 import {withSentryConfig} from "@sentry/nextjs";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  serverRuntimeConfig: {
+    API_URL: process.env.API_URL,
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /pdf\.worker\.entry\.js$/,
