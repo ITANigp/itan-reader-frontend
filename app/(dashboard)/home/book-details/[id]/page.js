@@ -396,9 +396,14 @@ import BookDetailsClient from "./BookDetailsClient";
 
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/books/${id}/storefront`
-  );
+
+  const apiUrl = process.env.API_URL;
+  if (!apiUrl) {
+    console.error("❌ Missing API_URL in server environment");
+    return {};
+  }
+
+  const res = await fetch(`${apiUrl}/books/${id}/storefront`);
   const { data } = await res.json();
 
   const book = data.attributes;
@@ -412,22 +417,22 @@ export async function generateMetadata({ params }) {
       images: [book.cover_image_url],
       type: "book",
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: { index: true, follow: true },
   };
 }
 
 export default async function BookDetailsPage({ params }) {
   const { id } = params;
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/books/${id}/storefront`,
-    {
-      cache: "no-cache",
-    }
-  );
+  const apiUrl = process.env.API_URL;
+  if (!apiUrl) {
+    console.error("❌ Missing API_URL in server environment");
+    return <div>Error: Server API URL missing</div>;
+  }
+
+  const res = await fetch(`${apiUrl}/books/${id}/storefront`, {
+    cache: "no-cache",
+  });
 
   const { data } = await res.json();
 
