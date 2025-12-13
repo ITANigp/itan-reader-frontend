@@ -397,9 +397,9 @@ import BookDetailsClient from "./BookDetailsClient";
 export async function generateMetadata({ params }) {
   const { id } = params;
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.API_URL;
   if (!apiUrl) {
-    console.error("❌ Missing API_URL in server environment");
+    console.error("❌ Missing API_URL(1) in server environment");
     return {};
   }
 
@@ -424,9 +424,9 @@ export async function generateMetadata({ params }) {
 export default async function BookDetailsPage({ params }) {
   const { id } = params;
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const apiUrl = process.env.API_URL;
   if (!apiUrl) {
-    console.error("❌ Missing API_URL in server environment");
+    console.error("❌ Missing API_URL(2) in server environment");
     return <div>Error: Server API URL missing</div>;
   }
 
