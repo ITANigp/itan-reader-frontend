@@ -397,7 +397,7 @@ import BookDetailsClient from "./BookDetailsClient";
 export async function generateMetadata({ params }) {
   const { id } = params;
 
-  const apiUrl = process.env.API_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) {
     console.error("❌ Missing API_URL in server environment");
     return {};
