@@ -424,7 +424,7 @@ export async function generateMetadata({ params }) {
 export default async function BookDetailsPage({ params }) {
   const { id } = params;
 
-  const apiUrl = process.env.API_URL;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) {
     console.error("❌ Missing API_URL in server environment");
     return <div>Error: Server API URL missing</div>;
