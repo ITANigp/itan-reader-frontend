@@ -398,10 +398,10 @@ export async function generateMetadata({ params }) {
   const { id } = params;
 
   const apiUrl = process.env.API_URL;
-  if (!apiUrl) {
-    console.error("❌ Missing API_URL(1) in server environment");
-    return {};
-  }
+  // if (!apiUrl) {
+  //   console.error("❌ Missing API_URL(1) in server environment");
+  //   return {};
+  // }
 
   const res = await fetch(`${apiUrl}/books/${id}/storefront`);
   const { data } = await res.json();
@@ -425,10 +425,10 @@ export default async function BookDetailsPage({ params }) {
   const { id } = params;
 
   const apiUrl = process.env.API_URL;
-  if (!apiUrl) {
-    console.error("❌ Missing API_URL(2) in server environment");
-    return <div>Error: Server API URL missing</div>;
-  }
+  // if (!apiUrl) {
+  //   console.error("❌ Missing API_URL(2) in server environment");
+  //   return <div>Error: Server API URL missing</div>;
+  // }
 
   const res = await fetch(`${apiUrl}/books/${id}/storefront`, {
     cache: "no-cache",
