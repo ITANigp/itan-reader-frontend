@@ -397,7 +397,7 @@ import BookDetailsClient from "./BookDetailsClient";
 export async function generateMetadata({ params }) {
   const { id } = params;
 
-  const apiUrl = process.env.API_URL;
+  const apiUrl = "https://api.itan.app/api/v1"
   // if (!apiUrl) {
   //   console.error("❌ Missing API_URL(1) in server environment");
   //   return {};
@@ -424,7 +424,7 @@ export async function generateMetadata({ params }) {
 export default async function BookDetailsPage({ params }) {
   const { id } = params;
 
-  const apiUrl = process.env.API_URL;
+  const apiUrl = "https://api.itan.app/api/v1"
   // if (!apiUrl) {
   //   console.error("❌ Missing API_URL(2) in server environment");
   //   return <div>Error: Server API URL missing</div>;
