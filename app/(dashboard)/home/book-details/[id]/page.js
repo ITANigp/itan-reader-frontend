@@ -50,7 +50,7 @@ export async function generateMetadata({ params }) {
 ---------------------------- */
 export default async function BookDetailsPage({ params }) {
   const { id } = params;
-  const API_URL = process.env.API_URL;
+  const API_URL = "https://api.itan.app/api/v1";
 
   if (!API_URL) {
     return <div>Server configuration error</div>;
