@@ -1,11 +1,9 @@
 import Image from "next/image";
-
-import { api } from "@/utils/auth/readerApi";
 import BookDetailsClient from "./BookDetailsClient";
 
 /**
- * Revalidate every one hour (ISR)
- * Good for SEO + performance
+ * Revalidate every 1 hour (ISR)
+ * SEO + performance friendly
  */
 export const revalidate = 3600;
 
@@ -17,18 +15,17 @@ export async function generateMetadata({ params }) {
   const API_URL = process.env.API_URL;
 
   if (!API_URL) {
-    // console.error("❌ API_URL is missing in generateMetadata");
     return {};
   }
 
-  const res = await api.get(`${API_URL}/books/${id}/storefront`, {
+  const res = await fetch(`${API_URL}/books/${id}/storefront`, {
     next: { revalidate: 3600 },
   });
 
   if (!res.ok) return {};
 
-  const { data } = await res.json();
-  const book = data.attributes;
+  const json = await res.json();
+  const book = json.data.attributes;
 
   const description = book.description?.slice(0, 160);
 
@@ -59,7 +56,7 @@ export default async function BookDetailsPage({ params }) {
     return <div>Server configuration error</div>;
   }
 
-  const res = await api.get(`${API_URL}/books/${id}/storefront`, {
+  const res = await fetch(`${API_URL}/books/${id}/storefront`, {
     next: { revalidate: 3600 },
   });
 
@@ -67,11 +64,11 @@ export default async function BookDetailsPage({ params }) {
     return <div>Book not found</div>;
   }
 
-  const { data } = await res.json();
+  const json = await res.json();
 
   const book = {
-    ...data.attributes,
-    unique_book_id: data.id,
+    ...json.data.attributes,
+    unique_book_id: json.data.id,
   };
 
   return (
