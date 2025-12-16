@@ -12,7 +12,7 @@ export const revalidate = 3600;
 ---------------------------- */
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const API_URL = process.env.API_URL;
+  const API_URL = "https://api.itan.app/api/v1";
 
   if (!API_URL) {
     return {};
