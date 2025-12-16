@@ -1,5 +1,6 @@
 import Image from "next/image";
 
+import { api } from "@/utils/auth/readerApi";
 import BookDetailsClient from "./BookDetailsClient";
 
 /**
@@ -20,7 +21,7 @@ export async function generateMetadata({ params }) {
     return {};
   }
 
-  const res = await fetch(`${API_URL}/books/${id}/storefront`, {
+  const res = await api.get(`${API_URL}/books/${id}/storefront`, {
     next: { revalidate: 3600 },
   });
 
@@ -58,7 +59,7 @@ export default async function BookDetailsPage({ params }) {
     return <div>Server configuration error</div>;
   }
 
-  const res = await fetch(`${API_URL}/books/${id}/storefront`, {
+  const res = await api.get(`${API_URL}/books/${id}/storefront`, {
     next: { revalidate: 3600 },
   });
 
