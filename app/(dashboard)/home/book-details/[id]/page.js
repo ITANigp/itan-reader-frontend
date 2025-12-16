@@ -1,10 +1,12 @@
+import Image from "next/image";
+
 import BookDetailsClient from "./BookDetailsClient";
 
 /**
- * Revalidate every 60 seconds (ISR)
+ * Revalidate every one hour (ISR)
  * Good for SEO + performance
  */
-export const revalidate = 60;
+export const revalidate = 3600;
 
 /* ---------------------------
    SEO METADATA (SERVER)
@@ -19,7 +21,7 @@ export async function generateMetadata({ params }) {
   }
 
   const res = await fetch(`${API_URL}/books/${id}/storefront`, {
-    next: { revalidate: 60 },
+    next: { revalidate: 3600 },
   });
 
   if (!res.ok) return {};
@@ -57,7 +59,7 @@ export default async function BookDetailsPage({ params }) {
   }
 
   const res = await fetch(`${API_URL}/books/${id}/storefront`, {
-    next: { revalidate: 60 },
+    next: { revalidate: 3600 },
   });
 
   if (!res.ok) {
