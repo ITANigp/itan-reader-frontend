@@ -73,7 +73,7 @@ export default async function BookDetailsPage({ params }) {
 
   return (
     <>
-      {/* ✅ Structured data for SEO */}
+      {/* Structured data for SEO */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
