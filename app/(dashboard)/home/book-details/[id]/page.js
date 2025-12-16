@@ -1,15 +1,15 @@
 import BookDetailsClient from "./BookDetailsClient";
 
 /**
- * ISR for SEO + performance
- * Page & metadata revalidate every 60s
+ * Revalidate every 60 seconds (ISR)
+ * Good for SEO + performance
  */
 export const revalidate = 60;
 
 /* ---------------------------
    SEO METADATA (SERVER)
 ---------------------------- */
-export async function generateMetadata({ params }: { params: { id: string } }) {
+export async function generateMetadata({ params }) {
   const { id } = params;
   const API_URL = process.env.API_URL;
 
@@ -48,11 +48,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 /* ---------------------------
    PAGE CONTENT (SERVER)
 ---------------------------- */
-export default async function BookDetailsPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function BookDetailsPage({ params }) {
   const { id } = params;
   const API_URL = process.env.API_URL;
 
