@@ -2,7 +2,7 @@ import BookDetailsClient from "./BookDetailsClient";
 
 export async function generateMetadata({ params }) {
   const { slug } = params;
-  const apiUrl = process.env.API_URL;
+  const apiUrl = "http://api.itan.app/api/v1";
 
   const res = await fetch(
     `${apiUrl}/books/by-slug/${encodeURIComponent(slug)}`,
@@ -38,7 +38,7 @@ export async function generateMetadata({ params }) {
 
 export default async function BookDetailsPage({ params }) {
   const { slug } = params; // params is a plain object
-  const apiUrl = "http://itan.app/api/v1";
+  const apiUrl = "http://api.itan.app/api/v1";
 
   try {
     const res = await fetch(
