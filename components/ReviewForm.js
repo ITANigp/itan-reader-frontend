@@ -11,6 +11,10 @@ function ReviewForm({ bookId, onReviewCreated, token }) {
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
+    if (!token) {
+      setError("You must be logged in to submit a review.");
+      return;
+    }
     e.preventDefault();
     setLoading(true);
     setError(null);

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,7 +21,9 @@ export default function SignIn() {
   const [recaptchaToken, setRecaptchaToken] = useState(null);
   const router = useRouter();
   const { setAuth } = useAuth();
+  const searchParams = useSearchParams();
 
+  const redirectTo = searchParams.get("redirect") || "/bookstore";
   // Check for stored error messages on mount
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -83,7 +85,7 @@ export default function SignIn() {
       localStorage.setItem("currentUserId", reader.data.id);
       if (reader?.data?.id) {
         setAuth(reader.data.token, reader.data.id);
-        router.push("/home");
+        router.push(redirectTo);
       }
     } catch (error) {
       // Simpler logging for authentication errors

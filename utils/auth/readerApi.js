@@ -183,9 +183,9 @@ export const getReaderProfile = async (token) => {
   try {
     // const token = getToken();
 
-    if (!token) {
-      throw new Error("User not authenticated");
-    }
+    // if (!token) {
+    //   throw new Error("User not authenticated");
+    // }
 
     const response = await api.get("/readers/profile", {
       headers: {

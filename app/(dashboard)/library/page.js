@@ -172,7 +172,7 @@ export default function Library() {
   }, [authToken, isLoadingAuth]);
 
   useEffect(() => {
-    // console.log("📚 Bought Books:", boughtBooks);
+    console.log("📚 Bought Books:", boughtBooks);
   }, [boughtBooks]);
 
   // Handle initial loading and not-logged-in states
@@ -318,7 +318,7 @@ export default function Library() {
                         Read
                       </div>
                       <Link
-                        href={`/home/book-details/${book.id}`}
+                        href={`/bookstore/${book.slug}`}
                         className="bg-red-600 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-red-700 transition-colors"
                       >
                         View details

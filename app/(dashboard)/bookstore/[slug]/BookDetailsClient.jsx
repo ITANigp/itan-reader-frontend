@@ -135,19 +135,12 @@ export default function BookDetailsClient({ book }) {
     reviews,
     reviews_count,
     unique_book_id,
-    created_at,
+    publication_date,
   } = bookData;
 
   const authorName = author?.name || "Unknown";
   const displayPrice = ebook_price ? `$${ebook_price.toFixed(2)}` : "N/A";
   const displayGenre = categories?.[0]?.main || "N/A";
-  const displayDate = created_at
-    ? new Date(created_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-    : "N/A";
   const displayRating =
     average_rating > 0
       ? "★".repeat(Math.round(average_rating)) +
@@ -155,8 +148,8 @@ export default function BookDetailsClient({ book }) {
       : "No ratings yet";
   return (
     <div className="space-y-10 px-6 py-10">
-      <Link href="/home" className="text-blue-600 hover:underline">
-        ← Back to home
+      <Link href="/bookstore" className="text-blue-600 hover:underline">
+        ← Back to book store
       </Link>
 
       <div className="flex flex-col md:flex-row gap-6">
@@ -182,6 +175,7 @@ export default function BookDetailsClient({ book }) {
 
             <BuyButton
               bookId={unique_book_id}
+              bookSlug={bookData.slug}
               className="bg-green-600 text-white rounded-md px-2"
             >
               {isLoggedIn && !isTrialActive
@@ -192,11 +186,21 @@ export default function BookDetailsClient({ book }) {
               open={isReviewModalOpen}
               onOpenChange={setIsReviewModalOpen}
             >
-              <DialogTrigger asChild>
-                <Button variant="ghost" className="border">
-                  Write a Review
-                </Button>
-              </DialogTrigger>
+              <Button
+                variant="ghost"
+                className="border"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    router.push(
+                      `/reader/sign_in?redirect=/bookstore/${bookData.slug}`
+                    );
+                    return;
+                  }
+                  setIsReviewModalOpen(true);
+                }}
+              >
+                Write a Review
+              </Button>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>Write a Review for "{title}"</DialogTitle>
@@ -236,7 +240,7 @@ export default function BookDetailsClient({ book }) {
         </div>
         <div>
           <strong>PUBLICATION DATE</strong>
-          <p>{displayDate}</p>
+          <p>{publication_date}</p>
         </div>
         <div>
           <strong>LANGUAGE</strong>

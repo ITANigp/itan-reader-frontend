@@ -4,6 +4,8 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+if (process.env.NODE_ENV === "production") {
+
 Sentry.init({
   dsn: "https://558871c2450f87bb39bf730846fb79bf@o4510458809548800.ingest.us.sentry.io/4510497918746624",
 
@@ -17,3 +19,5 @@ Sentry.init({
   // https://docs.sentry.io/platforms/javascript/guides/nextjs/configuration/options/#sendDefaultPii
   sendDefaultPii: true,
 });
+
+}

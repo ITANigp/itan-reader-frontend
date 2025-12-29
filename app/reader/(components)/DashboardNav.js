@@ -22,18 +22,38 @@ const DashboardNav = () => {
   const router = useRouter();
   const pathname = usePathname(); // Get the current path
 
+  const [hasMounted, setHasMounted] = useState(false);
+  const [token, setToken] = useState(null);
+  const [loadingReader, setLoadingReader] = useState(true);
+
   useEffect(() => {
+    setHasMounted(true);
+    const storedToken = localStorage.getItem("access_token");
+    setToken(storedToken);
+
+    if (!storedToken) {
+      setLoadingReader(false);
+    }
+  }, []);
+
+
+  useEffect(() => {
+    if (!token) return;
+
     const fetchProfile = async () => {
-      const token = localStorage.getItem("access_token");
       try {
         const { data } = await getReaderProfile(token);
         setReader(data);
       } catch (err) {
         console.error("Failed to fetch reader profile", err);
+      } finally {
+        setLoadingReader(false);
       }
     };
+
     fetchProfile();
-  }, []);
+  }, [token]);
+
   
   useEffect(() => {
     const parts = pathname.split("/").filter(Boolean);
@@ -44,7 +64,7 @@ const DashboardNav = () => {
       setActiveTab("Library");
     } else if (mainSegment === "reader" && subSegment === "profile-page") {
       setActiveTab("Profile");
-    } else if (mainSegment === "home") {
+    } else if (mainSegment === "bookstore") {
       setActiveTab("Home");
     } else {
       setActiveTab("Home");
@@ -106,21 +126,28 @@ const DashboardNav = () => {
             </div>
 
             <nav className="hidden md:flex items-center space-x-8 flex-1 justify-center">
-              {["Home", "Library", "Profile"].map((item) => (
-                <Link
-                  key={item}
-                  href={item === "Home" ? "/home" : item === "Profile"
-                  ? "/reader/profile-page" : `/${item.toLowerCase()}`}
-                  onClick={() => setActiveTab(item)}
-                  className={`text-base font-medium transition-colors ${
-                    activeTab === item
-                      ? "text-red-600"
-                      : "text-gray-600 hover:text-red-600"
-                  }`}
-                >
-                  {item}
-                </Link>
-              ))}
+              {hasMounted &&
+                token &&
+                ["Home", "Library", "Profile"].map((item) => (
+                  <Link
+                    key={item}
+                    href={
+                      item === "Home"
+                        ? "/bookstore"
+                        : item === "Profile"
+                          ? "/reader/profile-page"
+                          : `/${item.toLowerCase()}`
+                    }
+                    onClick={() => setActiveTab(item)}
+                    className={`text-base font-medium transition-colors ${
+                      activeTab === item
+                        ? "text-red-600"
+                        : "text-gray-600 hover:text-red-600"
+                    }`}
+                  >
+                    {item}
+                  </Link>
+                ))}
             </nav>
 
             <div
@@ -136,20 +163,23 @@ const DashboardNav = () => {
                 />
               </div>
 
-              <div className="relative">
-                <button
-                  // onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200"
-                >
-                  <User className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {reader
-                      ? `${reader.first_name} ${reader.last_name}`
-                      : "Loading..."}
-                  </span>
-                </button>
+              {loadingReader ? (
+                <span className="text-sm text-gray-400">Loading...</span>
+              ) : reader ? (
+                <div className="relative">
+                  <button
+                    // onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200"
+                  >
+                    <User className="w-4 h-4 text-gray-600" />
+                    <span className="text-sm font-medium text-gray-700">
+                      {reader
+                        ? `${reader.first_name} ${reader.last_name}`
+                        : "Loading..."}
+                    </span>
+                  </button>
 
-                {/* {dropdownOpen && (
+                  {/* {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg">
                     <Link
                       href="/reader/profile-page"
@@ -169,7 +199,15 @@ const DashboardNav = () => {
                     </button>
                   </div>
                 )} */}
-              </div>
+                </div>
+              ) : (
+                <Link
+                  href="/reader/sign_in"
+                  className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
+                >
+                  Sign In
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -210,12 +248,21 @@ const DashboardNav = () => {
             alt="back arrow"
           />
         </button>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 -mr-2"
-        >
-          <Image src="/images/menu-3.png" width={20} height={20} alt="menu" />
-        </button>
+        {hasMounted && token ? (
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 -mr-2"
+          >
+            <Image src="/images/menu-3.png" width={20} height={20} alt="menu" />
+          </button>
+        ) : (
+          <Link
+            href="/reader/sign_in"
+            className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2 text-sm h-8"
+          >
+            Sign In
+          </Link>
+        )}
 
         {/* Mobile Dropdown Menu */}
         {isMobileMenuOpen && (
@@ -237,7 +284,7 @@ const DashboardNav = () => {
                   <Link
                     href={
                       item === "Home"
-                        ? "/home"
+                        ? "/bokkstore"
                         : item === "Profile"
                           ? "/reader/profile-page"
                           : `/${item.toLowerCase()}`
