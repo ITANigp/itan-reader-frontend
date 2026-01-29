@@ -19,7 +19,7 @@ async function getBooks() {
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   try {
     const response = await fetch(`${BASE_URL}/books/all_storefront`, {
-      next: { revalidate: 3600 },
+      cache: "no-store" 
     });
     if (!response.ok) throw new Error("Failed to fetch books");
     const result = await response.json();

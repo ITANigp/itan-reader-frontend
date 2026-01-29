@@ -12,7 +12,7 @@ export async function generateMetadata({ params }) {
   if (!res.ok) return {};
 
   const json = await res.json();
-  const data = json.data || json.book || json;
+  const data = json.data;
   if (!data) return {};
 
   const book = data.attributes ?? data;
@@ -60,17 +60,18 @@ export default async function BookDetailsPage({ params }) {
     json
     );
 
-    const data = json.data || json.book || json;
+
+    const data = json.data; // This is the standard JSON:API structure
 
     if (!data) {
       console.log("❌ BookDetailsPage: data is missing");
       throw new Error("Book not found");
     }
 
-    const book = {
-      ...(data.attributes ?? data),
-      unique_book_id: data.id,
-    };
+   const book = {
+     ...data.attributes,
+     unique_book_id: data.id, // Now data.id will exist!
+   };
 
     return (
       <>
