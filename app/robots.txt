@@ -1,0 +1,16 @@
+import { MetadataRoute } from "next";
+
+export const runtime = "edge";
+
+/** @type {import('next').MetadataRoute.Robots} */
+export default function robots() {
+  return {
+    rules: [
+      {
+        userAgent: "*",
+        allow: "/",
+      },
+    ],
+    sitemap: "https://itan.app/sitemap.xml",
+  };
+}
