@@ -71,7 +71,7 @@ export default function Home() {
                 className="flex items-center bg-black text-white border-2 border-red-600 p-2 md:px-6 md:py-2 rounded-md hover:bg-red-600 hover:border-red-500 hover:scale-105 transition-all duration-200 text-base lg:text-lg font-medium"
                 style={{ lineHeight: 1, boxShadow: '0 0 15px rgba(220, 38, 38, 0.5)' }}
               >
-                Griot Review
+                The Griot Review
               </Link>
               <Link
                 href="/reader/sign_up"
