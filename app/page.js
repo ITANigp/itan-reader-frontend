@@ -67,10 +67,11 @@ export default function Home() {
             />
             <div className="flex justify-center items-center gap-4 min-h-[32px] lg:min-h-[46px] xl:min-h-[52px] px-4 md:px-6 xl:px-8">
               <Link
-                href="/blog"
-                className="flex items-center bg-[#D4A853] text-white p-2 md:px-6 md:py-2 rounded-md hover:bg-[#C49A48] transition shadow text-base lg:text-lg font-medium"
+                href="/TheGroitReview"
+                className="flex items-center bg-black text-white border-2 border-red-600 p-2 md:px-6 md:py-2 rounded-md hover:bg-red-600 hover:border-red-500 hover:scale-105 transition-all duration-200 text-base lg:text-lg font-medium"
+                style={{ lineHeight: 1, boxShadow: '0 0 15px rgba(220, 38, 38, 0.5)' }}
               >
-                Blog
+                Griot Review
               </Link>
               <Link
                 href="/reader/sign_up"

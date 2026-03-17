@@ -1,8 +1,11 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { urlFor } from '@/lib/sanity'
 import { useState, useMemo, useEffect } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 // ✅ Fix date parsing
 const parseDate = (dateStr) => {
@@ -19,6 +22,7 @@ const parseDate = (dateStr) => {
 }
 
 export default function BlogClient({ posts }) {
+  const router = useRouter()
   const [showModal, setShowModal] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
@@ -68,9 +72,17 @@ export default function BlogClient({ posts }) {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-12">
+      {/* Back Button */}
+      <button
+        onClick={() => router.back()}
+        className="mb-6 flex items-center gap-2 text-gray-600 hover:text-red-600 transition-colors"
+      >
+        <FontAwesomeIcon icon={faArrowLeft} className="text-lg" />
+        <span className="font-medium">Back</span>
+      </button>
+
       <h1 className="text-4xl mb-10 text-center">
-        <span className="font-bold">ITAN</span>{' '}
-        <span className="font-light">BLOG.</span>
+        The Griot Review.
       </h1>
 
       {/* Search */}
@@ -106,10 +118,10 @@ export default function BlogClient({ posts }) {
         <p className="text-center text-gray-500 mt-10">No posts found.</p>
       )}
 
-      {/* Featured Post */}
-      {paginatedPosts.length > 0 && (
+      {/* Featured Post - Only show when not searching */}
+      {paginatedPosts.length > 0 && !searchTerm && (
         <div className="mb-16 transition-transform hover:shadow-2xl hover:-translate-y-1 hover:border-gray-300 border rounded-xl p-4 bg-white">
-          <Link href={`/blog/${paginatedPosts[0].slug.current}`}>
+          <Link href={`/TheGroitReview/${paginatedPosts[0].slug.current}`}>
             <img
               src={urlFor(paginatedPosts[0].mainImage).width(1200).url()}
               alt={paginatedPosts[0].title}
@@ -125,7 +137,7 @@ export default function BlogClient({ posts }) {
                 day: 'numeric',
               }) || 'No date available'}
           </p>
-          <Link href={`/blog/${paginatedPosts[0].slug.current}`}>
+          <Link href={`/TheGroitReview/${paginatedPosts[0].slug.current}`}>
             <h2 className="text-3xl font-bold text-black hover:underline mt-1">
               {paginatedPosts[0].title}
             </h2>
@@ -133,14 +145,14 @@ export default function BlogClient({ posts }) {
         </div>
       )}
 
-      {/* Remaining Posts */}
+      {/* Posts Grid - Show all posts when searching, skip first when not searching */}
       <div className="grid md:grid-cols-3 gap-10">
-        {paginatedPosts.slice(1).map(post => (
+        {(searchTerm ? paginatedPosts : paginatedPosts.slice(1)).map(post => (
           <div
             key={post._id}
             className="bg-white hover:bg-gray-50 rounded-xl shadow-sm border transition-transform hover:shadow-xl hover:-translate-y-1 hover:border-gray-300 p-4 cursor-pointer"
           >
-            <Link href={`/blog/${post.slug.current}`}>
+            <Link href={`/TheGroitReview/${post.slug.current}`}>
               <img
                 src={urlFor(post.mainImage).width(600).url()}
                 alt={post.title}
@@ -158,7 +170,7 @@ export default function BlogClient({ posts }) {
                 }) || 'No date available'}
             </p>
 
-            <Link href={`/blog/${post.slug.current}`}>
+            <Link href={`/TheGroitReview/${post.slug.current}`}>
               <h3 className="text-lg font-semibold text-black hover:underline mt-1">
                 {post.title}
               </h3>

@@ -69,7 +69,7 @@ const TopNav = ({ styles }) => {
     { title: "About Itan", href: "/", icon: faInfoCircle },
     { title: "Publish", href: "/publish", icon: faBookOpen },
     { title: "Monetize", href: "/monetize", icon: faDollarSign },
-    { title: "Blog", href: "/blog", icon: faBookOpen },
+    { title: "The Griot Review", href: "/TheGroitReview", icon: faBookOpen },
     { title: "Help", href: "/help", icon: faQuestionCircle },
   ];
 
@@ -77,7 +77,7 @@ const TopNav = ({ styles }) => {
   const homePath = pathname.endsWith("/");
   const publishPath = pathname.endsWith("/publish");
   const monetizePath = pathname.endsWith("/monetize");
-  const blogPath = pathname.endsWith("/blog");
+  const blogPath = pathname.endsWith("/TheGroitReview");
   const helpPath = pathname.endsWith("/help");
 
   return (
@@ -170,10 +170,10 @@ const TopNav = ({ styles }) => {
           Monetize
         </Link>
         <Link
-          href="/blog"
+          href="/TheGroitReview"
           className={`${blogPath ? "border-b-2 border-b-red-600" : ""} hover:border-b-2 hover:border-b-red-600 hover:text-red-400 cursor-pointer px-3 py-2 transition-all duration-200 text-sm font-medium text-gray-200`}
         >
-          Blog
+          The Griot Review
         </Link>
         <Link
           href="/help"

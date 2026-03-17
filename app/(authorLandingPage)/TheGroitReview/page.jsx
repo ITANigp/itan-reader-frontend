@@ -24,7 +24,7 @@ export default async function BlogPage() {
   const posts = await client.fetch(query)
 
   return (
-    <div className='mt-20'>
+    <div className='pt-6 min-h-screen bg-gray-100'>
       <BlogClient posts={posts} />
     </div>
   );

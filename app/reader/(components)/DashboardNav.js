@@ -168,10 +168,10 @@ const DashboardNav = () => {
               ) : reader ? (
                 <div className="flex items-center space-x-3">
                   <Link
-                    href="/blog"
+                    href="/TheGroitReview"
                     className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
                   >
-                    Blog
+                    The Griot Review
                   </Link>
                   <button
                     // onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -188,10 +188,10 @@ const DashboardNav = () => {
               ) : (
                 <div className="flex items-center space-x-3">
                   <Link
-                    href="/blog"
+                    href="/TheGroitReview"
                     className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
                   >
-                    Blog
+                    The Griot Review
                   </Link>
                   <Link
                     href="/reader/sign_in"
@@ -251,10 +251,10 @@ const DashboardNav = () => {
         ) : (
           <div className="flex items-center space-x-2">
             <Link
-              href="/blog"
+              href="/TheGroitReview"
               className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2 text-sm h-8"
             >
-              Blog
+              The Griot Review
             </Link>
             <Link
               href="/reader/sign_in"
@@ -298,7 +298,7 @@ const DashboardNav = () => {
               ))}
               <li className="px-4 py-2 cursor-pointer transition-colors hover:bg-gray-100">
                 <Link
-                  href="/blog"
+                  href="/TheGroitReview"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Blog

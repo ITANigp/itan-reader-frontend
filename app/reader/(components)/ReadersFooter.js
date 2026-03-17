@@ -130,8 +130,8 @@ const Footer = ({ hiddenPage }) => {
             >
               FAQ
             </Link>
-            <Link href="#" className="cursor-pointer hover:text-[#EF5353]">
-              Newsletter
+            <Link href="/TheGroitReview" className="cursor-pointer hover:text-[#EF5353]">
+              The Griot Review 
             </Link>
             <Link
               href="https://www.youtube.com/@itanIGP"

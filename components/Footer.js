@@ -110,7 +110,7 @@ const Footer = ({ styles }) => {
               Author Resources
             </Link>
             <Link
-              href="/blog"
+              href="/TheGroitReview"
               className="cursor-pointer hover:text-[#EF5353]"
             >
               Blog
@@ -216,7 +216,7 @@ const Footer = ({ styles }) => {
                 Youtube
               </Link>
               <Link
-                href="/blog"
+                href="/TheGroitReview"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
                 Blog
