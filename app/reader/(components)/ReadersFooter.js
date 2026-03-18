@@ -173,7 +173,8 @@ const Footer = ({ hiddenPage }) => {
         {/* Copyright */}
         <div className="text-gray-200 flex justify-center w-full pb-4 text-xs sm:text-sm md:text-base">
           <p style={{ fontFamily: "Lato, sans-serif" }}>
-            ITAN Technologies Ltd. &copy; 2026. All Rights Reserved
+            ITAN Technologies Ltd. &copy; {new Date().getFullYear()}. All Rights
+            Reserved
           </p>
         </div>
       </section>
