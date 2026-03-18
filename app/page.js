@@ -219,7 +219,7 @@ export default function Home() {
                         quality={85}
                         loading={idx === 0 ? "eager" : "lazy"}
                         placeholder="blur"
-                        blurDataURL="/images/readers/onboarding/blur-placeholder.png"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIBAAAgICAQUBAAAAAAAAAAAAAQIDBAARBQYSITFBUf/EABQBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAABAgMAESH/2gAMAwEAAhEDEEA/ANK6g6sp8XxNW7VhSWeWUxsjNsDQBz/eI5XqOvLG8kMUKxu5LKB4BJ/uMYxIhkTc6Fsf/9k="
                       />
                     </motion.div>
                   </SwiperSlide>
