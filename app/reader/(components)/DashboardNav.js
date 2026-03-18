@@ -166,7 +166,13 @@ const DashboardNav = () => {
               {loadingReader ? (
                 <span className="text-sm text-gray-400">Loading...</span>
               ) : reader ? (
-                <div className="relative">
+                <div className="flex items-center space-x-3">
+                  <Link
+                    href="/TheGroitReview"
+                    className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
+                  >
+                    The Griot Review
+                  </Link>
                   <button
                     // onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="flex items-center space-x-2 bg-gray-100 px-3 py-1 rounded-full hover:bg-gray-200"
@@ -178,35 +184,22 @@ const DashboardNav = () => {
                         : "Loading..."}
                     </span>
                   </button>
-
-                  {/* {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg">
-                    <Link
-                      href="/reader/profile-page"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setLogoutConfirm(true);
-                      }}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                )} */}
                 </div>
               ) : (
-                <Link
-                  href="/reader/sign_in"
-                  className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
-                >
-                  Sign In
-                </Link>
+                <div className="flex items-center space-x-3">
+                  <Link
+                    href="/TheGroitReview"
+                    className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
+                  >
+                    The Griot Review
+                  </Link>
+                  <Link
+                    href="/reader/sign_in"
+                    className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2"
+                  >
+                    Sign In
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -256,12 +249,20 @@ const DashboardNav = () => {
             <Image src="/images/menu-3.png" width={20} height={20} alt="menu" />
           </button>
         ) : (
-          <Link
-            href="/reader/sign_in"
-            className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2 text-sm h-8"
-          >
-            Sign In
-          </Link>
+          <div className="flex items-center space-x-2">
+            <Link
+              href="/TheGroitReview"
+              className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2 text-sm h-8"
+            >
+              The Griot Review
+            </Link>
+            <Link
+              href="/reader/sign_in"
+              className="text-red-600 hover:bg-red-700 hover:text-white hover:border-red-700  bg-gray-200 border-2 border-red-600  font-medium rounded-md py-1 px-2 text-sm h-8"
+            >
+              Sign In
+            </Link>
+          </div>
         )}
 
         {/* Mobile Dropdown Menu */}
@@ -295,6 +296,14 @@ const DashboardNav = () => {
                   </Link>
                 </li>
               ))}
+              <li className="px-4 py-2 cursor-pointer transition-colors hover:bg-gray-100">
+                <Link
+                  href="/TheGroitReview"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Blog
+                </Link>
+              </li>
             </ul>
           </div>
         )}

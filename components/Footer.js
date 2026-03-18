@@ -54,7 +54,7 @@ const Footer = ({ styles }) => {
             placeholder="Enter email address"
             className="w-10 flex-1 border-0 outline-none ring-0 focus:ring-0 text-xs xs:text-sm medium:text-base px-2"
           />
-          <button className="text-gray-200 bg-[#E50913] border border-black px-3 xs:px-4 medium:px-6 py-1.5 medium:py-2 text-xs xs:text-sm medium:text-base rounded-md cursor-pointer">
+          <button className="text-gray-200 bg-[#D4A853] border border-black px-3 xs:px-4 medium:px-6 py-1.5 medium:py-2 text-xs xs:text-sm medium:text-base rounded-md cursor-pointer hover:bg-[#C49A48] transition-colors">
             Subscribe
           </button>
         </div>
@@ -110,8 +110,7 @@ const Footer = ({ styles }) => {
               Author Resources
             </Link>
             <Link
-              href="https://itanglobalpublishing.substack.com/"
-              target="_blank"
+              href="/TheGroitReview"
               className="cursor-pointer hover:text-[#EF5353]"
             >
               Blog
@@ -217,8 +216,7 @@ const Footer = ({ styles }) => {
                 Youtube
               </Link>
               <Link
-                href="https://itanglobalpublishing.substack.com/"
-                target="_blank"
+                href="/TheGroitReview"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
                 Blog
