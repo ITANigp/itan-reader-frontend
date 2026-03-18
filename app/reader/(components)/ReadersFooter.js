@@ -45,7 +45,11 @@ const Footer = ({ hiddenPage }) => {
             </Link>
             <div className="flex items-center text-gray-200">
               <div className="flex space-x-2">
-                <Link href="#" target="_blank" rel="noopener noreferrer">
+                <Link
+                  href="https://www.linkedin.com/company/itan-global-publishing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <FontAwesomeIcon
                     icon={faLinkedinIn}
                     className="w-[15px] h-5 p-2 rounded-full border-2 border-[#EF5353] hover:bg-[#EF5353]"
@@ -169,7 +173,7 @@ const Footer = ({ hiddenPage }) => {
         {/* Copyright */}
         <div className="text-gray-200 flex justify-center w-full pb-4 text-xs sm:text-sm md:text-base">
           <p style={{ fontFamily: "Lato, sans-serif" }}>
-            ITAN Technologies Ltd. &copy; 2025. All Rights Reserved
+            ITAN Technologies Ltd. &copy; 2026. All Rights Reserved
           </p>
         </div>
       </section>

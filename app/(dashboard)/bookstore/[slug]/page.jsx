@@ -1,8 +1,8 @@
 import BookDetailsClient from "./BookDetailsClient";
 
 export async function generateMetadata({ params }) {
-  const { slug } = params;
-  const apiUrl = "http://api.itan.app/api/v1";
+  const { slug } = await params;
+  const apiUrl = "https://api.itan.app/api/v1";
 
   const res = await fetch(
     `${apiUrl}/books/by-slug/${encodeURIComponent(slug)}`,
@@ -18,11 +18,11 @@ export async function generateMetadata({ params }) {
   const book = data.attributes ?? data;
 
   return {
-    metadataBase: new URL("https://itan.app"),
+    metadataBase: new URL("https://api.itan.app"),
     title: `${book.title} — ${book.author?.name || "Author"}`,
     description: book.description?.slice(0, 160),
     alternates: {
-      canonical: `https://itan.app/bookstore/${slug}`,
+      canonical: `https://api.itan.app/bookstore/${slug}`,
     },
     openGraph: {
       title: book.title,
@@ -37,8 +37,8 @@ export async function generateMetadata({ params }) {
 
 
 export default async function BookDetailsPage({ params }) {
-  const { slug } = params; // params is a plain object
-  const apiUrl = "http://api.itan.app/api/v1";
+  const { slug } = await params; // params is a plain object
+  const apiUrl = "https://api.itan.app/api/v1";
 
   try {
     const res = await fetch(
@@ -88,7 +88,7 @@ export default async function BookDetailsPage({ params }) {
               },
               image: book.cover_image_url,
               description: book.description,
-              url: `https://itan.app/bookstore/${slug}`,
+              url: `http://localhost:3000/bookstore/${slug}`,
               offers: book.ebook_price && {
                 "@type": "Offer",
                 price: book.ebook_price,
