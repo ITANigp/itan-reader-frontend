@@ -26,9 +26,7 @@ const Footer = ({ styles }) => {
     pathname.startsWith("/author") || pathname.startsWith("/dashboard");
 
   return (
-    <footer
-      className={`${styles} bg-[#111928] hidden`}
-    >
+    <footer className={`${styles} bg-[#111928] hidden`}>
       <section className="relative z-30 h-[150px] xs:h-[170px] medium:h-[200px] large:h-[220px] xl:h-[250px] flex flex-col items-center justify-center text-center">
         {/* Background image */}
         <div
@@ -152,7 +150,11 @@ const Footer = ({ styles }) => {
           {/* Social icons */}
           <div className="flex items-center justify-center sm:justify-start sm:ml-9 w-full">
             <div className="flex space-x-2">
-              <Link href="#" target="_blank" rel="noopener noreferrer">
+              <Link
+                href="https://www.linkedin.com/company/itan-global-publishing"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FontAwesomeIcon
                   icon={faLinkedinIn}
                   className="w-[15px] h-5 p-2 rounded-full border-2 border-[#EF5353] hover:bg-[#EF5353]"
