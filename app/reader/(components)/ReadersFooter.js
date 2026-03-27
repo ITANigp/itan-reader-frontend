@@ -128,7 +128,7 @@ const Footer = ({ hiddenPage }) => {
               Cookies preferences
             </Link>
             <Link
-              href="#"
+              href="#faq"
               aria-label="Contact support via email"
               className="cursor-pointer hover:text-[#EF5353]"
             >
@@ -138,7 +138,7 @@ const Footer = ({ hiddenPage }) => {
               Newsletter
             </Link>
             <Link
-              href="https://www.youtube.com/@itanIGP"
+              href="https://publish.itan.app/"
               target="_blank"
               className="cursor-pointer hover:text-[#EF5353]"
             >

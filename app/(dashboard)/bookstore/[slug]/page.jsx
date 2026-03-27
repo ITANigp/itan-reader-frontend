@@ -1,11 +1,18 @@
 import BookDetailsClient from "./BookDetailsClient";
 
+const apiUrl =
+  process.env.NODE_ENV === "production"
+    ? "https://api.itan.app"
+    : "http://localhost:3000";
+
+console.log("Using API URL:", apiUrl);
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const apiUrl = "https://api.itan.app/api/v1";
+  
 
   const res = await fetch(
-    `${apiUrl}/books/by-slug/${encodeURIComponent(slug)}`,
+    `${apiUrl}/api/v1/books/by-slug/${encodeURIComponent(slug)}`,
     { cache: "no-cache" }
   );
 
@@ -18,11 +25,11 @@ export async function generateMetadata({ params }) {
   const book = data.attributes ?? data;
 
   return {
-    metadataBase: new URL("https://api.itan.app"),
+    metadataBase: new URL(apiUrl),
     title: `${book.title} — ${book.author?.name || "Author"}`,
     description: book.description?.slice(0, 160),
     alternates: {
-      canonical: `https://api.itan.app/bookstore/${slug}`,
+      canonical: `${apiUrl}/bookstore/${slug}`,
     },
     openGraph: {
       title: book.title,
@@ -38,11 +45,11 @@ export async function generateMetadata({ params }) {
 
 export default async function BookDetailsPage({ params }) {
   const { slug } = await params; // params is a plain object
-  const apiUrl = "https://api.itan.app/api/v1";
+  // const apiUrl = "https://api.itan.app/api/v1";
 
   try {
     const res = await fetch(
-      `${apiUrl}/books/by-slug/${encodeURIComponent(slug)}`,
+      `${apiUrl}/api/v1/books/by-slug/${encodeURIComponent(slug)}`,
       { cache: "no-cache" }
     );
 
@@ -88,7 +95,7 @@ export default async function BookDetailsPage({ params }) {
               },
               image: book.cover_image_url,
               description: book.description,
-              url: `http://localhost:3000/bookstore/${slug}`,
+              url: `${apiUrl}/bookstore/${slug}`,
               offers: book.ebook_price && {
                 "@type": "Offer",
                 price: book.ebook_price,
