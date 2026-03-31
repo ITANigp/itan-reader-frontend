@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faXTwitter,
   faFacebookF,
@@ -9,41 +9,45 @@ import {
   faTiktok,
   faWhatsapp,
   faLinkedinIn,
-} from '@fortawesome/free-brands-svg-icons'
+} from "@fortawesome/free-brands-svg-icons";
 import {
   faHeart as faHeartSolid,
   faBookmark as faBookmarkSolid,
   faShare,
-} from '@fortawesome/free-solid-svg-icons'
+} from "@fortawesome/free-solid-svg-icons";
 import {
   faHeart as faHeartRegular,
   faBookmark as faBookmarkRegular,
-} from '@fortawesome/free-regular-svg-icons'
+} from "@fortawesome/free-regular-svg-icons";
 
 export default function BlogPostInteractions({ postTitle, postSlug }) {
-  const [isLiked, setIsLiked] = useState(false)
-  const [isSaved, setIsSaved] = useState(false)
-  const [likeCount, setLikeCount] = useState(0)
-  const [saveCount, setSaveCount] = useState(0)
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [saveCount, setSaveCount] = useState(0);
+  const [shareUrl, setShareUrl] = useState("");
 
   useEffect(() => {
-    setLikeCount(Math.floor(Math.random() * 800) + 200)
-    setSaveCount(Math.floor(Math.random() * 300) + 50)
-  }, [postSlug])
+    setLikeCount(Math.floor(Math.random() * 800) + 200);
+    setSaveCount(Math.floor(Math.random() * 300) + 50);
+  }, [postSlug]);
+
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}/TheGroitReview/${postSlug}`);
+  }, [postSlug]);
 
   const handleLike = () => {
-    setIsLiked(!isLiked)
-    setLikeCount(prev => isLiked ? prev - 1 : prev + 1)
-  }
+    setIsLiked(!isLiked);
+    setLikeCount((prev) => (isLiked ? prev - 1 : prev + 1));
+  };
 
   const handleSave = () => {
-    setIsSaved(!isSaved)
-    setSaveCount(prev => isSaved ? prev - 1 : prev + 1)
-  }
+    setIsSaved(!isSaved);
+    setSaveCount((prev) => (isSaved ? prev - 1 : prev + 1));
+  };
 
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/TheGroitReview/${postSlug}` : ''
-  const encodedUrl = encodeURIComponent(shareUrl)
-  const encodedTitle = encodeURIComponent(postTitle)
+  const encodedUrl = encodeURIComponent(shareUrl);
+  const encodedTitle = encodeURIComponent(postTitle);
 
   return (
     <div className="mt-10 border-t pt-8">
@@ -57,9 +61,11 @@ export default function BlogPostInteractions({ postTitle, postSlug }) {
           >
             <FontAwesomeIcon
               icon={isLiked ? faHeartSolid : faHeartRegular}
-              className={`text-2xl transition-all ${isLiked ? 'text-red-500 scale-110' : 'text-gray-600 group-hover:text-red-500'}`}
+              className={`text-2xl transition-all ${isLiked ? "text-red-500 scale-110" : "text-gray-600 group-hover:text-red-500"}`}
             />
-            <span className="text-gray-700 font-medium">{likeCount.toLocaleString()}</span>
+            <span className="text-gray-700 font-medium">
+              {likeCount.toLocaleString()}
+            </span>
           </button>
 
           {/* Save Button */}
@@ -69,9 +75,11 @@ export default function BlogPostInteractions({ postTitle, postSlug }) {
           >
             <FontAwesomeIcon
               icon={isSaved ? faBookmarkSolid : faBookmarkRegular}
-              className={`text-2xl transition-all ${isSaved ? 'text-yellow-500 scale-110' : 'text-gray-600 group-hover:text-yellow-500'}`}
+              className={`text-2xl transition-all ${isSaved ? "text-yellow-500 scale-110" : "text-gray-600 group-hover:text-yellow-500"}`}
             />
-            <span className="text-gray-700 font-medium">{saveCount.toLocaleString()}</span>
+            <span className="text-gray-700 font-medium">
+              {saveCount.toLocaleString()}
+            </span>
           </button>
         </div>
 
@@ -83,7 +91,9 @@ export default function BlogPostInteractions({ postTitle, postSlug }) {
 
       {/* Social Share Buttons */}
       <div className="flex flex-wrap items-center gap-3 mb-8 p-4 bg-gray-50 rounded-xl">
-        <span className="text-sm font-medium text-gray-600 mr-2">Share this article:</span>
+        <span className="text-sm font-medium text-gray-600 mr-2">
+          Share this article:
+        </span>
         <a
           href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
           target="_blank"
@@ -140,5 +150,5 @@ export default function BlogPostInteractions({ postTitle, postSlug }) {
         </a>
       </div>
     </div>
-  )
+  );
 }

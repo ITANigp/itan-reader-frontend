@@ -1,0 +1,84 @@
+
+> client@0.1.0 build
+> next build
+
+   Γû▓ Next.js 15.1.7
+   - Environments: .env.local
+   - Experiments (use with caution):
+     ┬╖ clientTraceMetadata
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ΓÜá Page "/robots.txt" is using runtime = 'edge' which is currently incompatible with dynamic = 'force-static'. Please remove either "runtime" or "force-static" for correct behavior
+ ΓÜá Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/32) ...
+   Generating static pages (8/32) 
+Data fetching error: Error: Dynamic server usage: Route /bookstore couldn't be rendered statically because it used revalidate: 0 fetch http://localhost:3000/api/v1/books/all_storefront /bookstore. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at h (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:62356)
+    at <unknown> (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:2:12543)
+    at <unknown> (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:2:24024)
+    at e.with (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:1155)
+    at e.with (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:2244)
+    at e.startActiveSpan (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:18840)
+    at e.startActiveSpan (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:19195)
+    at <unknown> (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:2:23532)
+    at e.with (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:1155)
+    at e.with (C:\Users\USER\Documents\itan-reader-frontend\.next\server\chunks\3774.js:1:2244) {
+  description: "Route /bookstore couldn't be rendered statically because it used revalidate: 0 fetch http://localhost:3000/api/v1/books/all_storefront /bookstore. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (16/32) 
+   Generating static pages (24/32) 
+ Γ£ô Generating static pages (32/32)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+Γöî Γùï /                                    72.8 kB         298 kB
+Γö£ Γùï /_not-found                          1.15 kB         219 kB
+Γö£ ╞Æ /api/highlights                      340 B           218 kB
+Γö£ ╞Æ /api/sentry-example-api              339 B           218 kB
+Γö£ ╞Æ /bookstore                           376 B           226 kB
+Γö£ ╞Æ /bookstore/[slug]                    17.1 kB         275 kB
+Γö£ Γùï /buyButton                           910 B           219 kB
+Γö£ Γùï /cookie-preferences                  338 B           218 kB
+Γö£ Γùï /library                             8.88 kB         265 kB
+Γö£ Γùï /payment/callback                    1.47 kB         220 kB
+Γö£ Γùï /privacy-policies                    340 B           218 kB
+Γö£ Γùï /readBook                            1.58 kB         220 kB
+Γö£ Γùï /readBook3                           1.52 kB         220 kB
+Γö£ Γùï /reader/confirm_email                1.31 kB         219 kB
+Γö£ Γùï /reader/epub                         2.07 kB         220 kB
+Γö£ ╞Æ /reader/epub/[id]                    2.67 kB         221 kB
+Γö£ Γùï /reader/flipbook                     2.44 kB         221 kB
+Γö£ Γùï /reader/forgot_password              4.2 kB          262 kB
+Γö£ Γùï /reader/history                      1.91 kB         255 kB
+Γö£ Γùï /reader/nextPage                     374 B           226 kB
+Γö£ Γùï /reader/notifications                1.91 kB         255 kB
+Γö£ Γùï /reader/orders                       1.9 kB          255 kB
+Γö£ Γùï /reader/profile-page                 42.7 kB         296 kB
+Γö£ Γùï /reader/reset_password               2.43 kB         223 kB
+Γö£ Γùï /reader/settings                     1.9 kB          255 kB
+Γö£ Γùï /reader/sign_in                      3.74 kB         275 kB
+Γö£ Γùï /reader/sign_up                      3.42 kB         274 kB
+Γö£ Γùï /reader/test-sign-up                 338 B           218 kB
+Γö£ Γùï /reader/two_factor_auth              2.89 kB         242 kB
+Γö£ Γùï /reader/wishlist                     1.91 kB         255 kB
+Γö£ ╞Æ /robots.txt                          0 B                0 B
+Γö£ Γùï /sentry-example-page                 5.12 kB         223 kB
+Γö£ Γùï /sitemap.xml                         0 B                0 B
+Γö£ Γùï /terms&conditions                    340 B           218 kB
+Γö£ ╞Æ /TheGroitReview                      36 kB           281 kB
+Γöö ╞Æ /TheGroitReview/[slug]               7.24 kB         243 kB
++ First Load JS shared by all            218 kB
+  Γö£ chunks/4bd1b696-1a9c8c3a4cbb50a3.js  53.1 kB
+  Γö£ chunks/52774a7f-3332a26a21cc40ac.js  36.9 kB
+  Γö£ chunks/6908-4fb85d45c5ab1bf9.js      124 kB
+  Γöö other shared chunks (total)          3.98 kB
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
