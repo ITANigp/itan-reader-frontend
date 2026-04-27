@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function BuyButton({
   bookId,
+  bookSlug,
   contentType = "ebook", // Default to ebook, but allow overriding
   children = "Buy Book", // Allow custom button text or content
   className,
@@ -17,9 +18,7 @@ export default function BuyButton({
     try {
       const jwtToken = localStorage.getItem("access_token");
       if (!jwtToken) {
-        // Handle case where no token is found, e.g., redirect to login
-        console.error("No access token found. Please log in.");
-        router.push("/reader/sign_in"); 
+        router.push("/reader/sign_in?redirect=/bookstore/" + bookSlug); // Redirect to login with return to book details
         return;
       }
 

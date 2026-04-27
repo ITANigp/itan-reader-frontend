@@ -28,7 +28,7 @@ function ReviewCard({ review, currentUserIsOwner, onDeleteSuccess, token }) {
   };
 
   return (
-    <Card key={review.id} className="min-w-[300px]">
+    <Card className="min-w-[300px]">
       <CardContent className="p-4 space-y-2">
         <p className="font-semibold">{review.title}</p>{" "}
         {/* Assuming review has a title */}
@@ -45,7 +45,11 @@ function ReviewCard({ review, currentUserIsOwner, onDeleteSuccess, token }) {
             month: "long",
             day: "numeric",
           })}{" "}
-          by {review.user_name || "Anonymous"}
+          by{" "}
+          {(review.reader && review.reader.name) ||
+            review.reader_name ||
+            review.user_name ||
+            "Anonymous"}
         </p>
         {currentUserIsOwner && (
           <button

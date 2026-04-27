@@ -18,16 +18,16 @@ export default function FreeTrialTimer({ trial_start, trial_end }) {
   ];
 
   useEffect(() => {
-    console.log("FreeTrialTimer trial_start:", trial_start);
-    console.log("FreeTrialTimer trial_end:", trial_end);
+    // console.log("FreeTrialTimer trial_start:", trial_start);
+    // console.log("FreeTrialTimer trial_end:", trial_end);
     if (!trial_end) return;
     const endTime = new Date(trial_end).getTime();
-    console.log("Parsed endTime (ms):", endTime);
+    // console.log("Parsed endTime (ms):", endTime);
 
     const updateTimer = () => {
       const now = Date.now();
       const diff = endTime - now;
-      console.log("Timer update - now:", now, "diff:", diff);
+      // console.log("Timer update - now:", now, "diff:", diff);
 
       if (diff <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -41,7 +41,7 @@ export default function FreeTrialTimer({ trial_start, trial_end }) {
       const minutes = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
       const seconds = Math.floor((diff % (60 * 1000)) / 1000);
 
-      console.log("Time left:", { days, hours, minutes, seconds });
+      // console.log("Time left:", { days, hours, minutes, seconds });
       setTimeLeft({ days, hours, minutes, seconds });
     };
 

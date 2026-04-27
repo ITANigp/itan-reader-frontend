@@ -22,28 +22,28 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
 
   const fetchLikeStatus = useCallback(async () => {
     if (!canFetchApi) {
-      console.log(
-        `LikeButton: [${section}] Fetch blocked - not authorized section`
-      );
+      // console.log(
+      //   `LikeButton: [${section}] Fetch blocked - not authorized section`
+      // );
       return;
     }
 
     // Check cache first before making API call
     const currentCachedData = likeCache[bookId];
     if (currentCachedData) {
-      console.log(
-        `LikeButton: [${section}] Using cached data for ${bookId}`,
-        currentCachedData
-      );
+      // console.log(
+      //   `LikeButton: [${section}] Using cached data for ${bookId}`,
+      //   currentCachedData
+      // );
       setIsLiked(currentCachedData.isLiked);
       setLikeId(currentCachedData.likeId || currentCachedData.likeCount);
       setIsLoading(false);
       return;
     }
 
-    console.log(
-      `LikeButton: [${section}] Fetching like status for book ${bookId}`
-    );
+    // console.log(
+    //   `LikeButton: [${section}] Fetching like status for book ${bookId}`
+    // );
     setIsLoading(true);
     setError(null);
 
@@ -52,10 +52,10 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
         headers: { Authorization: `Bearer ${memoizedToken}` },
       });
 
-      console.log(
-        `LikeButton: [${section}] Response for ${bookId}:`,
-        response.data
-      );
+      // console.log(
+      //   `LikeButton: [${section}] Response for ${bookId}:`,
+      //   response.data
+      // );
 
       if (response.status === 200) {
         const data = response.data;
@@ -79,7 +79,7 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
         console.error("Error fetching initial like status:", err);
       }
     } finally {
-      console.log(`LikeButton: [${section}] Finished loading for ${bookId}`);
+      // console.log(`LikeButton: [${section}] Finished loading for ${bookId}`);
       setIsLoading(false);
     }
   }, [
@@ -93,22 +93,22 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
 
   // Initialize state ONLY when bookId changes - avoid cache dependency
   useEffect(() => {
-    console.log(`LikeButton: [${section}] useEffect triggered for ${bookId}`, {
-      cachedData: !!cachedData,
-      memoizedToken: !!memoizedToken,
-      bookId,
-      canFetchApi,
-    });
+    // console.log(`LikeButton: [${section}] useEffect triggered for ${bookId}`, {
+    //   cachedData: !!cachedData,
+    //   memoizedToken: !!memoizedToken,
+    //   bookId,
+    //   canFetchApi,
+    // });
 
     if (canFetchApi && memoizedToken && bookId) {
       // Only fetch if this section is authorized and we have token and bookId
-      console.log(
-        `LikeButton: [${section}] Checking for ${bookId} (authorized section)`
-      );
+      // console.log(
+      //   `LikeButton: [${section}] Checking for ${bookId} (authorized section)`
+      // );
       fetchLikeStatus();
     } else if (!canFetchApi) {
       // Other sections wait for cache or show default state
-      console.log(`LikeButton: [${section}] Read-only mode for ${bookId}`);
+      // console.log(`LikeButton: [${section}] Read-only mode for ${bookId}`);
       setIsLiked(false);
       setLikeId(null);
       setIsLoading(false);
@@ -142,13 +142,13 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
     }
 
     if (isLoading) {
-      console.log(`LikeButton: Already loading for ${bookId}, skipping...`);
+      // console.log(`LikeButton: Already loading for ${bookId}, skipping...`);
       return;
     }
 
-    console.log(
-      `LikeButton: Toggle like for ${bookId}, current state: ${isLiked}`
-    );
+    // console.log(
+    //   `LikeButton: Toggle like for ${bookId}, current state: ${isLiked}`
+    // );
 
     setIsLoading(true);
     setError(null);
@@ -162,7 +162,7 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
           return;
         }
 
-        console.log(`LikeButton: Unliking ${bookId} with likeId ${likeId}`);
+        // console.log(`LikeButton: Unliking ${bookId} with likeId ${likeId}`);
         const response = await api.delete(`/likes/${likeId}`, {
           headers: { Authorization: `Bearer ${memoizedToken}` },
         });
@@ -171,11 +171,11 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
           setIsLiked(false);
           setLikeId(null);
           updateLikeStatus(bookId, false, null);
-          console.log(`LikeButton: Successfully unliked ${bookId}!`);
+          // console.log(`LikeButton: Successfully unliked ${bookId}!`);
         }
       } else {
         // Like
-        console.log(`LikeButton: Liking ${bookId}`);
+        // console.log(`LikeButton: Liking ${bookId}`);
         const response = await api.post(
           "/likes",
           { book_id: bookId },
@@ -184,15 +184,15 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
 
         if (response.status === 201 || response.status === 200) {
           const data = response.data;
-          console.log(`LikeButton: Like response for ${bookId}:`, data);
+          // console.log(`LikeButton: Like response for ${bookId}:`, data);
 
           const newLikeId = data.like_id || data.id;
           setIsLiked(true);
           setLikeId(newLikeId);
           updateLikeStatus(bookId, true, newLikeId);
-          console.log(
-            `LikeButton: Successfully liked ${bookId}! ID: ${newLikeId}`
-          );
+          // console.log(
+          //   `LikeButton: Successfully liked ${bookId}! ID: ${newLikeId}`
+          // );
         }
       }
 
@@ -206,7 +206,7 @@ const LikeButton = ({ bookId, onLikeChange, section = "default" }) => {
       const errorMessage = err.response?.data?.message || err.message;
       setError(`Network error: ${errorMessage}`);
     } finally {
-      console.log(`LikeButton: Finished processing for ${bookId}`);
+      // console.log(`LikeButton: Finished processing for ${bookId}`);
       setIsLoading(false);
     }
   }, [

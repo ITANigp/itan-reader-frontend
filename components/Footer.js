@@ -26,9 +26,7 @@ const Footer = ({ styles }) => {
     pathname.startsWith("/author") || pathname.startsWith("/dashboard");
 
   return (
-    <footer
-      className={`${styles} bg-[#111928] hidden`}
-    >
+    <footer className={`${styles} bg-[#111928] hidden`}>
       <section className="relative z-30 h-[150px] xs:h-[170px] medium:h-[200px] large:h-[220px] xl:h-[250px] flex flex-col items-center justify-center text-center">
         {/* Background image */}
         <div
@@ -54,7 +52,7 @@ const Footer = ({ styles }) => {
             placeholder="Enter email address"
             className="w-10 flex-1 border-0 outline-none ring-0 focus:ring-0 text-xs xs:text-sm medium:text-base px-2"
           />
-          <button className="text-gray-200 bg-[#E50913] border border-black px-3 xs:px-4 medium:px-6 py-1.5 medium:py-2 text-xs xs:text-sm medium:text-base rounded-md cursor-pointer">
+          <button className="text-gray-200 bg-[#D4A853] border border-black px-3 xs:px-4 medium:px-6 py-1.5 medium:py-2 text-xs xs:text-sm medium:text-base rounded-md cursor-pointer hover:bg-[#C49A48] transition-colors">
             Subscribe
           </button>
         </div>
@@ -110,8 +108,7 @@ const Footer = ({ styles }) => {
               Author Resources
             </Link>
             <Link
-              href="https://itanglobalpublishing.substack.com/"
-              target="_blank"
+              href="/TheGroitReview"
               className="cursor-pointer hover:text-[#EF5353]"
             >
               Blog
@@ -152,7 +149,11 @@ const Footer = ({ styles }) => {
           {/* Social icons */}
           <div className="flex items-center justify-center sm:justify-start sm:ml-9 w-full">
             <div className="flex space-x-2">
-              <Link href="#" target="_blank" rel="noopener noreferrer">
+              <Link
+                href="https://www.linkedin.com/company/itan-global-publishing"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <FontAwesomeIcon
                   icon={faLinkedinIn}
                   className="w-[15px] h-5 p-2 rounded-full border-2 border-[#EF5353] hover:bg-[#EF5353]"
@@ -217,8 +218,7 @@ const Footer = ({ styles }) => {
                 Youtube
               </Link>
               <Link
-                href="https://itanglobalpublishing.substack.com/"
-                target="_blank"
+                href="/TheGroitReview"
                 className="cursor-pointer hover:text-[#EF5353]"
               >
                 Blog

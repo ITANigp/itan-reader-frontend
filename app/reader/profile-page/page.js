@@ -193,17 +193,46 @@ export default function ProfilePage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
   
-  useEffect(() => {
-    const fetchReader = async () => {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        const { data } = await getReaderProfile(token);
-        setReader(data);
-      }
-    };
-    fetchReader();
-  }, [setReader]);
+  // useEffect(() => {
+  //   const fetchReader = async () => {
+  //     const token = localStorage.getItem("access_token");
+  //     if (!token) {
+  //       router.push("/reader/sign_in")
+  //       return;
+  //     };
+  //     if (token) {
+  //       const { data } = await getReaderProfile(token);
+  //       setReader(data);
+  //     }
+  //   };
+  //   fetchReader();
+  // }, [setReader]);
+
+   useEffect(() => {
+     const token = localStorage.getItem("access_token");
+
+     if (!token) {
+       router.replace("/reader/sign_in"); // replace = no back navigation
+       return;
+     }
+
+     const fetchReader = async () => {
+       try {
+         const { data } = await getReaderProfile(token);
+         setReader(data);
+       } catch {
+         router.replace("/reader/sign_in");
+       } finally {
+         setIsCheckingAuth(false);
+       }
+     };
+
+     fetchReader();
+   }, [router, setReader]);
+
 
     // Define the logout logic in the parent component
   const handleLogout = () => {
@@ -211,6 +240,10 @@ export default function ProfilePage() {
     localStorage.removeItem("access_token");
     router.push("/reader/sign_in");
   };
+
+   if (isCheckingAuth) {
+     return null; // or a loader
+   }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 relative">

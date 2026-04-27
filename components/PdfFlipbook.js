@@ -103,10 +103,6 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
   useEffect(() => {
     if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
       pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.3.31/build/pdf.worker.min.mjs`;
-      console.log(
-        "🔧 PDF.js worker configured:",
-        pdfjs.GlobalWorkerOptions.workerSrc
-      );
     }
   }, []);
 
@@ -181,8 +177,6 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
       setDocumentReady(false);
 
       try {
-        console.log("Initializing PDF from:", pdfUrl);
-
         // Fetch the PDF as an ArrayBuffer for better compatibility with react-pdf
         const response = await fetch(pdfUrl, {
           method: "GET",
@@ -196,14 +190,9 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
         }
 
         const arrayBuffer = await response.arrayBuffer();
-        console.log(
-          "PDF fetched as ArrayBuffer, size:",
-          arrayBuffer.byteLength
-        );
 
         // Pass ArrayBuffer directly to Document component
         setPdfData(arrayBuffer);
-        console.log("PDF ArrayBuffer set successfully");
       } catch (err) {
         console.error("Error fetching PDF:", err);
         setError(err.message);
@@ -217,7 +206,6 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
 
   // Callback for when the PDF document successfully loads
   const onDocumentLoadSuccess = useCallback(({ numPages }) => {
-    console.log("🎉 PDF Document loaded successfully with", numPages, "pages");
     setNumPages(numPages);
     setCurrentPage(1); // Reset to first page on new document load
     setDocumentReady(true);
@@ -226,11 +214,6 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
   // Callback for when document load fails
   const onDocumentLoadError = useCallback((error) => {
     console.error("❌ Error loading PDF document:", error);
-    console.error("Error details:", {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-    });
     setError(error.message || "Unknown PDF loading error");
     setLoading(false);
     setDocumentReady(false);
@@ -322,10 +305,6 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
 
       {pdfData && !loading && !error && fileObject ? (
         <div className="w-full max-w-5xl" ref={containerRef}>
-          {console.log(
-            "📄 Rendering Document component with fileObject:",
-            fileObject
-          )}
           <Document
             file={pdfUrl}
             onLoadSuccess={onDocumentLoadSuccess}
@@ -432,9 +411,10 @@ function PdfFlipbook({ pdfUrl, authHeaders = {} }) {
           </Document>
         </div>
       ) : (
-        <p className="text-lg text-red-500 mt-4">
-          Please provide a valid PDF URL to display the flipbook.
-        </p>
+        // <p className="text-lg text-red-500 mt-4">
+        //   Please provide a valid PDF URL to display the flipbook.
+        // </p>
+        ""
       )}
 
       {numPages > 0 && (

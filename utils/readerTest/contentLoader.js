@@ -1,11 +1,12 @@
 import { tokenManager } from "./tokenManager";
+import { loadEpubReader } from "../epubLoader";
 
 export async function loadBookContent(
   bookId,
   {
     showError,
     loadPdfViewer,
-    loadEpubReader,
+    loadEpubReaderCallback = loadEpubReader,
     loadGenericReader,
     initializeAudioPlayer,
   }
@@ -36,7 +37,7 @@ export async function loadBookContent(
     if (contentData.format?.includes("pdf")) {
       loadPdfViewer(contentData.url);
     } else if (contentData.format?.includes("epub")) {
-      loadEpubReader(contentData.url);
+      loadEpubReaderCallback(contentData.url, contentData.title || "E-Book");
     } else if (contentData.audio_files?.length > 0) {
       initializeAudioPlayer(contentData.audio_files, contentData.duration);
     } else {

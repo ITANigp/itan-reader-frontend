@@ -16,8 +16,8 @@ const LandingPgBtn = ({
 
   const variants = {
     outlined:
-      "text-white border border-red-500 border-solid hover:bg-red-500/10",
-    filled: "text-white bg-red-500 hover:bg-red-600",
+      "text-white border border-[#D4A853] border-solid hover:bg-[#D4A853]/10",
+    filled: "text-white bg-[#D4A853] hover:bg-[#C49A48]",
   };
 
   return (
