@@ -64,13 +64,14 @@ export default function SignIn() {
 
     try {
       const reader = await signInReader(email, password, recaptchaToken);
+      const payload = reader?.data || {};
 
       // Clear any stored errors on successful login
       sessionStorage.removeItem("login_error");
 
       // Handle email confirmation redirection
       if (
-        reader.data?.error ===
+        payload?.error ===
         "You have to confirm your email address before continuing."
       ) {
         router.push({
@@ -81,18 +82,20 @@ export default function SignIn() {
       }
 
       // Login successful
-      localStorage.setItem("access_token", reader.data.token);
-      localStorage.setItem("currentUserId", reader.data.id);
-      if (reader?.data?.id) {
-        setAuth(reader.data.token, reader.data.id);
+      if (payload?.id && payload?.token) {
+        setAuth(payload.token, payload.id, {
+          internalAccess: payload.internal_access,
+          trialStart: payload.trial_start,
+          trialEnd: payload.trial_end,
+        });
         router.push(redirectTo);
       }
     } catch (error) {
       // Simpler logging for authentication errors
-      if (process.env.NODE_ENV === 'development') {
+      if (process.env.NODE_ENV === "development") {
         console.log("Sign-in attempt failed:", {
           type: error?.type,
-          message: error?.message
+          message: error?.message,
         });
       }
 
@@ -103,7 +106,8 @@ export default function SignIn() {
       } else if (error?.message) {
         errorMsg = error.message;
       } else if (error?.type && error?.type === "USER_NOT_FOUND") {
-        errorMsg = "No account found with this email address. Please check your email or sign up.";
+        errorMsg =
+          "No account found with this email address. Please check your email or sign up.";
       } else if (error?.response?.data?.error) {
         errorMsg = error.response.data.error;
       } else {

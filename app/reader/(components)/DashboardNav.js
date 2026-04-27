@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
@@ -6,7 +6,7 @@ import { Search, User } from "lucide-react";
 import { getReaderProfile, signOutReader } from "@/utils/auth/readerApi";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
-
+import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardNav = () => {
   // Use a different state for mobile menu to avoid conflicts
@@ -25,6 +25,7 @@ const DashboardNav = () => {
   const [hasMounted, setHasMounted] = useState(false);
   const [token, setToken] = useState(null);
   const [loadingReader, setLoadingReader] = useState(true);
+  const { setReaderAccessState } = useAuth();
 
   useEffect(() => {
     setHasMounted(true);
@@ -36,7 +37,6 @@ const DashboardNav = () => {
     }
   }, []);
 
-
   useEffect(() => {
     if (!token) return;
 
@@ -44,6 +44,11 @@ const DashboardNav = () => {
       try {
         const { data } = await getReaderProfile(token);
         setReader(data);
+        setReaderAccessState({
+          internalAccess: data?.internal_access,
+          trialStart: data?.trial_start,
+          trialEnd: data?.trial_end,
+        });
       } catch (err) {
         console.error("Failed to fetch reader profile", err);
       } finally {
@@ -52,13 +57,12 @@ const DashboardNav = () => {
     };
 
     fetchProfile();
-  }, [token]);
+  }, [token, setReaderAccessState]);
 
-  
   useEffect(() => {
     const parts = pathname.split("/").filter(Boolean);
-    const mainSegment = parts[0]?.toLowerCase(); 
-    const subSegment = parts[1]?.toLowerCase(); 
+    const mainSegment = parts[0]?.toLowerCase();
+    const subSegment = parts[1]?.toLowerCase();
 
     if (mainSegment === "library") {
       setActiveTab("Library");
@@ -313,4 +317,3 @@ const DashboardNav = () => {
 };
 
 export default DashboardNav;
-

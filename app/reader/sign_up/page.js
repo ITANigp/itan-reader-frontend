@@ -8,11 +8,12 @@ import { api } from "@/utils/auth/readerApi";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import ReCAPTCHA from "react-google-recaptcha";
-
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SignUp() {
   const router = useRouter();
-  
+  const { setAuth } = useAuth();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -50,16 +51,27 @@ export default function SignUp() {
         recaptcha_token: recaptchaToken, // 👈 important
       });
 
+      const payload = response?.data?.data || {};
+
+      if (payload?.id && payload?.token) {
+        setAuth(payload.token, payload.id, {
+          internalAccess: payload.internal_access,
+          trialStart: payload.trial_start,
+          trialEnd: payload.trial_end,
+        });
+      }
+
       if (response?.data?.data) {
         setMessage(
-          "Registration successful! Please check your email to confirm your account."
+          "Registration successful! Please check your email to confirm your account.",
         );
         setMessageType("success");
         router.push(`/reader/confirm_email?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
       setMessage(
-        error.response?.data?.message || "Registration failed. Please try again."
+        error.response?.data?.message ||
+          "Registration failed. Please try again.",
       );
       setMessageType("error");
       console.error("Registration error:", error);

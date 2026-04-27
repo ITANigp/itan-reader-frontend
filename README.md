@@ -1,3 +1,1 @@
 # itan-readers-frontend
-
-

@@ -22,7 +22,13 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function BookDetailsClient({ book }) {
   const router = useRouter();
-  const { isLoggedIn, userId: currentUserId, authToken } = useAuth();
+  const {
+    isLoggedIn,
+    userId: currentUserId,
+    authToken,
+    internalAccess,
+    setReaderAccessState,
+  } = useAuth();
 
   const [bookData, setBookData] = useState(book);
   const [loading, setLoading] = useState(false);
@@ -46,24 +52,37 @@ export default function BookDetailsClient({ book }) {
           });
         }
         const { trial_start, trial_end } = response.data.data || {};
+        const nextInternalAccess = Boolean(
+          response.data?.data?.internal_access,
+        );
+
+        setReaderAccessState({
+          internalAccess: nextInternalAccess,
+          trialStart: trial_start,
+          trialEnd: trial_end,
+        });
+
         if (trial_start && trial_end) {
           const now = new Date();
           const end = new Date(trial_end);
           let daysLeft = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
           setIsTrialActive(daysLeft > 0);
           setDaysLeftInTrial(daysLeft > 0 ? daysLeft : 0);
+        } else {
+          setIsTrialActive(false);
+          setDaysLeftInTrial(0);
         }
       } catch {}
     }
     fetchTrialInfo();
-  }, [isLoggedIn, authToken]);
+  }, [isLoggedIn, authToken, setReaderAccessState]);
 
   const startReading = useCallback(async () => {
     try {
       const tokenRes = await api.post(
         "/purchases/refresh_reading_token",
         { book_id: bookData.unique_book_id, content_type: "ebook" },
-        { headers: { Authorization: `Bearer ${authToken}` } }
+        { headers: { Authorization: `Bearer ${authToken}` } },
       );
 
       const reading_token =
@@ -72,7 +91,7 @@ export default function BookDetailsClient({ book }) {
 
       const contentRes = await api.get(
         `/books/${bookData.unique_book_id}/content?direct_url=true&optimize_for_frontend=true`,
-        { headers: { Authorization: `Bearer ${reading_token}` } }
+        { headers: { Authorization: `Bearer ${reading_token}` } },
       );
 
       const content = contentRes.data;
@@ -89,7 +108,19 @@ export default function BookDetailsClient({ book }) {
         router.push(`/reader/flipbook?${params.toString()}`);
       }
     } catch (err) {
-      alert("Unable to read book. " + err.message);
+      if (axios.isAxiosError(err)) {
+        if (err.response?.status === 402) {
+          alert("You do not currently have access to read this book.");
+          return;
+        }
+
+        if (err.response?.status === 404) {
+          alert("Book or reading resource not found.");
+          return;
+        }
+      }
+
+      alert("Unable to read book. " + (err?.message || "Please try again."));
     }
   }, [authToken, router, bookData]);
   const handleReviewCreated = useCallback(
@@ -111,7 +142,7 @@ export default function BookDetailsClient({ book }) {
 
       setIsReviewModalOpen(false);
     },
-    [currentUserId]
+    [currentUserId],
   );
 
   const handleReviewDeleted = useCallback((id) => {
@@ -146,6 +177,15 @@ export default function BookDetailsClient({ book }) {
       ? "★".repeat(Math.round(average_rating)) +
         "☆".repeat(5 - Math.round(average_rating))
       : "No ratings yet";
+
+  const isBookApproved =
+    bookData?.approved === true ||
+    bookData?.is_approved === true ||
+    String(bookData?.status || "").toLowerCase() === "approved" ||
+    String(bookData?.approval_status || "").toLowerCase() === "approved";
+
+  const canReadAsInternal = isLoggedIn && internalAccess && isBookApproved;
+
   return (
     <div className="space-y-10 px-6 py-10">
       <Link href="/bookstore" className="text-blue-600 hover:underline">
@@ -169,19 +209,25 @@ export default function BookDetailsClient({ book }) {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4">
-            {isLoggedIn && isTrialActive && (
+            {canReadAsInternal && (
+              <Button onClick={startReading}>Read Now</Button>
+            )}
+
+            {!canReadAsInternal && isLoggedIn && isTrialActive && (
               <Button onClick={startReading}>Read Now (Trial)</Button>
             )}
 
-            <BuyButton
-              bookId={unique_book_id}
-              bookSlug={bookData.slug}
-              className="bg-green-600 text-white rounded-md px-2"
-            >
-              {isLoggedIn && !isTrialActive
-                ? "Buy Now"
-                : `Buy eBook (${displayPrice})`}
-            </BuyButton>
+            {!canReadAsInternal && (
+              <BuyButton
+                bookId={unique_book_id}
+                bookSlug={bookData.slug}
+                className="bg-green-600 text-white rounded-md px-2"
+              >
+                {isLoggedIn && !isTrialActive
+                  ? "Buy Now"
+                  : `Buy eBook (${displayPrice})`}
+              </BuyButton>
+            )}
             <Dialog
               open={isReviewModalOpen}
               onOpenChange={setIsReviewModalOpen}
@@ -192,7 +238,7 @@ export default function BookDetailsClient({ book }) {
                 onClick={() => {
                   if (!isLoggedIn) {
                     router.push(
-                      `/reader/sign_in?redirect=/bookstore/${bookData.slug}`
+                      `/reader/sign_in?redirect=/bookstore/${bookData.slug}`,
                     );
                     return;
                   }
